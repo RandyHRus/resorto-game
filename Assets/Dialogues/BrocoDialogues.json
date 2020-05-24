@@ -1,0 +1,38 @@
+{
+    "Strangers": [
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "Hello!",
+					"NextNode": 2
+				},
+				{
+					"Node": 2,
+					"Text": "How are you today?",
+					"NextNode": 3
+				},
+				{
+					"Node": 3,
+					"Text": "Goodbye!",
+				}
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "What a beautiful island!",
+				}
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "Broccolis are my favourite food.",
+				}
+			]
+		}
+	]
+}

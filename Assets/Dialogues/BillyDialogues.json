@@ -1,0 +1,28 @@
+{
+    "Strangers": [
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "Sup dude",
+				}
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "I really like your island",
+				},
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "I'm really tired. I could use some rest.",
+				},
+			]
+		}
+	]
+}

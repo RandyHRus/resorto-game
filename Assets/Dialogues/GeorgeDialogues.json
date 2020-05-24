@@ -1,0 +1,33 @@
+{
+    "Strangers": [
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "Hi, my name is George. Nice to meet you!",
+				}
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "I love fishing. I usually like to spend all my day fishing.",
+				}
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "Your island is really cool.",
+					"NextNode": 2
+				},
+				{
+					"Node": 2,
+					"Text": "It looks like the perfect place to go fishing.",
+				}
+			]
+		}
+	]
+}

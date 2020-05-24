@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d8ebe6e1146b6947aba627a5ffdef21, type: 3}
+  m_Name: Billy
+  m_EditorClassIdentifier: 
+  touristName: Billy
+  dialoguesFile: {fileID: 4900000, guid: ab397dabdd30cf741ab1d286fbbcd031, type: 3}
+  character:
+    eyes:
+      color:
+        serializedVersion: 2
+        rgba: 4278190080
+    skin:
+      color:
+        serializedVersion: 2
+        rgba: 4285176264
+    pants:
+      color:
+        serializedVersion: 2
+        rgba: 4280688415
+    shoes:
+      color:
+        serializedVersion: 2
+        rgba: 4280758842
+    shirt:
+      color:
+        serializedVersion: 2
+        rgba: 4291019715
+      sprite: {fileID: 21300000, guid: 17f7ac8fce4e73f42b86c590c020fc57, type: 3}
+    hair:
+      color:
+        serializedVersion: 2
+        rgba: 4288311077
+      sprite: {fileID: 21300000, guid: d760299d5bf56594a84a8d83d0c48d1d, type: 3}

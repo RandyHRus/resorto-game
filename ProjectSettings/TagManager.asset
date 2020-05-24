@@ -1,0 +1,86 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - TileGrid
+  - Stairs
+  - Canvas
+  - Item Count Field
+  - Item Name Field
+  - Item Icon Field
+  - FishingRod
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - NPC
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: SandTileMap
+    uniqueID: 4016508311
+    locked: 0
+  - name: LandTileMap
+    uniqueID: 1110310775
+    locked: 0
+  - name: GroundObjects
+    uniqueID: 3802279067
+    locked: 0
+  - name: DynamicY
+    uniqueID: 1543667321
+    locked: 0
+  - name: FishingLine
+    uniqueID: 846413029
+    locked: 0
+  - name: FishingBobber
+    uniqueID: 3936846419
+    locked: 0
+  - name: ShowRegionsTilemap
+    uniqueID: 4226416077
+    locked: 0
+  - name: ElevationTilemap
+    uniqueID: 3602804261
+    locked: 0
+  - name: Effects
+    uniqueID: 2852730845
+    locked: 0
+  - name: Indicator
+    uniqueID: 3135443335
+    locked: 0
+  - name: UI
+    uniqueID: 1969182901
+    locked: 0
+  - name: Above UI
+    uniqueID: 3303314261
+    locked: 0
