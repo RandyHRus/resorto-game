@@ -68,26 +68,17 @@ public class CollisionManager : MonoBehaviour
         {
             return true;
         }
-        if (tileLayer == 0)
+        //If water and no ground object, means there is collision with water
+        if (TileInformationManager.Instance.GetTileInformation(tilePosition).isWater)
         {
-            if (!TerrainManager.Instance.LandTileExists(0, tilePosition))
-                if (TileInformationManager.Instance.GetTileInformation(tilePosition).GetObjectOnTile(ObjectType.ground) == null)
-                    return true;
+            if (TileInformationManager.Instance.GetTileInformation(tilePosition).GetObjectOnTile(ObjectType.ground) == null)
+                return true;
         }
-        else if (!TerrainManager.Instance.LandTileExists(tileLayer, new Vector3Int(tilePosition.x, tilePosition.y - 1, 0)))
-        {
-            return true;
-        }
-
-        if (TerrainManager.Instance.LandTileExists(tileLayer + 1, tilePosition))
+        else if (TileInformationManager.Instance.GetTileInformation(tilePosition).layerNum != tileLayer)
         {
             return true;
         }
-        if (TerrainManager.Instance.LandTileExists(tileLayer + 1, new Vector3Int(tilePosition.x, tilePosition.y - 1, 0)))
-        {
-            return true;
-        }
-        if (TileInformationManager.Instance.GetTileInformation(tilePosition).collision) //TODO change to precise collision checking
+        if (TileInformationManager.Instance.GetTileInformation(tilePosition).collision) //TODO could be changed to precise collision checking?
         {
             return true;
         }

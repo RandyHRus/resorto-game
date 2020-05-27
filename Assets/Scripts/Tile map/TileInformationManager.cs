@@ -66,7 +66,9 @@ public class TileInformation
 {
     private bool hasFunctions;
     private ITileObjectFunctions functionsScript; //Only standard objects can have functions (for now)
-    public int layerNum;
+    public int layerNum; //Water or sand is 0, land will be >1
+
+    public bool isWater;
 
     private int regionId;
 
@@ -101,6 +103,7 @@ public class TileInformation
             onTopObject_ = value;
         }
     }
+
     private ObjectOnTile standardObject_;
     public ObjectOnTile standardObject
     {
@@ -116,6 +119,7 @@ public class TileInformation
             standardObject_ = value;
         }
     }
+
     private ObjectOnTile groundObject_;
     public ObjectOnTile groundObject
     {
@@ -137,11 +141,10 @@ public class TileInformation
         hasFunctions = false;
         functionsScript = null;
         layerNum = Constants.INVALID_TILE_LAYER;
-
+        isWater = false;
         onTopObject = null;
         standardObject = null;
         groundObject = null;
-
         collision = false;
         regionId = 0;
     }

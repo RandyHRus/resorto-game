@@ -11,6 +11,7 @@ TagManager:
   - Item Name Field
   - Item Icon Field
   - FishingRod
+  - Image component
   layers:
   - Default
   - TransparentFX
@@ -21,7 +22,7 @@ TagManager:
   - 
   - 
   - NPC
-  - 
+  - Fish
   - 
   - 
   - 
@@ -50,6 +51,9 @@ TagManager:
     locked: 0
   - name: SandTileMap
     uniqueID: 4016508311
+    locked: 0
+  - name: Fish
+    uniqueID: 4132934987
     locked: 0
   - name: LandTileMap
     uniqueID: 1110310775

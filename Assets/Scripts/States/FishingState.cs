@@ -16,6 +16,7 @@ public class FishingState : MonoBehaviour, IPlayerState
     private Transform playerTransform;
     private Transform fishingRod;
     private Vector3[] points;
+    private ContactFilter2D fishFilter;
     private FishingStates fishingState;
 
     #region line configuration
@@ -34,11 +35,11 @@ public class FishingState : MonoBehaviour, IPlayerState
     private float bobHeight = 0.04f;
     private float bobSpeed = 3f;
     //**************************************
+    private float fishScanRadius = FishManager.FISH_SEEING_DISTANCE;
     #endregion
 
     private static FishingState _instance;
     public static FishingState Instance { get { return _instance; } }
-
     private void Awake()
     {
         //Singleton
@@ -84,6 +85,13 @@ public class FishingState : MonoBehaviour, IPlayerState
                 }
             }
         }
+        //Create fish contact filter
+        {
+            fishFilter = new ContactFilter2D();
+            fishFilter.useTriggers = false;
+            fishFilter.SetLayerMask(1 << LayerMask.NameToLayer("Fish"));
+            fishFilter.useLayerMask = true;
+        }
     }
 
     public bool AllowMovement
@@ -113,7 +121,7 @@ public class FishingState : MonoBehaviour, IPlayerState
 
     public void StartState(object[] args)
     {
-       
+        //Nothing needed yet  
     }
 
     public bool TryEndState()
@@ -241,6 +249,9 @@ public class FishingState : MonoBehaviour, IPlayerState
         }
 
         animator.SetBool("LineCastFinished", true);
+
+        AlertNearbyFish(lineEndPosition);
+
         StartCoroutine(LineBobbing(lineMiddlePosition, lineEndPosition));
     }
 
@@ -274,10 +285,23 @@ public class FishingState : MonoBehaviour, IPlayerState
                 fishingRod.gameObject.SetActive(false);
                 fishingLineInstance.SetActive(false);
                 fishingState = FishingStates.none;
+
                 break;
             }
 
             yield return 0;
+        }
+    }
+
+    private void AlertNearbyFish(Vector2 bobberPosition)
+    {
+        List<Collider2D> results = new List<Collider2D>();
+        Physics2D.OverlapCircle(bobberPosition, fishScanRadius, fishFilter, results);
+
+        foreach (Collider2D fishCollider in results)
+        {
+            Debug.Log("Found");
+            fishCollider.gameObject.GetComponent<FishBehaviour>().ChangeTarget(bobberPosition);
         }
     }
 

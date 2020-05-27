@@ -123,7 +123,7 @@ public class CreateObjectsState : MonoBehaviour, IPlayerState
                     switch (location)
                     {
                         case (ObjectPlaceableLocation.land):
-                            if (layer == 0 && !TerrainManager.Instance.LandTileExists(0, mouseTilePosition))
+                            if (checkTile.isWater)
                             {
                                 if (mouseTile.GetObjectOnTile(ObjectType.ground) == null || !mouseTile.GetObjectOnTile(ObjectType.ground).objectsCanBePlacedOnTop)
                                 {
@@ -133,7 +133,7 @@ public class CreateObjectsState : MonoBehaviour, IPlayerState
                             }
                             break;
                         case (ObjectPlaceableLocation.water):
-                            if (layer != 0 || TerrainManager.Instance.LandTileExists(0, mouseTilePosition))
+                            if (!checkTile.isWater)
                             {
                                 objectIsPlaceable = false;
                                 goto EarlyBreak;

@@ -145,7 +145,7 @@ public class TerrainManager : MonoBehaviour, IPlayerState
 
     private void Start()
     {
-        //Initialize starter tile maps tile layers
+        //Initialize starter tile maps tile layers: TODO load from file
         {
             for (int i = 0; i < TileInformationManager.tileCountX; i++)
             {
@@ -154,6 +154,7 @@ public class TerrainManager : MonoBehaviour, IPlayerState
                     Vector3Int position = new Vector3Int(i, j, 0);
                     {
                         TileInformationManager.Instance.GetTileInformation(position).layerNum = GetHighestGrassLandLayer(position);
+                        TileInformationManager.Instance.GetTileInformation(position).isWater = !(LandTileExists(0, position) || GetHighestGrassLandLayer(position) > 0);
                     }
                 }
             }
@@ -294,12 +295,14 @@ public class TerrainManager : MonoBehaviour, IPlayerState
                     }
 
                 }
-                //Placed sand
-                {
-                    TileInformationManager.Instance.GetTileInformation(mouseTilePosition).layerNum = GetHighestGrassLandLayer(mouseTilePosition);
-                    ParticlesManager.Instance.PlaySmokeEffect(mouseTilePosition);
-                }
             }
+            //Placed sand
+            {
+                TileInformationManager.Instance.GetTileInformation(mouseTilePosition).layerNum = GetHighestGrassLandLayer(mouseTilePosition);
+                ParticlesManager.Instance.PlaySmokeEffect(mouseTilePosition);
+                TileInformationManager.Instance.GetTileInformation(mouseTilePosition).isWater = false;
+            }
+
             Skip:
             yield return 0;
         }
@@ -387,11 +390,12 @@ public class TerrainManager : MonoBehaviour, IPlayerState
                             Debug.Log("Tile representation not found for tile code: " + neighbourTileResult);
                     }
                 }
-                //Removed sand
-                {
-                    ParticlesManager.Instance.PlaySmokeEffect(mouseTilePosition);
-                    TileInformationManager.Instance.GetTileInformation(mouseTilePosition).layerNum = GetHighestGrassLandLayer(mouseTilePosition);
-                }
+            }
+            //Removed sand
+            {
+                ParticlesManager.Instance.PlaySmokeEffect(mouseTilePosition);
+                TileInformationManager.Instance.GetTileInformation(mouseTilePosition).layerNum = GetHighestGrassLandLayer(mouseTilePosition);
+                TileInformationManager.Instance.GetTileInformation(mouseTilePosition).isWater = (GetHighestGrassLandLayer(mouseTilePosition) == 0);
             }
 
 
@@ -548,6 +552,7 @@ public class TerrainManager : MonoBehaviour, IPlayerState
                 //Set new layers
                 {
                     TileInformationManager.Instance.GetTileInformation(above).layerNum = GetHighestGrassLandLayer(above);
+                    TileInformationManager.Instance.GetTileInformation(above).isWater = !(LandTileExists(0, above) || GetHighestGrassLandLayer(above) > 0);
                     TileInformationManager.Instance.GetTileInformation(mouseTilePosition).layerNum = GetHighestGrassLandLayer(mouseTilePosition);
                 }
             }
@@ -685,6 +690,7 @@ public class TerrainManager : MonoBehaviour, IPlayerState
                 //Set new layers
                 {
                     TileInformationManager.Instance.GetTileInformation(mouseAbovePosition).layerNum = GetHighestGrassLandLayer(mouseAbovePosition);
+                    TileInformationManager.Instance.GetTileInformation(mouseAbovePosition).isWater = !(LandTileExists(0, mouseAbovePosition) || GetHighestGrassLandLayer(mouseAbovePosition) > 0);
                     TileInformationManager.Instance.GetTileInformation(mouseTilePosition).layerNum = GetHighestGrassLandLayer(mouseTilePosition);
                 }
             }
@@ -696,9 +702,11 @@ public class TerrainManager : MonoBehaviour, IPlayerState
 
     #region Helpers
     //Layer number 0 = sand      >1 = cliffsAndGrass
-    public bool LandTileExists(int layerNumber, Vector3Int position)
+    private bool LandTileExists(int layerNumber, Vector3Int position)
     {
-        if (layerNumber == 0)
+        if (layerNumber == Constants.INVALID_TILE_LAYER)
+            return false;
+        else if (layerNumber == 0)
         {
             TileBase sandAndWaterMouseTile = sandWaterTileMap.GetTile(position);
 
@@ -716,7 +724,6 @@ public class TerrainManager : MonoBehaviour, IPlayerState
             }
             return sandExists;
         }
-
         else if (tilemapLayers_.Count < layerNumber)
         {
             return false;
