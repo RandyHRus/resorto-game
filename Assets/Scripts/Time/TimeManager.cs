@@ -6,24 +6,29 @@ using System;
 
 public class TimeManager : MonoBehaviour
 {
-    [SerializeField] private float timeSpeed = 2;
+    [SerializeField] private float timeSpeed = 0;
     public int day;
     public int hour;
     public int minute;
     private float timePassed;
     [SerializeField] private Text timeText = null;
 
-    private int dayStartHour = 7;
-    private int nightStartHour = 19;
+    private const int morningStart = 5;
+    private const int midDayStart = 10;
+    private const int eveningStart = 17;
+    private const int nightStart = 20;
 
+    public delegate void OnTurnedMorning();
+    public static event OnTurnedMorning onTurnedMorning;
 
-    public delegate void OnTurnedDay();
-    public static event OnTurnedDay onTurnedDay;
+    public delegate void OnTurnedMidDay();
+    public static event OnTurnedMidDay onTurnedMidDay;
+
+    public delegate void OnTurnedEvening();
+    public static event OnTurnedEvening onTurnedEvening;
 
     public delegate void OnTurnedNight();
     public static event OnTurnedNight onTurnedNight;
-
-
 
     private static TimeManager _instance;
     public static TimeManager Instance { get { return _instance; } }
@@ -46,9 +51,7 @@ public class TimeManager : MonoBehaviour
         }
     }
 
-
-    int previousHour;
-    int previousMinute;
+    private int previousHour = -1;
 
     private void Update()
     {
@@ -56,16 +59,10 @@ public class TimeManager : MonoBehaviour
         //Change time
         {
             timePassed += Time.deltaTime * timeSpeed;
-            if (timePassed > 1)
+            while (timePassed > 1)
             {
                 minute += 1;
                 timePassed -= 1;
-
-                //Reset timer if lag
-                if (timePassed > 1)
-                {
-                    timePassed = 0;
-                }
 
                 if (minute >= 60)
                 {
@@ -94,22 +91,51 @@ public class TimeManager : MonoBehaviour
             timeText.text = "Day " + day + "  " + hourString + ":" + minuteString; //TODO seperate canvases to increase performance
         }
 
-        //Send events
-        if (hour == nightStartHour && previousHour != nightStartHour)
-        {
-            onTurnedNight?.Invoke();
-        }
-        else if (hour == dayStartHour && previousHour != dayStartHour)
-        {
-            onTurnedDay?.Invoke();
-        }
+        if (hour != previousHour)
+            HourChanged();
 
         previousHour = hour;
-        previousMinute = minute;
+
     }
 
-    public bool IsDay()
+    private void HourChanged()
     {
-        return (hour >= dayStartHour && hour < nightStartHour);
+        switch (hour) {
+            case (morningStart):
+                onTurnedMorning?.Invoke();
+                break;
+
+            case (midDayStart):
+                onTurnedMidDay?.Invoke();
+                break;
+
+            case (eveningStart):
+                onTurnedEvening?.Invoke();
+                break;
+
+            case (nightStart):
+                onTurnedNight?.Invoke();
+                break;
+        }
     }
+
+    public TimeOfDay GetTimeOfDay()
+    {
+        if (hour >= morningStart && hour < midDayStart)
+            return TimeOfDay.Morning;
+        else if (hour >= midDayStart && hour < eveningStart)
+            return TimeOfDay.MidDay;
+        else if (hour >= eveningStart && hour < nightStart)
+            return TimeOfDay.Evening;
+        else
+            return TimeOfDay.Night;
+    }
+}
+
+public enum TimeOfDay
+{
+    Morning,
+    MidDay,
+    Evening,
+    Night
 }

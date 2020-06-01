@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Broco
   m_EditorClassIdentifier: 
   touristName: Broco
-  dialoguesFile: {fileID: 4900000, guid: ffa52775b36361141a75a14638e9932f, type: 3}
+  dialogueFile: {fileID: 4900000, guid: ffa52775b36361141a75a14638e9932f, type: 3}
   character:
     eyes:
       color:

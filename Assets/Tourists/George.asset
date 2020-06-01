@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: George
   m_EditorClassIdentifier: 
   touristName: George
-  dialoguesFile: {fileID: 4900000, guid: 669423f90e9c89c48b5ed2b100f3619b, type: 3}
+  dialogueFile: {fileID: 4900000, guid: 669423f90e9c89c48b5ed2b100f3619b, type: 3}
   character:
     eyes:
       color:

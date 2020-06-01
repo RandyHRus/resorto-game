@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fdb4b6060ef40e4aab2f277e4627212, type: 3}
+  m_Name: Music tile
+  m_EditorClassIdentifier: 
+  id: 5
+  objectName: Music tile
+  prefab: {fileID: 7396723378920823021, guid: fcfb76c7d479cd04e92952519d805a9a, type: 3}
+  iconSprite: {fileID: 4625823259324841402, guid: 359f3354bf654874c9bffc0d1c54f290,
+    type: 3}
+  collision: 0
+  objectsCanBePlacedOnTop: 0
+  type: 0
+  location: 0
+  front:
+    sprite: {fileID: 4625823259324841402, guid: 359f3354bf654874c9bffc0d1c54f290,
+      type: 3}
+    xSize: 1
+    ySize: 1
+  left:
+    sprite: {fileID: 0}
+    xSize: 0
+    ySize: 0
+  back:
+    sprite: {fileID: 0}
+    xSize: 0
+    ySize: 0
+  right:
+    sprite: {fileID: 0}
+    xSize: 0
+    ySize: 0

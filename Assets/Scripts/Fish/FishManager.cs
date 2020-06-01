@@ -5,14 +5,16 @@ using UnityEngine;
 public class FishManager : MonoBehaviour
 {
     public static float FISH_SEEING_DISTANCE = 3f;
+    public static float FISH_SEEING_ANGLE_DOT_PRODUCT = 0.707f; //0.707 is 45 degrees
+    public static float FISH_WORLD_WIDTH;
 
     [SerializeField] private GameObject fishPrefab = null;
 
     private Queue<GameObject> fishQueue;
 
     private float timer;
-    private int maxFishCount = 150; //This is the max number of fish locations, could be less if location is not water 
-    private float lengthBetweenSwitchOut = 2f; //Length between changing location for 1 particle at a time
+    private int maxFishCount = 10; //This is the max number of fish locations, could be less if location is not water 
+    private float lengthBetweenSwitchOut = 5f; //Length between changing location for 1 particle at a time
 
     private static FishManager _instance;
     public static FishManager Instance { get { return _instance; } }
@@ -27,6 +29,8 @@ public class FishManager : MonoBehaviour
             _instance = this;
         }
         fishQueue = new Queue<GameObject>();
+
+        FISH_WORLD_WIDTH = fishPrefab.GetComponent<SpriteRenderer>().sprite.rect.width / 16f;
     }
 
     private void Update()

@@ -394,7 +394,7 @@ public class ObjectItem: InventoryItem
         if (ObjectInformationManager.Instance.objectInformationMap.TryGetValue(id, out ObjectInformation info))
         {
             itemIcon = info.iconSprite;
-            itemName = info.name;
+            itemName = info.objectName;
         } 
         else
         {

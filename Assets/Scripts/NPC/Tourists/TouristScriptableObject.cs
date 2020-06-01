@@ -4,12 +4,13 @@ using UnityEngine;
 using UnityEditor;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.IO;
 
 [CreateAssetMenu]
 public class TouristScriptableObject : ScriptableObject
 {
     [SerializeField] private string touristName = null;
-    [SerializeField] private TextAsset dialoguesFile = null;
+    [SerializeField] private TextAsset dialogueFile = null;
     [SerializeField] private CharacterInformation character = null;
 
     public void CreateInScene(Vector2Int position)
@@ -22,8 +23,8 @@ public class TouristScriptableObject : ScriptableObject
         instance.AddComponent<TouristBehaviour>();
         instance.AddComponent<TouristRelationship>();
         TouristDialogue dialogueComponent = instance.AddComponent<TouristDialogue>();
-
-        dialogueComponent.Initialize(touristName, dialoguesFile);
+    
+        dialogueComponent.Initialize(touristName, dialogueFile);
 
         instance.layer = LayerMask.NameToLayer("NPC");
     }

@@ -19,6 +19,9 @@ public class FishingState : MonoBehaviour, IPlayerState
     private ContactFilter2D fishFilter;
     private FishingStates fishingState;
 
+    private HashSet<GameObject> fishInRange  = new HashSet<GameObject>();
+
+
     #region line configuration
     //**************************************
     private int numPoints = 10;
@@ -59,6 +62,7 @@ public class FishingState : MonoBehaviour, IPlayerState
 
             lineRenderer = fishingLineInstance.GetComponent<LineRenderer>();
             lineRenderer.positionCount = numPoints;
+            lineRenderer.generateLightingData = true;
 
             fishingLineTransform = fishingLineInstance.transform;
 
@@ -96,45 +100,123 @@ public class FishingState : MonoBehaviour, IPlayerState
 
     public bool AllowMovement
     {
-        get { return (fishingState == FishingStates.none); }
+        get { return (fishingState == FishingStates.None); }
     }
 
     public void Execute()
     {
         if (Input.GetButtonDown("Primary"))
         {
-            if (fishingState == FishingStates.none)
+            if (fishingState == FishingStates.None)
             {
-                //Animation
-                {
-                    PlayerMovement.Instance.StopMovement(); //TODO: Maybe there could be a better way to call this?
-                    animator.SetBool("LineCastFinished", false);
-                    animator.SetLayerWeight(animator.GetLayerIndex("Fishing"), 1);
-                    animator.SetBool("Fishing", true);
-                    animator.speed = 0;
-                }
-                fishingRod.gameObject.SetActive(true);
-                StartCoroutine(LineHolding());
+                SwitchFishingState(FishingStates.Charging, null);
             }
         }
     }
 
     public void StartState(object[] args)
     {
-        //Nothing needed yet  
+        animator.SetLayerWeight(animator.GetLayerIndex("Fishing"), 1);
     }
 
     public bool TryEndState()
     {
-        return (fishingState == FishingStates.none);
+        if (fishingState == FishingStates.None)
+        {
+            animator.SetLayerWeight(animator.GetLayerIndex("Fishing"), 0);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
-    IEnumerator LineHolding()
+    public void OnFishBite(GameObject hookedFish)
     {
-        fishingState = FishingStates.holding;
-        progressBar.SetPosition(new Vector2(playerTransform.position.x, playerTransform.position.y+1.5f));
-        progressBar.Show();
+        foreach (GameObject fish in fishInRange)
+        {
+            if (fish != null && fish != hookedFish)
+                fish.GetComponent<FishBehaviour>().StartFlee();
+        }
 
+        SwitchFishingState(FishingStates.FishHooked, new object[] { hookedFish.transform });
+    }
+
+    private void SwitchFishingState(FishingStates proposedState, object[] args)
+    {
+        fishingState = proposedState;
+
+        //Start new state
+        switch (proposedState)
+        {
+            case (FishingStates.None):
+                animator.SetBool("LineOut", false);
+                animator.SetBool("Hooked", false);
+                fishingLineInstance.SetActive(false);
+
+                fishingRod.gameObject.SetActive(false);
+
+                foreach (GameObject fish in fishInRange)
+                {
+                    if (fish != null)
+                        fish.GetComponent<FishBehaviour>().StartFlee();
+                }
+                fishInRange.Clear();
+
+                lineRenderer.positionCount = numPoints;
+
+                break;
+
+            case (FishingStates.Charging):
+                //Animation
+                {
+                    PlayerMovement.Instance.StopMovement(); //TODO: Maybe there could be a better way to call this?
+                    animator.SetBool("LineCastFinished", false);
+                    animator.SetBool("LineOut", true);
+                    animator.speed = 0;
+                }
+                fishingRod.gameObject.SetActive(true);
+                progressBar.SetPosition(new Vector2(playerTransform.position.x, playerTransform.position.y + 1.5f));
+                progressBar.Show();
+
+                StartCoroutine(Charging());
+                break;
+
+            case (FishingStates.LineCasting):
+                //fishingLineInstance.SetActive(true); This had to be set in coroutine to because yield was making line appear before it was supposed to
+                animator.speed = 1;
+                progressBar.Hide();
+
+                float chargeTimer = (float)args[0];
+                StartCoroutine(LineCasting(chargeTimer));
+
+                break;
+
+            case (FishingStates.Bobbing):
+                animator.SetBool("LineCastFinished", true);
+
+                Vector2 lineMiddlePosition = (Vector2)args[0];
+                Vector2 lineEndPosition = (Vector2)args[1];
+                StartCoroutine(LineBobbing(lineMiddlePosition, lineEndPosition));
+
+                break;
+
+            case (FishingStates.FishHooked):
+                animator.SetBool("Hooked", true);
+                lineRenderer.positionCount = 2;
+
+                Transform fishTransform = (Transform)args[0];
+                StartCoroutine(FishHooked(fishTransform));
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    IEnumerator Charging()
+    {
         float timer = 0;
         while (true)
         {
@@ -147,9 +229,7 @@ public class FishingState : MonoBehaviour, IPlayerState
 
             if (Input.GetButtonUp("Primary") || timer >= maxCastHoldTime)
             {
-                animator.speed = 1;
-                progressBar.Hide();
-                StartCoroutine(LineCasting(timer / maxCastHoldTime));
+                SwitchFishingState(FishingStates.LineCasting, new object[] { timer });
                 break;
             }
 
@@ -157,21 +237,20 @@ public class FishingState : MonoBehaviour, IPlayerState
         }
     }
 
-    IEnumerator LineCasting(float timerFraction)
+    IEnumerator LineCasting(float chargeTimer)
     {
-        fishingState = FishingStates.lineCasting;
-
         yield return 0; //Wait a frame to get proper fishing rod position (HeightToEndOfRod could return 0 if this isn't here) TODO: maybe there is better way?
-        fishingLineInstance.SetActive(true);
+        fishingLineInstance.SetActive(true); //Needs to go after yield
 
         Vector2 playerDirectionVector = PlayerMovement.Instance.direction.directionVector;
 
         Vector2 lineEndPosition = new Vector2(0,0), lineMiddlePosition = new Vector2(0, 0);
 
         float heightToEndOfRod = fishingRod.position.y - playerTransform.position.y;
+
         var minimumOffset = 0.02f; //this is there so that line can't be completely 90 degrees down
         float minCastLength = heightToEndOfRod + minimumOffset;
-        float maxLineLength = ((maxCastLength - minCastLength) * timerFraction) + minCastLength;
+        float maxLineLength = ((maxCastLength - minCastLength) * (chargeTimer / maxCastHoldTime)) + minCastLength;
 
         float beginLineAngle;
         //Horizontal direction
@@ -248,22 +327,19 @@ public class FishingState : MonoBehaviour, IPlayerState
             yield return 0;
         }
 
-        animator.SetBool("LineCastFinished", true);
-
-        AlertNearbyFish(lineEndPosition);
-
-        StartCoroutine(LineBobbing(lineMiddlePosition, lineEndPosition));
+        SwitchFishingState(FishingStates.Bobbing, new object[] { lineMiddlePosition, lineEndPosition });
     }
 
     IEnumerator LineBobbing(Vector2 lineMiddlePosition, Vector2 lineEndPosition)
     {
-        fishingState = FishingStates.bobbing;
         float timer = 0;
         Vector2 lineEndDefaultPosition = lineEndPosition;
         Vector2 lineMiddleDefaultPosition = lineMiddlePosition;
 
-        while (true)
+        while (fishingState == FishingStates.Bobbing)
         {
+            StartCoroutine(AlertNearbyFishToTarget(lineEndPosition));
+
             Vector2 lineStartPosition = fishingRod.position;
 
             float offset = Mathf.Sin(bobSpeed * timer) * bobHeight;
@@ -277,15 +353,7 @@ public class FishingState : MonoBehaviour, IPlayerState
 
             if (Input.GetButtonDown("Primary"))
             {
-                //Animation
-                {
-                    animator.SetBool("Fishing", false);
-                    animator.SetLayerWeight(animator.GetLayerIndex("Fishing"), 0);
-                }
-                fishingRod.gameObject.SetActive(false);
-                fishingLineInstance.SetActive(false);
-                fishingState = FishingStates.none;
-
+                SwitchFishingState(FishingStates.None, null);
                 break;
             }
 
@@ -293,15 +361,47 @@ public class FishingState : MonoBehaviour, IPlayerState
         }
     }
 
-    private void AlertNearbyFish(Vector2 bobberPosition)
+    IEnumerator FishHooked(Transform fish)
     {
-        List<Collider2D> results = new List<Collider2D>();
-        Physics2D.OverlapCircle(bobberPosition, fishScanRadius, fishFilter, results);
+        int clickCount = 5; //Todo: Come up with something else other then clicks
 
-        foreach (Collider2D fishCollider in results)
+        while (fishingState == FishingStates.FishHooked)
         {
-            Debug.Log("Found");
-            fishCollider.gameObject.GetComponent<FishBehaviour>().ChangeTarget(bobberPosition);
+            Vector2 lineEndPosition = fish.position + ((-fish.right) * FishManager.FISH_WORLD_WIDTH / 2);
+            Vector2 lineStartPosition = fishingRod.position;
+
+            fishingLineTransform.position = lineEndPosition; //For moving bobber to end of line
+            lineRenderer.SetPositions(new Vector3[] { lineStartPosition, lineEndPosition });
+
+            if (Input.GetButtonDown("Primary"))
+                clickCount--;
+
+            if (clickCount <= 0)
+            {
+                Destroy(fish.gameObject);
+                SwitchFishingState(FishingStates.None, null);
+            }
+            yield return 0; 
+        }
+    }
+
+
+    IEnumerator AlertNearbyFishToTarget(Vector2 lineEndPosition)
+    {
+        while (fishingState == FishingStates.Bobbing)
+        {
+            List<Collider2D> results = new List<Collider2D>();
+            Physics2D.OverlapCircle(lineEndPosition, fishScanRadius, fishFilter, results);
+            fishInRange.Clear(); //Refresh every time
+
+            foreach (Collider2D fishCollider in results)
+            {
+                GameObject obj = fishCollider.gameObject;
+                fishCollider.gameObject.GetComponent<FishBehaviour>().SetTarget(lineEndPosition);
+                fishInRange.Add(obj);
+            }
+
+            yield return new WaitForSeconds(1); //No need to do every frame.
         }
     }
 
@@ -329,9 +429,10 @@ public class FishingState : MonoBehaviour, IPlayerState
 
     private enum FishingStates
     {
-        none,
-        holding,
-        lineCasting,
-        bobbing,
+        None,
+        Charging,
+        LineCasting,
+        Bobbing,
+        FishHooked
     }
 }

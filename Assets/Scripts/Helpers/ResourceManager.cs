@@ -31,5 +31,7 @@ public class ResourceManager : MonoBehaviour
 
     public GameObject character;
 
+    public Material diffuse;
+
 
 }

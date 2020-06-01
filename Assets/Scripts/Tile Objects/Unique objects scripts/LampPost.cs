@@ -7,36 +7,44 @@ public class LampPost : MonoBehaviour
     [SerializeField] private Sprite litSprite = null;
     [SerializeField] private Sprite unlitSprite = null;
     private SpriteRenderer sprRenderer;
+    private LightEmitter lightEmitter;
 
+    private void Awake()
+    {
+        lightEmitter = GetComponent<LightEmitter>();
+    }
 
     private void Start()
     {
-        TimeManager.onTurnedDay += ChangeToUnlitSprite;
-        TimeManager.onTurnedNight += ChangeToLitSprite;
+        TimeManager.onTurnedMorning += UnLight;
+        TimeManager.onTurnedNight += LightUp;
 
         sprRenderer = GetComponent<SpriteRenderer>();
         if (sprRenderer == null)
             Debug.Log("No sprite renderer found in lamp post!");
 
-        if (TimeManager.Instance.IsDay())
-            ChangeToUnlitSprite();
+        TimeOfDay now = TimeManager.Instance.GetTimeOfDay();
+        if (now == TimeOfDay.Morning || now == TimeOfDay.MidDay)
+            UnLight();
         else
-            ChangeToLitSprite();
+            LightUp();
     }
 
-    private void ChangeToLitSprite()
+    private void LightUp()
     {
         sprRenderer.sprite = litSprite;
+        lightEmitter.StartEmit();
     }
     
-    private void ChangeToUnlitSprite()
+    private void UnLight()
     {
         sprRenderer.sprite = unlitSprite;
+        lightEmitter.StopEmit();
     }
 
     private void OnDestroy()
     {
-        TimeManager.onTurnedDay -= ChangeToUnlitSprite;
-        TimeManager.onTurnedNight -= ChangeToLitSprite;
+        TimeManager.onTurnedMorning -= UnLight;
+        TimeManager.onTurnedNight -= LightUp;
     }
 }

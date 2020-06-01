@@ -125,7 +125,7 @@ public class CreateObjectsState : MonoBehaviour, IPlayerState
                         case (ObjectPlaceableLocation.land):
                             if (checkTile.isWater)
                             {
-                                if (mouseTile.GetObjectOnTile(ObjectType.ground) == null || !mouseTile.GetObjectOnTile(ObjectType.ground).objectsCanBePlacedOnTop)
+                                if (checkTile.GetObjectOnTile(ObjectType.ground) == null || !checkTile.GetObjectOnTile(ObjectType.ground).objectsCanBePlacedOnTop)
                                 {
                                     objectIsPlaceable = false;
                                     goto EarlyBreak;
@@ -145,7 +145,7 @@ public class CreateObjectsState : MonoBehaviour, IPlayerState
                     }
 
                     //Check for valid objects
-                    if (mouseTile.GetObjectOnTile(type) != null)
+                    if (checkTile.GetObjectOnTile(type) != null)
                     {
                         objectIsPlaceable = false;
                         goto EarlyBreak;
@@ -201,15 +201,8 @@ public class CreateObjectsState : MonoBehaviour, IPlayerState
         //Create gameObject
         GameObject obj;
         {
-            if (info.prefab == null)
-            {
-                obj = new GameObject(info.name);
-                obj.transform.position = new Vector2(pos.x, pos.y);
-            }
-            else
-            {
-                obj = Instantiate(info.prefab, new Vector2(pos.x, pos.y), Quaternion.identity);
-            }
+            obj = Instantiate(info.prefab, new Vector2(pos.x, pos.y), Quaternion.identity);
+            obj.name = info.objectName;
         }
 
         SpriteInformation sprInfo = info.GetSpriteInformation(rotation);
@@ -243,6 +236,7 @@ public class CreateObjectsState : MonoBehaviour, IPlayerState
                         break;
                 }
                 renderer.sprite = sprInfo.sprite;
+                renderer.material = ResourceManager.Instance.diffuse;
             }
         }
         //Set tiles
