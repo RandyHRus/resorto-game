@@ -9,7 +9,7 @@ public class TerrainManager : MonoBehaviour, IPlayerState
     [SerializeField] private Sprite sandIndicatorSprite = null;
     [SerializeField] private Tilemap landTileMapPrefab = null;
     [SerializeField] private GameObject tileGrid = null;
-    [SerializeField] private Tilemap sandWaterTileMap = null;
+    [SerializeField] private Tilemap sandTilemap = null;
     [SerializeField] private Tile[] fullSandTiles = null;
     [SerializeField] private List<StarterTilemaps> starterTilemaps = null;
 
@@ -38,7 +38,7 @@ public class TerrainManager : MonoBehaviour, IPlayerState
     */
     [SerializeField] private TileToCode[] sandWaterTileCodes = null;
     private Dictionary<string, int> sandWaterTileNameToCode = new Dictionary<string, int>();
-    private Dictionary<int, Tile> sandWaterCodeToTile = new Dictionary<int, Tile>();
+    private Dictionary<int, TileBase> sandWaterCodeToTile = new Dictionary<int, TileBase>();
 
 
     /*
@@ -53,13 +53,13 @@ public class TerrainManager : MonoBehaviour, IPlayerState
     */
     [SerializeField] private TileToCode[] landTileCodes = null;
     private Dictionary<string, int> landTileNameToCode = new Dictionary<string, int>();
-    private Dictionary<int, Tile> landCodeToTile = new Dictionary<int, Tile>();
+    private Dictionary<int, TileBase> landCodeToTile = new Dictionary<int, TileBase>();
 
     [System.Serializable]
     public struct TileToCode
     {
         public string code;
-        public Tile tile;
+        public TileBase tile;
     }
     #endregion
 
@@ -261,7 +261,7 @@ public class TerrainManager : MonoBehaviour, IPlayerState
 
             {
                 Tile pickedSandTile = fullSandTiles[Random.Range(0, fullSandTiles.Length)];
-                sandWaterTileMap.SetTile(mouseTilePosition, pickedSandTile);
+                sandTilemap.SetTile(mouseTilePosition, pickedSandTile);
                 Dictionary<Vector3Int, int> neighboursToCheck = new Dictionary<Vector3Int, int>()
                 {
                     {  new Vector3Int(mouseTilePosition.x-1, mouseTilePosition.y+1, 0), 0b00001000 }, //UpLeft    
@@ -275,25 +275,27 @@ public class TerrainManager : MonoBehaviour, IPlayerState
                 };
                 foreach (KeyValuePair<Vector3Int, int> neighbour in neighboursToCheck)
                 {
-                    TileBase sandAndWaterNeighbourTile = sandWaterTileMap.GetTile(neighbour.Key);
-                    if (sandAndWaterNeighbourTile != null)
-                    {
-                        if (sandWaterTileNameToCode.TryGetValue(sandAndWaterNeighbourTile.name, out int code))
-                        {
-                            int tileCodeRepresentation = code | neighbour.Value;
+                    TileBase sandAndWaterNeighbourTile = sandTilemap.GetTile(neighbour.Key);
 
-                            if (sandWaterCodeToTile.TryGetValue(tileCodeRepresentation, out Tile tile))
-                                sandWaterTileMap.SetTile(neighbour.Key, tile);
-                            else
-                                Debug.Log("Tile representation not found for tile code: " + tileCodeRepresentation);
-                        }
-                        else
-                        {
-                            //Removed because sand kept getting printed
-                            //Debug.Log("Code representation not found for tile with name: " + sandAndWaterNeighbourTile.name);
-                        }
+                    int tileCode;
+
+                    if (sandAndWaterNeighbourTile == null)
+                    {
+                        tileCode = 0b00000000;
+                    }
+                    else if (!sandWaterTileNameToCode.TryGetValue(sandAndWaterNeighbourTile.name, out tileCode))
+                    {
+                        //Debug.Log("Code representation not found for tile with name: " + sandAndWaterNeighbourTile.name);
+                        //Could be full sand tile, don't change
+                        continue;
                     }
 
+                    int tileCodeRepresentation = tileCode | neighbour.Value;
+
+                    if (sandWaterCodeToTile.TryGetValue(tileCodeRepresentation, out TileBase tile))
+                        sandTilemap.SetTile(neighbour.Key, tile);
+                    else
+                        Debug.Log("Tile representation not found for tile code: " + tileCodeRepresentation);
                 }
             }
             //Placed sand
@@ -352,10 +354,17 @@ public class TerrainManager : MonoBehaviour, IPlayerState
                         mouseTileResult = mouseTileResult | neighbour.Value;
                 }
 
-                if (sandWaterCodeToTile.TryGetValue(mouseTileResult, out Tile tile))
-                    sandWaterTileMap.SetTile(mouseTilePosition, tile);
+                if (mouseTileResult == 0b00000000)
+                {
+                    sandTilemap.SetTile(mouseTilePosition, null);
+                }
                 else
-                    Debug.Log("Tile representation not found for tile code: " + mouseTileResult);
+                {
+                    if (sandWaterCodeToTile.TryGetValue(mouseTileResult, out TileBase tile))
+                        sandTilemap.SetTile(mouseTilePosition, tile);
+                    else
+                        Debug.Log("Tile representation not found for tile code: " + mouseTileResult);
+                }
             }
             //Change neighbours tile
             {
@@ -384,10 +393,17 @@ public class TerrainManager : MonoBehaviour, IPlayerState
                             neighbourTileResult = neighbourTileResult | neighboursNeighbour.Value;
                     }
                     {
-                        if (sandWaterCodeToTile.TryGetValue(neighbourTileResult, out Tile tile))
-                            sandWaterTileMap.SetTile(neighbour.Key, tile);
+                        if (neighbourTileResult == 0b00000000)
+                        {
+                            sandTilemap.SetTile(neighbour.Key, null);
+                        }
                         else
-                            Debug.Log("Tile representation not found for tile code: " + neighbourTileResult);
+                        {
+                            if (sandWaterCodeToTile.TryGetValue(neighbourTileResult, out TileBase tile))
+                                sandTilemap.SetTile(neighbour.Key, tile);
+                            else
+                                Debug.Log("Tile representation not found for tile code: " + neighbourTileResult);
+                        }
                     }
                 }
             }
@@ -708,7 +724,7 @@ public class TerrainManager : MonoBehaviour, IPlayerState
             return false;
         else if (layerNumber == 0)
         {
-            TileBase sandAndWaterMouseTile = sandWaterTileMap.GetTile(position);
+            TileBase sandAndWaterMouseTile = sandTilemap.GetTile(position);
 
             if (sandAndWaterMouseTile == null)
                 return false;
@@ -753,7 +769,7 @@ public class TerrainManager : MonoBehaviour, IPlayerState
     {
         if (code == Constants.EMPTY_TILECODE)
             landTileMap.SetTile(position, null);
-        else if (landCodeToTile.TryGetValue(code, out Tile tile))
+        else if (landCodeToTile.TryGetValue(code, out TileBase tile))
             landTileMap.SetTile(position, tile);
         else
             Debug.Log("No tile associated with code: " + code);

@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5904abac08cbd5f47a73a9fffff4a595, type: 3}
+  m_Name: SandTile27
+  m_EditorClassIdentifier: 
+  m_AnimatedSprites:
+  - {fileID: -5315426168797434411, guid: ebe61cffe96745a40848517fed0a3adf, type: 3}
+  - {fileID: -5315426168797434411, guid: ebe61cffe96745a40848517fed0a3adf, type: 3}
+  - {fileID: 2040128922426227954, guid: cf974e86b839f614ca98bcae0382f6f6, type: 3}
+  - {fileID: 2040128922426227954, guid: cf974e86b839f614ca98bcae0382f6f6, type: 3}
+  - {fileID: -371597950379993118, guid: 36298bcce8d113e41849a791198ae966, type: 3}
+  - {fileID: -371597950379993118, guid: 36298bcce8d113e41849a791198ae966, type: 3}
+  - {fileID: -80401934856387854, guid: 842119c6197741f43b2a613ff397182c, type: 3}
+  - {fileID: -80401934856387854, guid: 842119c6197741f43b2a613ff397182c, type: 3}
+  - {fileID: -80401934856387854, guid: 842119c6197741f43b2a613ff397182c, type: 3}
+  - {fileID: -80401934856387854, guid: 842119c6197741f43b2a613ff397182c, type: 3}
+  - {fileID: -371597950379993118, guid: 36298bcce8d113e41849a791198ae966, type: 3}
+  - {fileID: -371597950379993118, guid: 36298bcce8d113e41849a791198ae966, type: 3}
+  - {fileID: 2040128922426227954, guid: cf974e86b839f614ca98bcae0382f6f6, type: 3}
+  - {fileID: 2040128922426227954, guid: cf974e86b839f614ca98bcae0382f6f6, type: 3}
+  - {fileID: -5315426168797434411, guid: ebe61cffe96745a40848517fed0a3adf, type: 3}
+  - {fileID: -5315426168797434411, guid: ebe61cffe96745a40848517fed0a3adf, type: 3}
+  m_MinSpeed: 2
+  m_MaxSpeed: 2
+  m_AnimationStartTime: 0
+  m_TileColliderType: 0

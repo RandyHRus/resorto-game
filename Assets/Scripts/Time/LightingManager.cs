@@ -18,7 +18,7 @@ public class LightingManager : MonoBehaviour
         TimeManager.onTurnedMorning += () => StartChangeLight(new Color32(187, 227, 255, 255), 0.8f,  20);
         TimeManager.onTurnedMidDay  += () => StartChangeLight(new Color32(255, 255, 255, 255), 1f,    20);
         TimeManager.onTurnedEvening += () => StartChangeLight(new Color32(255, 174, 144, 255), 0.9f,  20);
-        TimeManager.onTurnedNight   += () => StartChangeLight(new Color32(0,   100, 244, 255), 0.6f,  20);
+        TimeManager.onTurnedNight   += () => StartChangeLight(new Color32(55,  136, 255, 255), 0.4f,  20);
     }
 
     private void StartChangeLight(Color32 targetColor, float targetIntensity, float durationSeconds)
