@@ -21,9 +21,11 @@ public class NPCManager : MonoBehaviour
                 _instance = this;
             }
         }
+
+        IslandGenerator.OnMapLoad += CreateNPCs;
     }
 
-    private void Start()
+    private void CreateNPCs()
     {
         //TODO remove
         foreach(TouristScriptableObject tourist in tourists)

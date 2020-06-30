@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,9 +30,10 @@ public class ResourceManager : MonoBehaviour
 
     public Color32[] elevationColors;
 
+    [EnumNamedArray(typeof(TileLocation))]
+    public Color32[] tileLocationColors = new Color32[Enum.GetNames(typeof(TileLocation)).Length];
+
     public GameObject character;
 
     public Material diffuse;
-
-
 }

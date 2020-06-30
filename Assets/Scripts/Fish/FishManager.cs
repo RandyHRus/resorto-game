@@ -65,7 +65,7 @@ public class FishManager : MonoBehaviour
 
             TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(new Vector3Int(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y), 0));
 
-            if (tileInfo.isWater)
+            if (tileInfo.tileLocation == TileLocation.DeepWater)
             {
                 GameObject fish = Instantiate(fishPrefab, pos, Quaternion.Euler(0.0f, 0.0f, Random.Range(0.0f, 360.0f)));
                 fishQueue.Enqueue(fish);

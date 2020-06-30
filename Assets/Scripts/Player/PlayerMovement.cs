@@ -34,7 +34,6 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        currentTileLayer = 0; 
         playerTransform = transform;
         direction = new PlayerDirection();
         animator = GetComponent<Animator>();
@@ -42,6 +41,15 @@ public class PlayerMovement : MonoBehaviour
         boxColliderSizeX = CollisionManager.boxColliderSizeX;
         boxColliderSizeY = CollisionManager.boxColliderSizeY;
         BUFFER = CollisionManager.BUFFER;
+
+        IslandGenerator.OnMapLoad += InitializeLayer;
+    }
+
+    private void InitializeLayer()
+    {
+        Vector3Int tilePos = new Vector3Int(Mathf.RoundToInt(playerTransform.position.x), Mathf.RoundToInt(playerTransform.position.y), 0);
+        int layerNum = TileInformationManager.Instance.GetTileInformation(tilePos).layerNum;
+        currentTileLayer = layerNum;
     }
 
     public void Execute()

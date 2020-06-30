@@ -16,8 +16,8 @@ public class LampPost : MonoBehaviour
 
     private void Start()
     {
-        TimeManager.onTurnedMorning += UnLight;
-        TimeManager.onTurnedNight += LightUp;
+        TimeManager.OnTurnedMorning += UnLight;
+        TimeManager.OnTurnedNight += LightUp;
 
         sprRenderer = GetComponent<SpriteRenderer>();
         if (sprRenderer == null)
@@ -44,7 +44,7 @@ public class LampPost : MonoBehaviour
 
     private void OnDestroy()
     {
-        TimeManager.onTurnedMorning -= UnLight;
-        TimeManager.onTurnedNight -= LightUp;
+        TimeManager.OnTurnedMorning -= UnLight;
+        TimeManager.OnTurnedNight -= LightUp;
     }
 }

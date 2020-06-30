@@ -32,7 +32,7 @@ public class MessageManager : MonoBehaviour
         }
         messageBoxes = new Queue<MessageBox>();
 
-        InventoryManager.itemGained += (InventoryItem item, int count) => { new ItemGainMessage(item, count); };
+        InventoryManager.OnItemGained += (InventoryItem item, int count) => { new ItemGainMessage(item, count); };
     }
 
     private abstract class MessageBox: UIObject

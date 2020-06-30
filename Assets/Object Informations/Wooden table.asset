@@ -18,7 +18,7 @@ MonoBehaviour:
   iconSprite: {fileID: 21300000, guid: bf0fda3206d636d46817e3b66ea45fec, type: 3}
   collision: 1
   objectsCanBePlacedOnTop: 1
-  type: 1
+  type: 0
   location: 0
   front:
     sprite: {fileID: 21300000, guid: bf0fda3206d636d46817e3b66ea45fec, type: 3}

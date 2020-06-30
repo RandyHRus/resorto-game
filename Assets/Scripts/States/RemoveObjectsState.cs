@@ -49,20 +49,20 @@ public class RemoveObjectsState : MonoBehaviour, IPlayerState
         Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
         TileInformation mouseTile = TileInformationManager.Instance.GetTileInformation(mouseTilePosition);
 
-        bool objectOnTileExists = (mouseTile != null && !(mouseTile.TileIsEmpty()));
+        bool tileIsNotEmpty = (mouseTile != null && !(mouseTile.TileIsEmpty()));
 
         //Indicator things
         {
             indicator.transform.position = new Vector2(mouseTilePosition.x, mouseTilePosition.y);
 
-            if (objectOnTileExists)
+            if (tileIsNotEmpty)
                 indicatorRenderer.color = ResourceManager.Instance.yellow;
             else
                 indicatorRenderer.color = ResourceManager.Instance.red;
         }
 
         //Remove
-        if (objectOnTileExists && Input.GetButtonDown("Primary"))
+        if (tileIsNotEmpty && Input.GetButtonDown("Primary"))
         {
             int removedId = TileInformationManager.Instance.GetTileInformation(mouseTilePosition).RemoveTileObject();
             if (removedId != Constants.INVALID_ID)

@@ -3,57 +3,44 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class ShowElevation : MonoBehaviour
+public static class ShowElevation
 {
-    [SerializeField] private Tilemap elevationTilemap = null;
-    [SerializeField] private Tile indicatorTile = null;
 
-    private bool showElevation = false;
-
-    private void Update()
+    public static Color32[,] GetColorMap()
     {
-        if (Input.GetButtonDown("Dev"))
-        {
-            ToggleElevation(!showElevation);
-        }
-    }
+        int mapWidth = TileInformationManager.tileCountX;
+        int mapHeight = TileInformationManager.tileCountY;
 
-    public void ToggleElevation(bool show)
-    {
-        showElevation = show;
-
-        elevationTilemap.gameObject.SetActive(show);
+        Color32[,] colorMap = new Color32[mapWidth, mapHeight];
 
         int elevationColorSize = ResourceManager.Instance.elevationColors.Length;
 
-        if (show)
+        for (int i = 0; i < mapWidth; i++)
         {
-            for (int i = 0; i < TileInformationManager.tileCountX; i++)
+            for (int j = 0; j < mapHeight; j++)
             {
-                for (int j = 0; j < TileInformationManager.tileCountX; j++)
+                Vector3Int pos = new Vector3Int(i, j, 0);
+                int layerNum = TileInformationManager.Instance.GetTileInformation(pos).layerNum;
+
+                if (layerNum != Constants.INVALID_TILE_LAYER)
                 {
-                    Vector3Int pos = (new Vector3Int(i, j, 0));
-                    int layerNum = TileInformationManager.Instance.GetTileInformation(pos).layerNum;
-
-                    if (layerNum != Constants.INVALID_TILE_LAYER)
+                    if (layerNum < elevationColorSize)
                     {
-                        elevationTilemap.SetTile(pos, indicatorTile);
-
-                        if (layerNum < elevationColorSize) {
-                            elevationTilemap.SetTileFlags(pos, TileFlags.None);
-                            elevationTilemap.SetColor(pos, ResourceManager.Instance.elevationColors[layerNum]);
-                        }
-                        else
-                        {
-                            Debug.Log("No color set for elevation layer");
-                        }
+                        colorMap[i,j] = ResourceManager.Instance.elevationColors[layerNum];
                     }
                     else
                     {
-                        elevationTilemap.SetTile(pos, null);
+                        Debug.Log("No color set for elevation layer");
+                        colorMap[i, j] = Color.white;
                     }
+                }
+                else
+                {
+                    colorMap[i, j] = Color.white;
                 }
             }
         }
+
+        return colorMap;
     }
 }

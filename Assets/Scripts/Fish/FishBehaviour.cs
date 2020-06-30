@@ -19,8 +19,8 @@ public class FishBehaviour : MonoBehaviour
 
     private float fleeSpeed = 1f;
 
-    private float maxIdleTurnSpeed = 10f;
-    private float idleRotationAcceleration = 0.2f;
+    private float maxIdleTurnSpeed = 20f;
+    private float idleRotationAcceleration = 0.5f;
     private float minRotationSwitchTime = 3f, maxRotationSwitchTime = 20f; //Time to switch which direction rotating
 
     private float minIdleAnimationSpeed = 0.2f;
@@ -259,6 +259,7 @@ public class FishBehaviour : MonoBehaviour
                 Vector2 proposedPosition = (Vector2)fishTransform.position + change;
                 Vector3Int proposedTile = new Vector3Int(Mathf.RoundToInt(proposedPosition.x), Mathf.RoundToInt(proposedPosition.y), 0);
 
+                //Fade out if there is collision(land/sand) ahead
                 if (proposedTile != currentTile)
                 {
                     CheckForHeadingCollision(change, proposedTile, out bool Tile_h_collision, out bool tile_v_collision, out bool tile_hv_collision);
@@ -316,9 +317,9 @@ public class FishBehaviour : MonoBehaviour
             tile_hv = TileInformationManager.Instance.GetTileInformation(new Vector3Int(tile.x + signX, tile.y + signY, 0));
         }
 
-        tile_h_collision = (tile_h == null || !tile_h.isWater);
-        tile_v_collision = (tile_v == null || !tile_v.isWater);
-        tile_hv_collision = (tile_hv == null || !tile_hv.isWater);
+        tile_h_collision = (tile_h == null || tile_h.tileLocation == TileLocation.WaterEdge);
+        tile_v_collision = (tile_v == null || tile_v.tileLocation == TileLocation.WaterEdge);
+        tile_hv_collision = (tile_hv == null || tile_hv.tileLocation == TileLocation.WaterEdge);
     }
 
 

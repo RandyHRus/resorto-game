@@ -18,17 +18,17 @@ public class TimeManager : MonoBehaviour
     private const int eveningStart = 17;
     private const int nightStart = 20;
 
-    public delegate void OnTurnedMorning();
-    public static event OnTurnedMorning onTurnedMorning;
+    public delegate void OnTurnedMorningDelegate();
+    public static event OnTurnedMorningDelegate OnTurnedMorning;
 
-    public delegate void OnTurnedMidDay();
-    public static event OnTurnedMidDay onTurnedMidDay;
+    public delegate void OnTurnedMidDayDelegate();
+    public static event OnTurnedMidDayDelegate OnTurnedMidDay;
 
-    public delegate void OnTurnedEvening();
-    public static event OnTurnedEvening onTurnedEvening;
+    public delegate void OnTurnedEveningDelegate();
+    public static event OnTurnedEveningDelegate OnTurnedEvening;
 
-    public delegate void OnTurnedNight();
-    public static event OnTurnedNight onTurnedNight;
+    public delegate void OnTurnedNightDelegate();
+    public static event OnTurnedNightDelegate OnTurnedNight;
 
     private static TimeManager _instance;
     public static TimeManager Instance { get { return _instance; } }
@@ -102,19 +102,19 @@ public class TimeManager : MonoBehaviour
     {
         switch (hour) {
             case (morningStart):
-                onTurnedMorning?.Invoke();
+                OnTurnedMorning?.Invoke();
                 break;
 
             case (midDayStart):
-                onTurnedMidDay?.Invoke();
+                OnTurnedMidDay?.Invoke();
                 break;
 
             case (eveningStart):
-                onTurnedEvening?.Invoke();
+                OnTurnedEvening?.Invoke();
                 break;
 
             case (nightStart):
-                onTurnedNight?.Invoke();
+                OnTurnedNight?.Invoke();
                 break;
         }
     }

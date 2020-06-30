@@ -21,6 +21,7 @@ public class InventoryManager : MonoBehaviour
 
     private Color32 selectedSlotColor = new Color32(189, 189, 189, 255);
 
+    private int selectedSlotIndex = -1;
     private InventorySlotInformation selectedSlot = null;
 
     private KeyCode[] numberKeys = {
@@ -43,6 +44,7 @@ public class InventoryManager : MonoBehaviour
         public Image iconImage;
         public Text itemCountText;
         public GameObject slotObject;
+
 
         public void SetSlot(InventoryItem item, int count)
         {
@@ -89,7 +91,7 @@ public class InventoryManager : MonoBehaviour
     }
 
     public delegate void ItemGained(InventoryItem item, int count);
-    public static event ItemGained itemGained;
+    public static event ItemGained OnItemGained;
 
     private static InventoryManager _instance;
     public static InventoryManager Instance { get { return _instance; } }
@@ -180,12 +182,33 @@ public class InventoryManager : MonoBehaviour
             ToggleInventory(!isInventoryOpen);
         }
 
+        //Set selected slot with number keys
         for (int i = 0; i < numberKeys.Length; i++)
         {
             if (Input.GetKeyDown(numberKeys[i]))
             {
                 SelectItemSlot(i);
                 break;
+            }
+        }
+
+        //Set selected slot with scroll wheel
+        {
+            if (Input.GetAxis("Mouse ScrollWheel") < 0f) // forward
+            {
+                selectedSlotIndex++;
+                if (selectedSlotIndex >= inventorySize_h)
+                    selectedSlotIndex = 0;
+
+                SelectItemSlot(selectedSlotIndex);
+        }
+            if (Input.GetAxis("Mouse ScrollWheel") > 0f) // forward
+            {
+                selectedSlotIndex--;
+                if (selectedSlotIndex < 0)
+                    selectedSlotIndex = inventorySize_h - 1;
+
+                SelectItemSlot(selectedSlotIndex);
             }
         }
 
@@ -268,6 +291,7 @@ public class InventoryManager : MonoBehaviour
         }
 
         selectedSlot = inventorySlots[i];
+        selectedSlotIndex = i;
         PlayerStatesManager.Instance.OnSelectedItemChanged(selectedSlot.item);
     }
 
@@ -278,7 +302,7 @@ public class InventoryManager : MonoBehaviour
 
     public void AddItem(InventoryItem item, int count) {
 
-        itemGained?.Invoke(item, count);
+        OnItemGained?.Invoke(item, count);
 
         foreach (InventorySlotInformation slotInfo in inventorySlots)
         {

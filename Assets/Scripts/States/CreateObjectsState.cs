@@ -123,7 +123,7 @@ public class CreateObjectsState : MonoBehaviour, IPlayerState
                     switch (location)
                     {
                         case (ObjectPlaceableLocation.land):
-                            if (checkTile.isWater)
+                            if (TileLocationManager.isWater.HasFlag(checkTile.tileLocation))
                             {
                                 if (checkTile.GetObjectOnTile(ObjectType.ground) == null || !checkTile.GetObjectOnTile(ObjectType.ground).objectsCanBePlacedOnTop)
                                 {
@@ -133,7 +133,7 @@ public class CreateObjectsState : MonoBehaviour, IPlayerState
                             }
                             break;
                         case (ObjectPlaceableLocation.water):
-                            if (!checkTile.isWater)
+                            if (!TileLocationManager.isWater.HasFlag(checkTile.tileLocation))
                             {
                                 objectIsPlaceable = false;
                                 goto EarlyBreak;

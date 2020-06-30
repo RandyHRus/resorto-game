@@ -74,6 +74,6 @@ public class PlayerStatesManager : MonoBehaviour
     //TODO come up with better system (looks ok for now tho)
     public void TerrainButtonClicked()
     {
-        TrySwitchState(TerrainManager.Instance, null);
+        TrySwitchState(TerrainState.Instance, null);
     }
 }

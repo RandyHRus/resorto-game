@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -68,7 +69,7 @@ public class TileInformation
     private ITileObjectFunctions functionsScript; //Only standard objects can have functions (for now)
     public int layerNum; //Water or sand is 0, land will be >1
 
-    public bool isWater;
+    public TileLocation tileLocation;
 
     private int regionId;
 
@@ -136,17 +137,20 @@ public class TileInformation
         }
     }
 
+    public int[] waterBGTracker;
+
     public TileInformation()
     {
         hasFunctions = false;
         functionsScript = null;
-        layerNum = Constants.INVALID_TILE_LAYER;
-        isWater = false;
+        layerNum = 0;
+        tileLocation = TileLocation.Unknown;
         onTopObject = null;
         standardObject = null;
         groundObject = null;
         collision = false;
         regionId = 0;
+        waterBGTracker = new int[4];
     }
 
     public bool SetTileObject(GameObject obj, int id, bool collision, ObjectRotation rotation, ObjectType type, bool objectsCanBePlacedOnTop)
@@ -203,17 +207,17 @@ public class TileInformation
         if (onTopObject != null)
         {
             returnId = onTopObject.id;
-            Object.Destroy(onTopObject.gameObjectOnTile);
+            UnityEngine.Object.Destroy(onTopObject.gameObjectOnTile);
         }
         else if (standardObject != null)
         {
             returnId = standardObject.id;
-            Object.Destroy(standardObject.gameObjectOnTile);
+            UnityEngine.Object.Destroy(standardObject.gameObjectOnTile);
         }
         else if (groundObject != null)
         {
             returnId = groundObject.id;
-            Object.Destroy(groundObject.gameObjectOnTile);
+            UnityEngine.Object.Destroy(groundObject.gameObjectOnTile);
         }
         else
         {
