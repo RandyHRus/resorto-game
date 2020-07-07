@@ -13,8 +13,8 @@ public class FishManager : MonoBehaviour
     private Queue<GameObject> fishQueue;
 
     private float timer;
-    private int maxFishCount = 10; //This is the max number of fish locations, could be less if location is not water 
-    private float lengthBetweenSwitchOut = 5f; //Length between changing location for 1 particle at a time
+    private int maxFishCount = 30; //This is the max number of fish locations, could be less if location is not water 
+    private float lengthBetweenSwitchOut = 1f; //Length between changing location for 1 particle at a time
 
     private static FishManager _instance;
     public static FishManager Instance { get { return _instance; } }
@@ -59,8 +59,8 @@ public class FishManager : MonoBehaviour
         }
         //Adding new fish 
         {
-            float randomX = Random.Range(0f, TileInformationManager.tileCountX - 1);
-            float randomY = Random.Range(0f, TileInformationManager.tileCountY - 1);
+            float randomX = Random.Range(0f, TileInformationManager.mapSize - 1);
+            float randomY = Random.Range(0f, TileInformationManager.mapSize - 1);
             Vector2 pos = new Vector2(randomX, randomY);
 
             TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(new Vector3Int(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y), 0));

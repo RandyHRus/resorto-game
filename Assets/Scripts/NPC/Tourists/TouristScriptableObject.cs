@@ -17,7 +17,7 @@ public class TouristScriptableObject : ScriptableObject
     {
         Vector2 vec = position;
         float depth = DynamicZDepth.GetDynamicZDepth(vec, DynamicZDepth.NPC_OFFSET);
-        GameObject instance = GameObject.Instantiate(ResourceManager.Instance.character, new Vector3(position.x, position.y, depth), Quaternion.identity);
+        GameObject instance = GameObject.Instantiate(ResourceManager.Instance.Character, new Vector3(position.x, position.y, depth), Quaternion.identity);
 
         instance.GetComponent<CharacterCustomizationLoader>().LoadCharacter(character);
         instance.AddComponent<TouristBehaviour>();

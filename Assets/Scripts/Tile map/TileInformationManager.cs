@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class TileInformationManager : MonoBehaviour
 {
-    public static int tileCountX = 60, tileCountY = 60;
+    public static int mapSize = 120;
 
     private TileInformation[,] tileInformationMap;
 
@@ -27,11 +27,11 @@ public class TileInformationManager : MonoBehaviour
         }
         //Initialize information map
         {
-            tileInformationMap = new TileInformation[tileCountX, tileCountY];
+            tileInformationMap = new TileInformation[mapSize, mapSize];
 
-            for (int i = 0; i < tileCountX; i++)
+            for (int i = 0; i < mapSize; i++)
             {
-                for (int j = 0; j < tileCountY; j++)
+                for (int j = 0; j < mapSize; j++)
                 {
                     tileInformationMap[i, j] = new TileInformation();
                 }
@@ -53,7 +53,7 @@ public class TileInformationManager : MonoBehaviour
 
     public bool PositionInMap(Vector3Int position)
     {
-        return (position.x >= 0 && position.y >= 0 && position.x < tileCountX && position.y < tileCountY);
+        return (position.x >= 0 && position.y >= 0 && position.x < mapSize && position.y < mapSize);
     }
 
     public Vector3Int GetMouseTile()
@@ -65,126 +65,39 @@ public class TileInformationManager : MonoBehaviour
 
 public class TileInformation
 {
-    private bool hasFunctions;
-    private ITileObjectFunctions functionsScript; //Only standard objects can have functions (for now)
     public int layerNum; //Water or sand is 0, land will be >1
-
     public TileLocation tileLocation;
+
+    private ObjectOnTile topMostObject;
 
     private int regionId;
 
-    private bool collision_;
-    public bool collision
-    {
-        get
-        {
-            if (standardObject == null)
-                return false;
-            else
-                return collision_;
-        }
-        private set
-        {
-            collision_ = value;
-        }
-    }
+    public bool Collision { get; private set; }
 
-    private ObjectOnTile onTopObject_;
-    public ObjectOnTile onTopObject
-    {
-        get
-        {
-            if (onTopObject_ == null || onTopObject_.gameObjectOnTile == null)
-                return null;
-            else
-                return onTopObject_;
-        }
-        private set
-        {
-            onTopObject_ = value;
-        }
-    }
-
-    private ObjectOnTile standardObject_;
-    public ObjectOnTile standardObject
-    {
-        get
-        {
-            if (standardObject_ == null || standardObject_.gameObjectOnTile == null)
-                return null;
-            else
-                return standardObject_;
-        }
-        private set
-        {
-            standardObject_ = value;
-        }
-    }
-
-    private ObjectOnTile groundObject_;
-    public ObjectOnTile groundObject
-    {
-        get
-        {
-            if (groundObject_ == null || groundObject_.gameObjectOnTile == null)
-                return null;
-            else
-                return groundObject_;
-        }
-        private set
-        {
-            groundObject_ = value;
-        }
-    }
+    public Dictionary<ObjectType, ObjectOnTile> objectTypeToObject { get; private set; }
 
     public int[] waterBGTracker;
 
     public TileInformation()
     {
-        hasFunctions = false;
-        functionsScript = null;
+        topMostObject = null;
         layerNum = 0;
-        tileLocation = TileLocation.Unknown;
-        onTopObject = null;
-        standardObject = null;
-        groundObject = null;
-        collision = false;
+        tileLocation = TileLocation.Unknown;       
+        Collision = false;
         regionId = 0;
         waterBGTracker = new int[4];
+
+        objectTypeToObject = new Dictionary<ObjectType, ObjectOnTile>();
+        objectTypeToObject[ObjectType.onTop] = null;
+        objectTypeToObject[ObjectType.standard] = null;
+        objectTypeToObject[ObjectType.ground] = null;
     }
 
-    public bool SetTileObject(GameObject obj, int id, bool collision, ObjectRotation rotation, ObjectType type, bool objectsCanBePlacedOnTop)
+    public void SetTileObject(GameObject obj, ObjectInformation info, ObjectType type, List<Vector3Int> occupiedTiles, ObjectRotation rotation = ObjectRotation.front)
     {
-        ObjectOnTile objectOnTile = GetObjectOnTile(type);
-
-        if (objectOnTile != null)
-        {
-            Debug.Log("Tried to set object where there already is an object! This should not happen, check beforehand.");
-            return false;
-        }
-        {
-            switch (type)
-            {
-                case (ObjectType.standard):
-                    hasFunctions = obj.GetComponent<ITileObjectFunctions>() != null;
-                    if (hasFunctions)
-                        functionsScript = obj.GetComponent<ITileObjectFunctions>();
-
-                    this.collision = collision;
-
-                    standardObject = new ObjectOnTile(obj, id, rotation, objectsCanBePlacedOnTop);
-                    return true;
-                case (ObjectType.ground):
-                    groundObject = new ObjectOnTile(obj, id, rotation, objectsCanBePlacedOnTop);
-                    return true;
-                case (ObjectType.onTop):
-                    onTopObject = new ObjectOnTile(obj, id, rotation, objectsCanBePlacedOnTop);
-                    return true;
-                default:
-                    Debug.Log("Unknown type!");
-                    return false;
-            }
-        }
+        objectTypeToObject[type] = new ObjectOnTile(obj, info, occupiedTiles, rotation, this, type);
+        topMostObject = GetTopMostObject();
+        Collision = CheckForCollision();
     }
 
     public void SetRegion(int id)
@@ -200,93 +113,99 @@ public class TileInformation
             return null;
     }
 
-    public int RemoveTileObject()
+    public void RemoveTileObject(ObjectType type)
     {
-        int returnId;
-
-        if (onTopObject != null)
-        {
-            returnId = onTopObject.id;
-            UnityEngine.Object.Destroy(onTopObject.gameObjectOnTile);
-        }
-        else if (standardObject != null)
-        {
-            returnId = standardObject.id;
-            UnityEngine.Object.Destroy(standardObject.gameObjectOnTile);
-        }
-        else if (groundObject != null)
-        {
-            returnId = groundObject.id;
-            UnityEngine.Object.Destroy(groundObject.gameObjectOnTile);
-        }
-        else
-        {
-            Debug.Log("No object to destroy!");
-            returnId = Constants.INVALID_ID;
-        }
-
-        return returnId;
-
+        objectTypeToObject[type] = null;
+        topMostObject = GetTopMostObject();
+        Collision = CheckForCollision();
     }
 
-    public ObjectOnTile GetObjectOnTile(ObjectType type)
+    private ObjectOnTile GetTopMostObject()
     {
-        switch (type)
-        {
-            case (ObjectType.standard): return standardObject;
-            case (ObjectType.onTop): return onTopObject;
-            case (ObjectType.ground): return groundObject;
-            default:
-                Debug.Log("Unknown type!");
-                return null;
-        }
+        ObjectType topMostObjectType = GetTopMostObjectType();
+        if (topMostObjectType == ObjectType.None)
+            return null;
+        else
+            return objectTypeToObject[topMostObjectType];
+    }
+
+    public ObjectType GetTopMostObjectType()
+    {
+        if (objectTypeToObject[ObjectType.onTop] != null)
+            return ObjectType.onTop;
+        else if (objectTypeToObject[ObjectType.standard] != null)
+            return ObjectType.standard;
+        else if (objectTypeToObject[ObjectType.ground] != null)
+            return ObjectType.ground;
+        else
+            return ObjectType.None;
     }
 
     public bool TileIsEmpty()
     {
-        return (standardObject == null && groundObject == null && onTopObject == null);
+        return (objectTypeToObject[ObjectType.onTop] == null && 
+                objectTypeToObject[ObjectType.standard] == null && 
+                objectTypeToObject[ObjectType.ground] == null);
     }
 
     public void StepOn()
     {
-        if (hasFunctions && standardObject != null)
-            functionsScript.StepOn();
+        if (topMostObject != null && topMostObject.Functions != null)
+            topMostObject.Functions.StepOn();
     }
 
     public void StepOff()
     {
-        if (hasFunctions && standardObject != null)
-            functionsScript.StepOff();
+        if (topMostObject != null && topMostObject.Functions != null)
+            topMostObject.Functions.StepOff();
     }
 
-    public void ClickLeft()
+    public void ClickInteract()
     {
-        if (hasFunctions && standardObject != null)
-            functionsScript.ClickLeft();
+        if (topMostObject != null && topMostObject.Functions != null)
+            topMostObject.Functions.ClickInteract();
     }
 
-    public void ClickRight()
+    private bool CheckForCollision()
     {
-        if (hasFunctions && standardObject != null)
-            functionsScript.ClickRight();
+        return ((objectTypeToObject[ObjectType.onTop] != null    && objectTypeToObject[ObjectType.onTop].ObjectInfo.Collision) || 
+                (objectTypeToObject[ObjectType.standard] != null && objectTypeToObject[ObjectType.standard].ObjectInfo.Collision) || 
+                (objectTypeToObject[ObjectType.ground] != null   && objectTypeToObject[ObjectType.ground].ObjectInfo.Collision));
     }
 }
 
 public class ObjectOnTile
 {
-    public ObjectOnTile(GameObject gameObjectOnTile, int id, ObjectRotation rotation, bool objectsCanBePlacedOnTop)
+    public ObjectOnTile(GameObject gameObjectOnTile, ObjectInformation objectInfo, List<Vector3Int> occupiedTiles, ObjectRotation rotation, TileInformation parentTile, ObjectType modifiedType)
     {
-        this.gameObjectOnTile = gameObjectOnTile;
-        this.id = id;
-        this.rotation = rotation;
-        this.objectsCanBePlacedOnTop = objectsCanBePlacedOnTop;
+        this.ObjectInfo = objectInfo;
+        this.GameObjectOnTile = gameObjectOnTile;
+        this.Rotation = rotation;
+        this.OccupiedTiles = occupiedTiles;
+
+        this.Functions = gameObjectOnTile.GetComponent<ITileObjectFunctions>();
+        if (Functions != null)
+            Functions.Initialize(this);
+
+        this.modifiedType = modifiedType;
+        this.parentTile = parentTile;
     }
 
-    public GameObject gameObjectOnTile { get; private set; }
+    public void RemoveFromTile()
+    {
+        TileObjectsManager.Instance.RemoveObject(parentTile, modifiedType);
+    }
 
-    public int id { get; private set; }
+    public ITileObjectFunctions Functions { get; private set; }
 
-    public ObjectRotation rotation { get; private set; }
+    public List<Vector3Int> OccupiedTiles { get; private set; }
 
-    public bool objectsCanBePlacedOnTop { get; private set; }
+    public ObjectInformation ObjectInfo { get; private set; }
+
+    public GameObject GameObjectOnTile { get; private set; }
+
+    public ObjectRotation Rotation { get; private set; }
+
+    private TileInformation parentTile;
+    private ObjectType modifiedType;
 }

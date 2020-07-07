@@ -16,13 +16,8 @@ public abstract class UIObject
         ObjectTransform.SetParent(parent, false);
     }
 
-    public void Show()
+    public void Show(bool show)
     {
-        ObjectInScene.SetActive(true);
-    }
-
-    public void Hide()
-    {
-        ObjectInScene.SetActive(false);
+        ObjectInScene.SetActive(show);
     }
 }

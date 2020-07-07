@@ -317,9 +317,9 @@ public class FishBehaviour : MonoBehaviour
             tile_hv = TileInformationManager.Instance.GetTileInformation(new Vector3Int(tile.x + signX, tile.y + signY, 0));
         }
 
-        tile_h_collision = (tile_h == null || tile_h.tileLocation == TileLocation.WaterEdge);
-        tile_v_collision = (tile_v == null || tile_v.tileLocation == TileLocation.WaterEdge);
-        tile_hv_collision = (tile_hv == null || tile_hv.tileLocation == TileLocation.WaterEdge);
+        tile_h_collision = (tile_h == null || tile_h.tileLocation != TileLocation.DeepWater);
+        tile_v_collision = (tile_v == null || tile_v.tileLocation != TileLocation.DeepWater);
+        tile_hv_collision = (tile_hv == null || tile_hv.tileLocation != TileLocation.DeepWater);
     }
 
 

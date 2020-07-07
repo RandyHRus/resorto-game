@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class CharacterInformation
 {
-    [SerializeField] private CharacterPartSpritePreDefined eyes = new CharacterPartSpritePreDefined();
+    [SerializeField] private CharacterPartSpriteEditable eyes = new CharacterPartSpriteEditable();
     [SerializeField] private CharacterPartSpritePreDefined skin = new CharacterPartSpritePreDefined();
     [SerializeField] private CharacterPartSpritePreDefined pants = new CharacterPartSpritePreDefined();
     [SerializeField] private CharacterPartSpritePreDefined shoes = new CharacterPartSpritePreDefined();

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class NPCManager : MonoBehaviour
 {
-    [SerializeField] private List<TouristScriptableObject> tourists = null;
+    //[SerializeField] private List<TouristScriptableObject> tourists = null;
 
     private static NPCManager _instance;
     public static NPCManager Instance { get { return _instance; } }
@@ -22,16 +22,18 @@ public class NPCManager : MonoBehaviour
             }
         }
 
-        IslandGenerator.OnMapLoad += CreateNPCs;
+        IslandGenerationPipeline.IslandCompleted += CreateNPCs;
     }
 
     private void CreateNPCs()
     {
         //TODO remove
+        /*
         foreach(TouristScriptableObject tourist in tourists)
         {
-            tourist.CreateInScene(new Vector2Int(31, 30));
+            tourist.CreateInScene(new Vector2Int(10, 10));
         }
+        */
     }
 }
 

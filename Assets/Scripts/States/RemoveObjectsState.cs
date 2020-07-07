@@ -56,19 +56,19 @@ public class RemoveObjectsState : MonoBehaviour, IPlayerState
             indicator.transform.position = new Vector2(mouseTilePosition.x, mouseTilePosition.y);
 
             if (tileIsNotEmpty)
-                indicatorRenderer.color = ResourceManager.Instance.yellow;
+                indicatorRenderer.color = ResourceManager.Instance.Green;
             else
-                indicatorRenderer.color = ResourceManager.Instance.red;
+                indicatorRenderer.color = ResourceManager.Instance.Red;
         }
 
         //Remove
         if (tileIsNotEmpty && Input.GetButtonDown("Primary"))
         {
-            int removedId = TileInformationManager.Instance.GetTileInformation(mouseTilePosition).RemoveTileObject();
-            if (removedId != Constants.INVALID_ID)
-            {
-                InventoryManager.Instance.AddItem(new ObjectItem(removedId), 1);
-            }
+            TileInformation info = TileInformationManager.Instance.GetTileInformation(mouseTilePosition);
+            ObjectType highestObject = info.GetTopMostObjectType();
+
+            TileObjectsManager.Instance.RemoveObject(info, highestObject);
+
         }
     }
 

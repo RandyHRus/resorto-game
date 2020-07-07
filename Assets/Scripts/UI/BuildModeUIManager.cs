@@ -49,12 +49,12 @@ public class BuildModeUIManager : MonoBehaviour
 
     public void ShowRegionPanel()
     {
-        regionPanel.Show();
+        regionPanel.Show(true);
     }
 
     public void ClosePanel()
     {
-        regionPanel.Hide();
+        regionPanel.Show(false);
         //Can add more panels here
     }
 }

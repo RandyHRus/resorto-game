@@ -41,15 +41,17 @@ public class PlayerMovement : MonoBehaviour
         boxColliderSizeX = CollisionManager.boxColliderSizeX;
         boxColliderSizeY = CollisionManager.boxColliderSizeY;
         BUFFER = CollisionManager.BUFFER;
-
-        IslandGenerator.OnMapLoad += InitializeLayer;
     }
 
-    private void InitializeLayer()
+    //Called from PlayerInitialization
+    public void InitializeLayerAndDepth()
     {
         Vector3Int tilePos = new Vector3Int(Mathf.RoundToInt(playerTransform.position.x), Mathf.RoundToInt(playerTransform.position.y), 0);
         int layerNum = TileInformationManager.Instance.GetTileInformation(tilePos).layerNum;
         currentTileLayer = layerNum;
+
+        //Set depth
+        playerTransform.position = new Vector3(playerTransform.position.x, playerTransform.position.y, DynamicZDepth.GetDynamicZDepth(playerTransform.position, DynamicZDepth.PLAYER_OFFSET));
     }
 
     public void Execute()

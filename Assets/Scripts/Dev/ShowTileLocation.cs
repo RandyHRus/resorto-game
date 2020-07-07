@@ -7,21 +7,20 @@ public static class ShowTileLocation
 {
     public static Color32[,] GetColorMap()
     {
-        int mapWidth = TileInformationManager.tileCountX;
-        int mapHeight = TileInformationManager.tileCountY;
+        int mapSize = TileInformationManager.mapSize;
 
-        Color32[,] colorMap = new Color32[mapWidth, mapHeight];
+        Color32[,] colorMap = new Color32[mapSize, mapSize];
 
-        for (int x = 0; x < mapWidth; x++)
+        for (int x = 0; x < mapSize; x++)
         {
-            for (int y = 0; y < mapHeight; y++)
+            for (int y = 0; y < mapSize; y++)
             {
                 Vector3Int pos = new Vector3Int(x, y, 0);
                 TileInformation info = TileInformationManager.Instance.GetTileInformation(pos);
 
                 int devVisualizationIndex = Array.IndexOf(Enum.GetValues(info.tileLocation.GetType()), info.tileLocation);
 
-                Color32 color = ResourceManager.Instance.tileLocationColors[devVisualizationIndex];
+                Color32 color = ResourceManager.Instance.TileLocationColors[devVisualizationIndex];
                 colorMap[x, y] = color;
             }
         }

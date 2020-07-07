@@ -5,24 +5,23 @@ using UnityEngine.UI;
 
 public class InventoryManager : MonoBehaviour
 {
-    private int slotCapacity = 5;
-    [SerializeField] private GameObject canvas = null;
-    [SerializeField] private GameObject inventorySlotPrefab = null;
-    [SerializeField] private GameObject draggingSlotPrefab = null;
+    [SerializeField] private GameObject dropitemSlotPrefab = null;
+    [SerializeField] private InventoryItemInformation[] starterItems = null;
+    [SerializeField] private Transform playerTransform = null;
     private int inventorySize_h = 10;
     private int inventorySize_v = 3;
     private int totalSlotCount;
 
     bool isInventoryOpen;
 
-    private InventorySlotInformation[] inventorySlots;
-    private InventorySlotInformation mouseDraggingSlotInformation = null;
-    private Transform mouseDraggingSlotTransform;
+    private Storage inventory;
+    private ItemSlot mouseDraggingSlotInformation = null;
+    private GameObject itemDropSlot;
 
     private Color32 selectedSlotColor = new Color32(189, 189, 189, 255);
 
     private int selectedSlotIndex = -1;
-    private InventorySlotInformation selectedSlot = null;
+    private ItemSlot selectedSlot = null;
 
     private KeyCode[] numberKeys = {
          KeyCode.Alpha1,
@@ -37,60 +36,7 @@ public class InventoryManager : MonoBehaviour
          KeyCode.Alpha0,
      };
 
-    private class InventorySlotInformation
-    {
-        public InventoryItem item { get; private set; }
-        public int count { get; private set; }
-        public Image iconImage;
-        public Text itemCountText;
-        public GameObject slotObject;
-
-
-        public void SetSlot(InventoryItem item, int count)
-        {
-            this.item = item;
-            this.count = count;
-
-            if (count <= 0)
-            {
-                this.item = null;
-                this.count = 0;
-            }
-        }
-
-        public void ClearSlot()
-        {
-            item = null;
-            count = 0;
-        }
-
-        public InventorySlotInformation(GameObject slotObject) {
-            item = null;
-            count = 0;
-            this.slotObject = slotObject;
-
-            {
-                //Find child components
-                Transform t = slotObject.transform;
-                foreach (Transform tr in t)
-                {
-                    if (tr.tag == "Item Count Field")
-                    {
-                        itemCountText = tr.GetComponent<Text>();
-                    }
-                    else if (tr.tag == "Item Icon Field")
-                    {
-                        iconImage = tr.GetComponent<Image>();
-                    }
-                }
-            }
-
-            iconImage.enabled = false; //To remove white space
-            itemCountText.enabled = false;
-        }
-    }
-
-    public delegate void ItemGained(InventoryItem item, int count);
+    public delegate void ItemGained(InventoryItemInformation item, int count);
     public static event ItemGained OnItemGained;
 
     private static InventoryManager _instance;
@@ -117,7 +63,7 @@ public class InventoryManager : MonoBehaviour
             int slotStartX = 60;
             int slotPadding = 60;
 
-            inventorySlots = new InventorySlotInformation[totalSlotCount];
+            inventory = new Storage(totalSlotCount);
 
             for (int k = 0; k < inventorySize_v; k++)
             {
@@ -125,36 +71,34 @@ public class InventoryManager : MonoBehaviour
 
                 for (int i = 0; i < inventorySize_h; i++)
                 {
-                    GameObject obj = Instantiate(inventorySlotPrefab);
                     int index = i + (inventorySize_h * k);
 
-                    //Set parent and transform position
+                    //Create
                     {
-                        obj.transform.SetParent(canvas.transform, false);
-
                         int slotPosX = slotStartX + i * slotPadding;
-                        obj.GetComponent<RectTransform>().anchoredPosition = new Vector2(slotPosX, slotPosY);
-                    }
-                    //Create and set up slot information
-                    {
-                        inventorySlots[index] = new InventorySlotInformation(obj);
+                        inventory.GetItemSlot(index).RectTransform.anchoredPosition = (new Vector2(slotPosX, slotPosY));
                     }
                     //Button
                     {
-                        InventorySlotClick script = obj.AddComponent<InventorySlotClick>();
+                        InventorySlotClick script = inventory.GetItemSlot(index).ObjectInScene.AddComponent<InventorySlotClick>();
                         script.slotIndex = index;
                     }
                 }
             }
-        }
-        //Craete mouse dragging slot
-        {
-            GameObject obj = Instantiate(draggingSlotPrefab);
+            //Create trashcan
+            {
+                int slotPosX = slotStartX + (inventorySize_h * slotPadding);
+                int slotPosY = slotStartY - ((inventorySize_v-1) * slotPadding);
 
-            obj.transform.SetParent(canvas.transform, false);
-
-            mouseDraggingSlotInformation = new InventorySlotInformation(obj);
-            mouseDraggingSlotTransform = obj.transform;
+                itemDropSlot = Instantiate(dropitemSlotPrefab);
+                itemDropSlot.transform.SetParent(ResourceManager.Instance.InventoryCanvas.transform, false);
+                itemDropSlot.GetComponent<RectTransform>().anchoredPosition = new Vector2(slotPosX, slotPosY);
+            }
+            //Craete mouse dragging slot
+            {
+                mouseDraggingSlotInformation = new ItemSlot();
+                mouseDraggingSlotInformation.ObjectInScene.GetComponent<Image>().enabled = false;
+            }
         }
     }
 
@@ -162,17 +106,10 @@ public class InventoryManager : MonoBehaviour
     {
         ToggleInventory(false);
 
-        //TODO remove
-        AddItem(new ToolItem(0), 1);
-        AddItem(new ToolItem(1), 1);
-        AddItem(new ToolItem(2), 1);
-        AddItem(new ObjectItem(0), 3);
-        AddItem(new ObjectItem(1), 3);
-        AddItem(new ObjectItem(2), 3);
-        AddItem(new ObjectItem(3), 3);
-        AddItem(new ObjectItem(4), 3);
-        AddItem(new ObjectItem(5), 3);
-        AddItem(new ObjectItem(6), 3);
+        foreach (InventoryItemInformation item in starterItems)
+        {
+            AddItem(item, 1);
+        }
     }
 
     private void Update()
@@ -215,7 +152,7 @@ public class InventoryManager : MonoBehaviour
         if (isInventoryOpen)
         {
             Vector2 mouseToWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mouseDraggingSlotTransform.position = new Vector2(mouseToWorld.x, mouseToWorld.y);
+            mouseDraggingSlotInformation.ObjectTransform.position = (new Vector2(mouseToWorld.x, mouseToWorld.y));
         }
     }
 
@@ -223,30 +160,31 @@ public class InventoryManager : MonoBehaviour
     {
         if (isInventoryOpen)
         {
-            InventoryItem inventoryItem = inventorySlots[i].item;
-            int inventoryCount = inventorySlots[i].count;
+            ItemSlot inventorySlot = inventory.GetItemSlot(i);
+            InventoryItemInformation inventoryItem = inventorySlot.Item;
+            int inventoryCount = inventorySlot.Count;
 
             //Just put mouse item in inventory slot
             if (inventoryItem == null)
             {
-                inventorySlots[i].SetSlot(mouseDraggingSlotInformation.item, mouseDraggingSlotInformation.count);
+                inventorySlot.SetSlot(mouseDraggingSlotInformation.Item, mouseDraggingSlotInformation.Count);
                 mouseDraggingSlotInformation.ClearSlot();
             }
             //Fill slot with dragging item
-            else if (inventoryItem.Equals(mouseDraggingSlotInformation.item))
+            else if (inventoryItem.Equals(mouseDraggingSlotInformation.Item))
             {
-                FillSlotToCapacity(inventorySlots[i], inventoryItem, mouseDraggingSlotInformation.count, out int remains);
+                FillSlotToCapacity(inventorySlot, inventoryItem, mouseDraggingSlotInformation.Count, out int remains);
                 mouseDraggingSlotInformation.SetSlot(inventoryItem, remains);
             }
             //Switch slots items
             else
             {
-                inventorySlots[i].SetSlot(mouseDraggingSlotInformation.item, mouseDraggingSlotInformation.count);
+                inventorySlot.SetSlot(mouseDraggingSlotInformation.Item, mouseDraggingSlotInformation.Count);
                 mouseDraggingSlotInformation.SetSlot(inventoryItem, inventoryCount);
             }
 
-            RefreshSlotUI(inventorySlots[i]);
-            RefreshSlotUI(mouseDraggingSlotInformation);
+            inventorySlot.RefreshUI();
+            mouseDraggingSlotInformation.RefreshUI();
         }
     }
 
@@ -258,41 +196,21 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    private void RefreshSlotUI(InventorySlotInformation info)
-    {
-        if (info.item == null)
-        {
-            info.iconImage.sprite = null;
-            info.iconImage.enabled = false;
-
-            info.itemCountText.text = "";
-            info.itemCountText.enabled = false;
-        }
-        else
-        {
-            info.iconImage.sprite = info.item.itemIcon;
-            info.iconImage.enabled = true;
-
-            info.itemCountText.text = info.count.ToString();
-            info.itemCountText.enabled = true;
-        }
-    }
-
     public void SelectItemSlot(int i)
     {
         //Highlight selected slot, unhighlight previously selected slot
         if (selectedSlot != null)
-            selectedSlot.slotObject.GetComponent<Image>().color = Color.white;
-        inventorySlots[i].slotObject.GetComponent<Image>().color = selectedSlotColor;
+            selectedSlot.ObjectInScene.GetComponent<Image>().color = Color.white;
 
         if (i >= totalSlotCount) {
-            Debug.Log("Invalid item slot");
+            Debug.LogError("Invalid item slot");
             return;
         }
 
-        selectedSlot = inventorySlots[i];
+        selectedSlot = inventory.GetItemSlot(i);
+        selectedSlot.ObjectInScene.GetComponent<Image>().color = selectedSlotColor;
         selectedSlotIndex = i;
-        PlayerStatesManager.Instance.OnSelectedItemChanged(selectedSlot.item);
+        PlayerStatesManager.Instance.OnSelectedItemChanged(selectedSlot.Item);
     }
 
     public void RemoveItem(int itemId, int count)
@@ -300,21 +218,22 @@ public class InventoryManager : MonoBehaviour
         //TODO
     }
 
-    public void AddItem(InventoryItem item, int count) {
+    public void AddItem(InventoryItemInformation item, int count) {
 
         OnItemGained?.Invoke(item, count);
 
-        foreach (InventorySlotInformation slotInfo in inventorySlots)
+        for (int i = 0; i < totalSlotCount; i++)
         {
-            if (slotInfo.item == null || (item.id == slotInfo.item.id && item.GetType() == slotInfo.item.GetType()))
+            ItemSlot slot = inventory.GetItemSlot(i);
+            if (slot.Item == null || (item == slot.Item))
             {
                 //Add items
                 {
-                    FillSlotToCapacity(slotInfo, item, count, out count);
+                    FillSlotToCapacity(slot, item, count, out count);
                 }
                 //Refresh info
                 {
-                    RefreshSlotUI(slotInfo);
+                    slot.RefreshUI();
                 }
             }
         }
@@ -325,18 +244,18 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    private void FillSlotToCapacity(InventorySlotInformation slotInfo, InventoryItem item, int count, out int remains)
+    private void FillSlotToCapacity(ItemSlot slot, InventoryItemInformation item, int count, out int remains)
     {
-        if (slotInfo.count + count <= slotCapacity)
+        if (slot.Count + count <= slot.capacity)
         {
-            slotInfo.SetSlot(item, slotInfo.count + count);
+            slot.SetSlot(item, slot.Count + count);
             remains = 0;
             return;
         }
-        else if (slotInfo.count < slotCapacity)
+        else if (slot.Count < slot.capacity)
         {
-            count -= slotCapacity - slotInfo.count;
-            slotInfo.SetSlot(item, slotCapacity);
+            count -= slot.capacity - slot.Count;
+            slot.SetSlot(item, slot.capacity);
             remains = count;
             return;
         }
@@ -350,195 +269,25 @@ public class InventoryManager : MonoBehaviour
 
         for (int i = 1; i < inventorySize_v; i++) {
             for (int j = 0; j < inventorySize_h; j++) {
-                inventorySlots[j + (inventorySize_h * i)].slotObject.SetActive(show);
+                inventory.GetItemSlot(j + (inventorySize_h * i)).Show(show);
             }
         }
 
-        mouseDraggingSlotInformation.slotObject.SetActive(show);
+        mouseDraggingSlotInformation.Show(show);
+        itemDropSlot.SetActive(show);
     }
 
-    public InventoryItem GetSelectedItem()
+    public InventoryItemInformation GetSelectedItem()
     {
         if (selectedSlot != null)
-            return selectedSlot.item;
+            return selectedSlot.Item;
         else
             return null;
     }
-}
 
-#region Inventory items
-
-public interface InventoryItem: System.IEquatable<InventoryItem>
-{
-    int id { get; }
-    Sprite itemIcon { get; }
-    string itemName { get; }
-    IPlayerState onSelectStateInstance { get; }
-}
-
-public class ObjectItem: InventoryItem
-{
-    private int id_;
-    public int id {
-        get {
-            return id_;
-        }
-        private set {
-            id_ = value;
-        }
-    }
-    private Sprite itemIcon_;
-    public Sprite itemIcon {
-        get {
-            return itemIcon_;
-        }
-        private set {
-            itemIcon_ = value;
-        }
-    }
-    private string itemName_;
-    public string itemName {
-        get {
-            return itemName_;
-        }
-        private set {
-            itemName_ = value;
-        }
-    }
-
-    public IPlayerState onSelectStateInstance {
-        get {
-            return CreateObjectsState.Instance;
-        }
-    }
-
-    public ObjectItem(int id)
+    public void DropDraggingItem()
     {
-        this.id = id;
-        if (ObjectInformationManager.Instance.objectInformationMap.TryGetValue(id, out ObjectInformation info))
-        {
-            itemIcon = info.iconSprite;
-            itemName = info.objectName;
-        } 
-        else
-        {
-            Debug.Log("Could not find object with id: " + id);
-        }
-    }
-
-    public override bool Equals(object obj)
-    {
-        return this.Equals(obj as InventoryItem);
-    }
-
-    public bool Equals(InventoryItem item)
-    {
-        if (Object.ReferenceEquals(item, null))
-        {
-            return false;
-        }
-
-        if (Object.ReferenceEquals(this, item))
-        {
-            return true;
-        }
-
-        if (this.GetType() != item.GetType())
-        {
-            return false;
-        }
-
-        return (id == item.id);
-    }
-
-    public override int GetHashCode()
-    {
-        return 0001000000 + id;
+        if (mouseDraggingSlotInformation.Item != null)
+            DropItems.DropItem(playerTransform.position, mouseDraggingSlotInformation.Item, mouseDraggingSlotInformation.Count);
     }
 }
-
-public class ToolItem: InventoryItem
-{
-    private int id_;
-    public int id {
-        get {
-            return id_;
-        }
-        private set {
-            id_ = value;
-        }
-    }
-    private Sprite itemIcon_;
-    public Sprite itemIcon {
-        get {
-            return itemIcon_;
-        }
-        private set {
-            itemIcon_ = value;
-        }
-    }
-    private string itemName_;
-    public string itemName {
-        get {
-            return itemName_;
-        }
-        private set {
-            itemName_ = value;
-        }
-    }
-
-    private IPlayerState onSelectStateInstance_;
-    public IPlayerState onSelectStateInstance {
-        get {
-            return onSelectStateInstance_;
-        }
-    }
-
-    public ToolItem(int id)
-    {
-        this.id = id;
-        if (ToolInformationManager.Instance.informationMap.TryGetValue(id, out ToolInformation info))
-        {
-            itemIcon = info.icon;
-            itemName = info.name;
-
-            onSelectStateInstance_ = ToolInformationManager.Instance.GetToolState(info.toolState);
-        }
-        else
-        {
-            Debug.Log("Could not find tool with id: " + id);
-        }
-    }
-
-    public override bool Equals(object obj)
-    {
-        return this.Equals(obj as InventoryItem);
-    }
-
-    public bool Equals(InventoryItem item)
-    {
-        if (Object.ReferenceEquals(item, null))
-        {
-            return false;
-        }
-
-        if (Object.ReferenceEquals(this, item))
-        {
-            return true;
-        }
-
-        if (this.GetType() != item.GetType())
-        {
-            return false;
-        }
-
-        return (id == item.id);
-    }
-
-    public override int GetHashCode()
-    {
-        return 0002000000 + id;
-    }
-}
-
-#endregion

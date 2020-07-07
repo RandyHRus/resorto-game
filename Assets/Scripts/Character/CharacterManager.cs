@@ -54,7 +54,7 @@ public class CharacterManager : MonoBehaviour
                         charInfo.partInformations[i].Sprite = sprites[Random.Range(0, sprites.Length)];
                     } catch (System.Exception e)
                     {
-                        Debug.Log(e);
+                        Debug.LogError(e);
                     }
                 }
             }

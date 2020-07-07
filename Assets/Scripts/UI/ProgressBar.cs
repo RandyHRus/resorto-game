@@ -6,7 +6,7 @@ public class ProgressBar: UIObject
 {
     private Transform fillBarTransform;
 
-    public ProgressBar(Canvas canvas): base(ResourceManager.Instance.progressbar, canvas.transform)
+    public ProgressBar(Canvas canvas): base(ResourceManager.Instance.Progressbar, canvas.transform)
     {
         foreach (Transform t in ObjectTransform)
         {
@@ -21,10 +21,5 @@ public class ProgressBar: UIObject
     public void SetFill(float xScale)
     {
         fillBarTransform.localScale = new Vector3(xScale, 1, 1);
-    }
-
-    public void SetPosition(Vector2 position)
-    {
-        ObjectTransform.position = position;
     }
 }

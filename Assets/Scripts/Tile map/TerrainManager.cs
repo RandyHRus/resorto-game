@@ -250,6 +250,8 @@ public class TerrainManager : MonoBehaviour
                     }
                 }
                 SetTileCode(neighbour.Key, neighbourTileCode, sandWaterTilemapInfo, sandTilemap);
+                if (neighbourTileCode == 0b000000000)
+                    TileInformationManager.Instance.GetTileInformation(neighbour.Key).tileLocation = TileLocation.DeepWater;
             }
         }
         //Water background
@@ -358,7 +360,7 @@ public class TerrainManager : MonoBehaviour
 
                 if (newTileIsGrass) //Full grass
                 {
-                    tile.tileLocation = TileLocation.Land;
+                    tile.tileLocation = TileLocation.Grass;
                 }
                 else
                 {
@@ -399,7 +401,8 @@ public class TerrainManager : MonoBehaviour
 
         foreach (KeyValuePair<Vector3Int, int> pair in bitsToRemoveFromTiles)
         {
-            bool existingTileIsGrass = TileIsGrass(tilemapLayer.GetTile(pair.Key), tilemapLayer);
+            TileBase existingTile = tilemapLayer.GetTile(pair.Key);
+            bool existingTileIsGrass = TileIsGrass(existingTile, tilemapLayer);
 
             if (AddOrRemoveTileCode(pair.Key, pair.Value, landTilemapInfo, tilemapLayer, false, out int newCode))
             {
@@ -411,9 +414,12 @@ public class TerrainManager : MonoBehaviour
                     tile.layerNum--;
 
                 TileBase newTile = tilemapLayer.GetTile(pair.Key);
-                //bool newTileIsGrass = TileIsGrass(newTile, tilemapLayer);
 
-                if (newTile == null)
+                if (newTile == null && existingTile == null)
+                {
+                    //Nothing changed
+                }
+                else if (newTile == null)
                 {
                     if (tile.layerNum == 0)
                     {
@@ -422,12 +428,12 @@ public class TerrainManager : MonoBehaviour
                     }
                     else
                     {
-                        tile.tileLocation = TileLocation.Land;
+                        tile.tileLocation = TileLocation.Grass;
                     }
                 }
                 else if (newTileIsGrass)
                 {
-                    tile.tileLocation = TileLocation.Land;
+                    tile.tileLocation = TileLocation.Grass;
                 }
                 else
                 {
@@ -479,6 +485,11 @@ public class TerrainManager : MonoBehaviour
 
         if (mainTileLocation == TileLocation.Sand)
         {
+            if (checkForObjectsAtPosition(position, 0)) {
+                layerNumber = Constants.INVALID_TILE_LAYER;
+                return false;
+            }
+
             //If tile is sand, simple return
             layerNumber = 0;
             return true;
@@ -501,7 +512,7 @@ public class TerrainManager : MonoBehaviour
                 }
             }
             //Below
-            else if (aboveTileInformation.tileLocation == TileLocation.Land)
+            else if (aboveTileInformation.tileLocation == TileLocation.Grass)
             {
                 proposedLayerNumber = aboveTileInformation.layerNum;
             }
@@ -517,7 +528,7 @@ public class TerrainManager : MonoBehaviour
 
             //Check layer up
             {
-                Tilemap tilemapLayerToCheck = GetTilemapLayer(proposedLayerNumber + 1);
+                int objectLayerNumToCheck = proposedLayerNumber;
                 Vector3Int[] positionsToCheck = new Vector3Int[]
                 {
                     new Vector3Int(aboveTilePosition.x,     aboveTilePosition.y, 0),
@@ -531,14 +542,15 @@ public class TerrainManager : MonoBehaviour
                 //Check for objects
                 foreach (Vector3Int positionToCheck in positionsToCheck)
                 {
-                    if (!TileInformationManager.Instance.GetTileInformation(positionToCheck).TileIsEmpty())
-                    {
+                    if (checkForObjectsAtPosition(positionToCheck, objectLayerNumToCheck)) {
                         layerNumber = Constants.INVALID_TILE_LAYER;
                         return false;
                     }
                 }
 
                 //Check for land
+                int terrainLayerNumToCheck = proposedLayerNumber + 1;
+                Tilemap tilemapLayerToCheck = GetTilemapLayer(terrainLayerNumToCheck);
                 if (tilemapLayerToCheck != null)
                 {
                     foreach (Vector3Int positionToCheck in positionsToCheck)
@@ -554,6 +566,16 @@ public class TerrainManager : MonoBehaviour
 
             layerNumber = proposedLayerNumber;
             return true;
+        }
+
+        bool checkForObjectsAtPosition(Vector3Int pos, int layerNum)
+        {
+            TileInformation info = TileInformationManager.Instance.GetTileInformation(pos);
+            if (info.layerNum == layerNum && !info.TileIsEmpty())
+            {
+                return true;
+            }
+            return false;
         }
     }
 

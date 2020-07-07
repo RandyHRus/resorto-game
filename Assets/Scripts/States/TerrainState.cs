@@ -66,12 +66,12 @@ public class TerrainState : MonoBehaviour, IPlayerState
 
         indicator.transform.position = new Vector2(mouseTilePosition.x, mouseTilePosition.y);
         indicatorRenderer.sprite = landIndicatorSprite;
-        indicatorRenderer.color = ResourceManager.Instance.red;
+        indicatorRenderer.color = ResourceManager.Instance.Red;
 
         {
             if (TerrainManager.Instance.TerrainRemoveable(mouseTilePosition, out int layerNumber))
             {
-                indicatorRenderer.color = ResourceManager.Instance.yellow;
+                indicatorRenderer.color = ResourceManager.Instance.Yellow;
 
                 if (Input.GetButtonDown("Secondary"))
                 {
@@ -91,7 +91,7 @@ public class TerrainState : MonoBehaviour, IPlayerState
         {
             if (TerrainManager.Instance.TerrainPlaceable(mouseTilePosition, out int layerNumber))
             {
-                indicatorRenderer.color = ResourceManager.Instance.green;
+                indicatorRenderer.color = ResourceManager.Instance.Green;
 
                 if (layerNumber == 0)
                     indicatorRenderer.sprite = sandIndicatorSprite;

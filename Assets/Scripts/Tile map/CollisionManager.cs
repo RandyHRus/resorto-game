@@ -8,6 +8,8 @@ public class CollisionManager : MonoBehaviour
     public static float boxColliderSizeY = 0.2f;
     public static float BUFFER = 1 / 16f;
 
+    public ObjectInformation stairsObject;
+
     private static CollisionManager _instance;
     public static CollisionManager Instance { get { return _instance; } }
     private void Awake()
@@ -66,13 +68,15 @@ public class CollisionManager : MonoBehaviour
     {
         TileInformation tile = TileInformationManager.Instance.GetTileInformation(tilePosition);
         if (!TileInformationManager.Instance.PositionInMap(tilePosition))
-        {
             return true;
-        }
+
+        if (tile.Collision) //TODO could be changed to precise collision checking?
+            return true;
+
         //If water and no ground object, means there is collision with water
-        if (tile.tileLocation == TileLocation.WaterEdge)
+        if (TileLocationManager.isWater.HasFlag(tile.tileLocation))
         {
-            if (tile.GetObjectOnTile(ObjectType.ground) == null)
+            if (tile.objectTypeToObject[ObjectType.ground] == null)
                 return true;
         }
 
@@ -80,13 +84,7 @@ public class CollisionManager : MonoBehaviour
             return true;
 
         if (tile.layerNum != tileLayer)
-        {
             return true;
-        }
-        if (tile.collision) //TODO could be changed to precise collision checking?
-        {
-            return true;
-        }
         
         return false;
     }
@@ -162,12 +160,12 @@ public class CollisionManager : MonoBehaviour
     {
         TileInformation tile = TileInformationManager.Instance.GetTileInformation(tilePosition);
 
-        if (tile == null || tile.standardObject == null)
+        if (tile == null || tile.objectTypeToObject[ObjectType.standard] == null)
             return false;
 
         if (tileLayer != tile.layerNum)
             return false;
 
-        return (tile.standardObject.id == 0 && tile.standardObject.rotation == rotation);
+        return (tile.objectTypeToObject[ObjectType.standard].ObjectInfo == stairsObject && tile.objectTypeToObject[ObjectType.standard].Rotation == rotation);
     }
 }

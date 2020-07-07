@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3197150672211723964}
-  - component: {fileID: -1019110220261828033}
+  - component: {fileID: -1799253480547182370}
   m_Layer: 0
   m_Name: Music Tile
   m_TagString: Untagged
@@ -31,7 +31,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-1019110220261828033
+--- !u!114 &-1799253480547182370
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -73,7 +73,7 @@ public class FishingState : MonoBehaviour, IPlayerState
         //Configure progress bar
         {
             progressBar = new ProgressBar(progressBarCanvas);
-            progressBar.Hide();
+            progressBar.Show(false);
         }
         //Find components
         {
@@ -177,8 +177,8 @@ public class FishingState : MonoBehaviour, IPlayerState
                     animator.speed = 0;
                 }
                 fishingRod.gameObject.SetActive(true);
-                progressBar.SetPosition(new Vector2(playerTransform.position.x, playerTransform.position.y + 1.5f));
-                progressBar.Show();
+                progressBar.RectTransform.anchoredPosition = (new Vector2(playerTransform.position.x, playerTransform.position.y + 1.5f));
+                progressBar.Show(true);
 
                 StartCoroutine(Charging());
                 break;
@@ -186,7 +186,7 @@ public class FishingState : MonoBehaviour, IPlayerState
             case (FishingStates.LineCasting):
                 //fishingLineInstance.SetActive(true); This had to be set in coroutine to because yield was making line appear before it was supposed to
                 animator.speed = 1;
-                progressBar.Hide();
+                progressBar.Show(false);
 
                 float chargeTimer = (float)args[0];
                 StartCoroutine(LineCasting(chargeTimer));

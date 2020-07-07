@@ -84,6 +84,19 @@ public class DefaultState : MonoBehaviour, IPlayerState
                 }
             }
         }
+
+        //Interact with tile object
+        {
+            if (Input.GetButtonDown("Fire2"))
+            {
+                Vector3Int mouseTilePos = TileInformationManager.Instance.GetMouseTile();
+                TileInformation mouseTileInfo = TileInformationManager.Instance.GetTileInformation(mouseTilePos);
+                if (mouseTileInfo != null)
+                {
+                    mouseTileInfo.ClickInteract();
+                }
+            }
+        }
     }
 
     public void StartState(object[] args)

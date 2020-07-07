@@ -9,11 +9,11 @@ public class SelectionPanel: UIObject
     private List<Selection> selections;
     private float panelContentHeight = 0;
 
-    private int PADDING = 3;
+    private readonly int PADDING = 3;
 
-    public SelectionPanel(Canvas canvas, Vector2 position) : base(ResourceManager.Instance.selectionPanel, canvas.transform)
+    public SelectionPanel(Canvas canvas, Vector2 position) : base(ResourceManager.Instance.SelectionPanel, canvas.transform)
     {
-        ObjectInScene.GetComponent<RectTransform>().anchoredPosition = position;
+        RectTransform.anchoredPosition = position;
         contentTransform = ObjectTransform.Find("Viewport/Content");
         selections = new List<Selection>();
         panelContentHeight = PADDING;

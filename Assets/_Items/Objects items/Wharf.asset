@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf7cbe68299a02c4782bfd2d31180757, type: 3}
+  m_Name: Wharf
+  m_EditorClassIdentifier: 
+  itemName: Wharf
+  itemIcon: {fileID: -8192778606339900388, guid: 4e8be28a477e52f49876b48c75042dad,
+    type: 3}
+  objectToPlace: {fileID: 11400000, guid: 1bc5bf514b2dd9b4d9485772ecd4047f, type: 2}

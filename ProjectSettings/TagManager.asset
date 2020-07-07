@@ -23,7 +23,7 @@ TagManager:
   - 
   - NPC
   - Fish
-  - 
+  - DropItems
   - 
   - 
   - 
@@ -60,6 +60,9 @@ TagManager:
     locked: 0
   - name: GroundObjects
     uniqueID: 3802279067
+    locked: 0
+  - name: Drop item
+    uniqueID: 2124954675
     locked: 0
   - name: DynamicY
     uniqueID: 1543667321

@@ -95,10 +95,10 @@ public class RegionsManager : MonoBehaviour, IPlayerState
                 indicatorRenderer.color = selectedRegion.color;
 
             else if (regionRemoveable) //Region is removeable
-                indicatorRenderer.color = ResourceManager.Instance.yellow;
+                indicatorRenderer.color = ResourceManager.Instance.Yellow;
 
             else
-                indicatorRenderer.color = ResourceManager.Instance.red;
+                indicatorRenderer.color = ResourceManager.Instance.Red;
         }
 
         {
@@ -129,9 +129,9 @@ public class RegionsManager : MonoBehaviour, IPlayerState
 
         if (show)
         {
-            for (int i = 0; i < TileInformationManager.tileCountX; i++)
+            for (int i = 0; i < TileInformationManager.mapSize; i++)
             {
-                for (int j = 0; j < TileInformationManager.tileCountY; j++)
+                for (int j = 0; j < TileInformationManager.mapSize; j++)
                 {
                     Vector3Int pos = (new Vector3Int(i, j, 0));
                     if (TileInformationManager.Instance.GetTileInformation(pos).GetRegionInformation().id != RegionInformationManager.DEFAULT_REGION_ID)
@@ -165,7 +165,7 @@ public class RegionsManager : MonoBehaviour, IPlayerState
         Vector3Int previousTilePosition = new Vector3Int(-1, -1, -1);
 
         Vector3Int startPos = TileInformationManager.Instance.GetMouseTile();
-        int[,] regionPlaceableCache = new int[TileInformationManager.tileCountX, TileInformationManager.tileCountY]; // 0 not visited, -1 not placeable, 1 placeable
+        int[,] regionPlaceableCache = new int[TileInformationManager.mapSize, TileInformationManager.mapSize]; // 0 not visited, -1 not placeable, 1 placeable
 
         indicatorRenderer.drawMode = SpriteDrawMode.Tiled;
 
@@ -216,7 +216,7 @@ public class RegionsManager : MonoBehaviour, IPlayerState
             if (placeable)
                 indicatorRenderer.color = region.color;
             else
-                indicatorRenderer.color = ResourceManager.Instance.red;
+                indicatorRenderer.color = ResourceManager.Instance.Red;
 
             Skip:
             yield return 0;
