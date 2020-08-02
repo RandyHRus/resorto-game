@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf7cbe68299a02c4782bfd2d31180757, type: 3}
   m_Name: Tall grass seeds
   m_EditorClassIdentifier: 
-  itemName: 
+  itemName: Tall grass seeds
   itemIcon: {fileID: 21300000, guid: 78ee831c6c8a1c341a74ab64de49e269, type: 3}
+  tag: 2
   objectToPlace: {fileID: 11400000, guid: bfa88f15d14998743bd456118ee7677d, type: 2}

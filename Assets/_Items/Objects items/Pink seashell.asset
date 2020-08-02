@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Pink seashell
   itemIcon: {fileID: 21300000, guid: bff5199e7313e3a409cacc86a2a90d61, type: 3}
+  tag: 3
   objectToPlace: {fileID: 11400000, guid: b35e2a0340a91714f8dde79099b07754, type: 2}

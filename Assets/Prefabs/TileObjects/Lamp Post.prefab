@@ -113,7 +113,7 @@ MonoBehaviour:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
   m_LightVolumeOpacity: 0
-  m_ApplyToSortingLayers: 00000000970d67ef4b9557f677ff2d429b2ca2e2797e025ce53c73325382a7eacdfde9fb256ebed6dd3709aa8711e3bab5585f755593e4c4
+  m_ApplyToSortingLayers: 00000000ab70f0f74b9557f677ff2d42d533beec9b2ca2e2797e025c333ca87ee53c73325382a7eacdfde9fb256ebed6dd3709aa8711e3bab5585f75d32eb5df5593e4c4
   m_LightCookieSprite: {fileID: 0}
   m_UseNormalMap: 0
   m_LightOrder: 0

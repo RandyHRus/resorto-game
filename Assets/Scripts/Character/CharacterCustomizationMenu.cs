@@ -132,6 +132,7 @@ public class CharacterCustomizationMenu : MonoBehaviour
 
             ICharacterPartInformation info = playerCharacter.partInformations[i];
 
+            //TODO use Character customization loader instead
             //Refresh character display
             {
                 if (resource.uipartSpriteRenderers.Length > 1)

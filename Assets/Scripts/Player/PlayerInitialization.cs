@@ -45,7 +45,7 @@ public class PlayerInitialization : MonoBehaviour
             visitedPositions.Add(thisPosition);
 
             TileInformation thisTileInfo = TileInformationManager.Instance.GetTileInformation(thisPosition);
-            if (thisTileInfo == null || !TileLocationManager.isWater.HasFlag(thisTileInfo.tileLocation))
+            if (thisTileInfo == null || !TileLocation.Water.HasFlag(thisTileInfo.tileLocation))
             {
                 //Not water
                 continue;

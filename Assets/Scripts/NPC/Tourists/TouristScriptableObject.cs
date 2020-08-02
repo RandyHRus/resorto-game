@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
@@ -26,6 +25,7 @@ public class TouristScriptableObject : ScriptableObject
     
         dialogueComponent.Initialize(touristName, dialogueFile);
 
-        instance.layer = LayerMask.NameToLayer("NPC");
+        instance.layer = LayerMask.NameToLayer("Interactable");
+        instance.tag = "NPC";
     }
 }

@@ -6,13 +6,19 @@ using UnityEngine.UI;
 public class MessageManager : MonoBehaviour
 {
     [SerializeField] private GameObject itemGainMessageBox = null;
+    public GameObject ItemGainMessageBox => itemGainMessageBox;
+
+    [SerializeField] private GameObject warningMessageBox = null;
+    public GameObject WarningMessageBox => warningMessageBox;
+
     [SerializeField] private Canvas canvas = null;
-    private Queue<MessageBox> messageBoxes;
+    public Canvas Canvas => canvas;
 
     private float boxFadeSpeed = 0.01f;
-    private float boxShowTime = 3;
-    private int paddingBetween = 100;
-    private int maxMessages = 3;
+    private int paddingBetween = 30;
+    private int maxMessages = 5;
+
+    private Queue<MessageBox> messageBoxes;
 
 
     private static MessageManager _instance;
@@ -35,62 +41,21 @@ public class MessageManager : MonoBehaviour
         InventoryManager.OnItemGained += (InventoryItemInformation item, int count) => { new ItemGainMessage(item, count); };
     }
 
-    private abstract class MessageBox: UIObject
+    public void ShowMessage(MessageBox newMessageBox)
     {
-        private CanvasGroup group;
-        public float alpha {
-            get {
-                return group.alpha;
-            }
-            set {
-                group.alpha = value;
-            }
-        }
-        public float timeRemaining;
-
-        public MessageBox(GameObject prefab): base(prefab, Instance.canvas.transform)
+        newMessageBox.RectTransform.anchoredPosition = new Vector2(-40, 20);
+        foreach (MessageBox messageBox in messageBoxes)
         {
-            group = ObjectInScene.GetComponent<CanvasGroup>();
-            timeRemaining = Instance.boxShowTime;
-
-            RectTransform.anchoredPosition = new Vector2(-120, 60);
-            foreach(MessageBox messageBox in Instance.messageBoxes)
-            {
-                Vector2 pos = messageBox.RectTransform.anchoredPosition;
-                messageBox.RectTransform.anchoredPosition = new Vector2(pos.x, pos.y + Instance.paddingBetween);
-            }
-
-            Instance.messageBoxes.Enqueue(this);
-
-            if (Instance.messageBoxes.Count > Instance.maxMessages)
-            {
-                Destroy(Instance.messageBoxes.Peek().ObjectInScene);
-                Instance.messageBoxes.Dequeue();
-            }
+            Vector2 pos = messageBox.RectTransform.anchoredPosition;
+            messageBox.RectTransform.anchoredPosition = new Vector2(pos.x, pos.y + paddingBetween);
         }
-    }
 
-    private class ItemGainMessage : MessageBox
-    {
-        public ItemGainMessage(InventoryItemInformation item, int count) : base(Instance.itemGainMessageBox)
+        messageBoxes.Enqueue(newMessageBox);
+
+        if (messageBoxes.Count > maxMessages)
         {
-            //Find child components
-            Transform t = ObjectInScene.transform;
-            foreach (Transform tr in t)
-            {
-                if (tr.tag == "Item Count Field")
-                {
-                    tr.GetComponent<Text>().text = "x" + count.ToString();
-                }
-                else if (tr.tag == "Item Name Field")
-                {
-                    tr.GetComponent<Text>().text = item.ItemName;
-                }
-                else if (tr.tag == "Item Icon Field")
-                {
-                    tr.GetComponent<Image>().sprite = item.ItemIcon;
-                }
-            }
+            messageBoxes.Peek().Destroy();
+            messageBoxes.Dequeue();
         }
     }
 
@@ -106,7 +71,7 @@ public class MessageManager : MonoBehaviour
 
         while (messageBoxes.Count != 0 && messageBoxes.Peek().alpha <= 0)
         {
-            Destroy(messageBoxes.Peek().ObjectInScene);
+            messageBoxes.Peek().Destroy();
             messageBoxes.Dequeue();
         }
     } 

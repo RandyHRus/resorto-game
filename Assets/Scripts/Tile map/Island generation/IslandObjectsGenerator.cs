@@ -15,7 +15,9 @@ public class IslandObjectsGenerator : MonoBehaviour
     [SerializeField] private ObjectInformation[] seashellObjectInfos = null;
     [SerializeField] private float tilesToSeashellsTryCountRatio = 0.003f;
 
-
+    [Header("Bush")]
+    [SerializeField] private ObjectInformation[] bushObjectInfos = null;
+    [SerializeField] private float tilesToBushTryCountRatio = 0.003f;
 
     private static IslandObjectsGenerator _instance;
     public static IslandObjectsGenerator Instance { get { return _instance; } }
@@ -36,8 +38,9 @@ public class IslandObjectsGenerator : MonoBehaviour
 
     public void GenerateIslandObjects()
     {
-        GenerateGrass();
+        //GenerateGrass();
         GenerateSeashells();
+        GenerateBush();
     }
 
     private void GenerateGrass()
@@ -68,10 +71,33 @@ public class IslandObjectsGenerator : MonoBehaviour
 
                     bool bSpawn = Random.Range(0f, 1f) < grassPatchDensity;
 
-                    if (bSpawn && TileObjectsManager.Instance.ObjectPlaceable(proposedPos, grassObjectInfo, out ObjectType modifiedType))
-                        TileObjectsManager.Instance.CreateObject(grassObjectInfo, proposedPos, modifiedType);
+                    if (bSpawn)
+                        TileObjectsManager.TryCreateObject(grassObjectInfo, proposedPos, out ObjectOnTile objectOnTile);
                 }
             }
+        }
+    }
+
+    private void GenerateBush()
+    {
+        int mapSize = TileInformationManager.mapSize;
+        int tileCount = mapSize * mapSize;
+        int bushTryCount = (int)(tileCount * tilesToBushTryCountRatio);
+
+        for (int c = 0; c < bushTryCount; c++)
+        {
+            //Get random bush
+            ObjectInformation bushObjectInfo = bushObjectInfos[Random.Range(0, bushObjectInfos.Length)];
+
+            //Get random point
+            int randomX = Random.Range(0, mapSize);
+            int randomY = Random.Range(0, mapSize);
+            Vector3Int proposedPos = new Vector3Int(randomX, randomY, 0);
+
+            if (TileInformationManager.Instance.GetTileInformation(proposedPos).tileLocation != TileLocation.Grass)
+                continue;
+
+            TileObjectsManager.TryCreateObject(bushObjectInfo, proposedPos, out ObjectOnTile objectOnTile);
         }
     }
 
@@ -94,8 +120,7 @@ public class IslandObjectsGenerator : MonoBehaviour
             if (TileInformationManager.Instance.GetTileInformation(proposedPos).tileLocation != TileLocation.Sand)
                 continue;
 
-            if (TileObjectsManager.Instance.ObjectPlaceable(proposedPos, seashellObjectInfo, out ObjectType modifiedType))
-                TileObjectsManager.Instance.CreateObject(seashellObjectInfo, proposedPos, modifiedType);
+            TileObjectsManager.TryCreateObject(seashellObjectInfo, proposedPos, out ObjectOnTile objectOnTile);
         }
     }
 }

@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Orange seashell
   itemIcon: {fileID: 21300000, guid: bc2aa280a96aa4942a328c811bb1ed72, type: 3}
+  tag: 3
   objectToPlace: {fileID: 11400000, guid: 874fc4c155d0c3740afec52c5366f92a, type: 2}

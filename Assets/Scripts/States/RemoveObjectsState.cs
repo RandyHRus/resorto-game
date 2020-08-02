@@ -2,79 +2,81 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RemoveObjectsState : MonoBehaviour, IPlayerState
+[CreateAssetMenu(menuName = "States/Remove Objects")]
+public class RemoveObjectsState : PlayerState
 {
-    [SerializeField] private Sprite indicatorSprite = null;
+    private OutlineIndicatorManager indicatorManager;
 
-    private GameObject indicator;
-    private SpriteRenderer indicatorRenderer;
-
-    private static RemoveObjectsState _instance;
-    public static RemoveObjectsState Instance { get { return _instance; } }
-
-    private void Awake()
-    {
-        //Singleton
-        {
-            if (_instance != null && _instance != this)
-            {
-                Destroy(this.gameObject);
-            }
-            else
-            {
-                _instance = this;
-            }
-        }
-        {
-            indicator = new GameObject("Indicator");
-            indicatorRenderer = indicator.AddComponent<SpriteRenderer>();
-            indicatorRenderer.sortingLayerName = "Indicator";
-            indicator.SetActive(false);
-            indicatorRenderer.sprite = indicatorSprite;
-        }
-    }
-
-    public bool AllowMovement
+    public override bool AllowMovement
     {
         get { return true; }
     }
 
-    public void StartState(object[] args)
+    public override void StartState(object[] args)
     {
-        indicator.SetActive(true);
+        indicatorManager = new OutlineIndicatorManager();
+        indicatorManager.Toggle(true);
     }
 
-    public void Execute()
+    public override void Execute()
     {
         Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
-        TileInformation mouseTile = TileInformationManager.Instance.GetTileInformation(mouseTilePosition);
 
-        bool tileIsNotEmpty = (mouseTile != null && !(mouseTile.TileIsEmpty()));
+        bool objectRemovable = TileObjectsManager.ObjectRemovable(mouseTilePosition);
+        bool flooringRemovable = false;
+        if (!objectRemovable)
+        {
+            flooringRemovable = FlooringManager.FlooringRemoveable(mouseTilePosition);
+        }
 
         //Indicator things
         {
-            indicator.transform.position = new Vector2(mouseTilePosition.x, mouseTilePosition.y);
+            TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(mouseTilePosition);
+            if (tileInfo != null)
+            {
+                if (objectRemovable) {
+                    ObjectOnTile topMostObject = tileInfo.TopMostObject;
+                    ObjectSpriteInformation sprInfo = topMostObject.ObjectInfo.GetSpriteInformation(topMostObject.Rotation);
+                    Vector2Int bottomLeft = (Vector2Int)topMostObject.OccupiedTiles[0];
+                    Vector2Int topRight = new Vector2Int(bottomLeft.x + sprInfo.XSize - 1, bottomLeft.y + sprInfo.YSize - 1);
+                    indicatorManager.SetSizeAndPosition(bottomLeft, topRight);
+                }
+                else if (flooringRemovable)
+                {
+                    FlooringGroup group = tileInfo.GetTopFlooringGroup();
+                    indicatorManager.SetSizeAndPosition(group.BottomLeft, group.TopRight);
+                }
+                else
+                {
+                    indicatorManager.SetSizeAndPosition((Vector2Int)mouseTilePosition, (Vector2Int)mouseTilePosition);
+                }
+            }
 
-            if (tileIsNotEmpty)
-                indicatorRenderer.color = ResourceManager.Instance.Green;
-            else
-                indicatorRenderer.color = ResourceManager.Instance.Red;
+            indicatorManager.SetColor(objectRemovable || flooringRemovable ? ResourceManager.Instance.Green : ResourceManager.Instance.Red);
         }
 
-        //Remove
-        if (tileIsNotEmpty && Input.GetButtonDown("Primary"))
-        {
-            TileInformation info = TileInformationManager.Instance.GetTileInformation(mouseTilePosition);
-            ObjectType highestObject = info.GetTopMostObjectType();
-
-            TileObjectsManager.Instance.RemoveObject(info, highestObject);
-
+        //Actual remove part
+        if (CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary")) {
+            if (objectRemovable)
+            {
+                if (TileObjectsManager.TryRemoveObject(mouseTilePosition, out ObjectInformation objectInfo)) {
+                    if (objectInfo.DropItem != null)
+                        DropItems.DropItem(new Vector2(mouseTilePosition.x, mouseTilePosition.y), objectInfo.DropItem, 1, true);
+                }
+            }
+            else if (flooringRemovable)
+            {
+                if (FlooringManager.TryRemoveFlooring(mouseTilePosition))
+                {
+                    //TODO: do something?? add money or something idk
+                }
+            }
         }
     }
 
-    public bool TryEndState()
+    public override bool TryEndState()
     {
-        indicator.SetActive(false);
+        indicatorManager.Toggle(false);
         return true;
     }
 }

@@ -9,7 +9,7 @@ public class ButtonHoverEvents : MonoBehaviour, IPointerEnterHandler, IPointerEx
     private Vector2 defaultPosition;
     private RectTransform rectTransform;
 
-    private float waveHeight = 10f;
+    private float waveHeight = 3f;
     private float waveSpeed = 5f;
 
     private void Awake()

@@ -35,4 +35,5 @@ MonoBehaviour:
     sprite: {fileID: 0}
     xSize: 0
     ySize: 0
+  size: {x: 1, y: 1}
   dropItem: {fileID: 11400000, guid: a22d7a68b707cea40b0b46042c511736, type: 2}

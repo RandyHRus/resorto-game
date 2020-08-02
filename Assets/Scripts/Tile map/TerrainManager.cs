@@ -134,7 +134,7 @@ public class TerrainManager : MonoBehaviour
             {
                 AddOrRemoveTileCode(neighbour.Key, neighbour.Value, sandWaterTilemapInfo, sandTilemap, true, out int newCode);
                 TileInformation neighbourInfo = TileInformationManager.Instance.GetTileInformation(neighbour.Key);
-                if (TileLocationManager.isWater.HasFlag(neighbourInfo.tileLocation))
+                if (TileLocation.Water.HasFlag(neighbourInfo.tileLocation))
                     neighbourInfo.tileLocation = TileLocation.WaterEdge;
             }
         }
@@ -244,7 +244,7 @@ public class TerrainManager : MonoBehaviour
                 foreach (KeyValuePair<Vector3Int, int> neighboursNeighbour in neighboursTileBitsToAddFromNeighbours)
                 {
                     TileLocation tileLocation = TileInformationManager.Instance.GetTileInformation(neighboursNeighbour.Key).tileLocation;
-                    if (!TileLocationManager.isWater.HasFlag(tileLocation))
+                    if (!TileLocation.Water.HasFlag(tileLocation))
                     {
                         neighbourTileCode = neighbourTileCode | neighboursNeighbour.Value;
                     }
@@ -349,26 +349,25 @@ public class TerrainManager : MonoBehaviour
         {
             bool existingTileIsGrass = TileIsGrass(tilemapLayer.GetTile(pair.Key), tilemapLayer);
 
-            if (AddOrRemoveTileCode(pair.Key, pair.Value, landTilemapInfo, tilemapLayer, true, out int newCode))
+            AddOrRemoveTileCode(pair.Key, pair.Value, landTilemapInfo, tilemapLayer, true, out int newCode);
+
+            //Set new layers
+            TileInformation tile = TileInformationManager.Instance.GetTileInformation(pair.Key);
+            bool newTileIsGrass = TileIsGrass(tilemapLayer.GetTile(pair.Key), tilemapLayer);
+
+            if (newTileIsGrass && !existingTileIsGrass)
+                tile.layerNum++;
+
+            if (newTileIsGrass) //Full grass
             {
-                //Set new layers
-                TileInformation tile = TileInformationManager.Instance.GetTileInformation(pair.Key);
-                bool newTileIsGrass = TileIsGrass(tilemapLayer.GetTile(pair.Key), tilemapLayer);
-
-                if (newTileIsGrass && !existingTileIsGrass)
-                    tile.layerNum++;
-
-                if (newTileIsGrass) //Full grass
-                {
-                    tile.tileLocation = TileLocation.Grass;
-                }
+                tile.tileLocation = TileLocation.Grass;
+            }
+            else
+            {
+                if ((newCode & 0b1100) == 0b1100 || newCode == 0b0100 || newCode == 0b1000)
+                    tile.tileLocation = TileLocation.CliffFront;
                 else
-                {
-                    if ((newCode & 0b1100) == 0b1100 || newCode == 0b0100 || newCode == 0b1000)
-                        tile.tileLocation = TileLocation.CliffFront;
-                    else
-                        tile.tileLocation = TileLocation.CliffBack;
-                }
+                    tile.tileLocation = TileLocation.CliffBack;
             }
         }
         return true;
@@ -423,7 +422,7 @@ public class TerrainManager : MonoBehaviour
                 {
                     if (tile.layerNum == 0)
                     {
-                        if (!TileLocationManager.isWater.HasFlag(tile.tileLocation))
+                        if (!TileLocation.Water.HasFlag(tile.tileLocation))
                             tile.tileLocation = TileLocation.Sand;
                     }
                     else
@@ -497,19 +496,9 @@ public class TerrainManager : MonoBehaviour
         else
         {
             int proposedLayerNumber;
-            if (mainTile.tileLocation == TileLocation.CliffFront)
+            if (TileLocation.Cliff.HasFlag(mainTile.tileLocation))
             {
                 proposedLayerNumber = mainTile.layerNum + 1;
-            }
-            else if (mainTile.tileLocation == TileLocation.CliffBack)
-            {
-                if (aboveTileInformation.tileLocation == TileLocation.CliffBack)
-                    proposedLayerNumber = aboveTileInformation.layerNum + 1;
-                else
-                {
-                    layerNumber = Constants.INVALID_TILE_LAYER;
-                    return false;
-                }
             }
             //Below
             else if (aboveTileInformation.tileLocation == TileLocation.Grass)
@@ -524,6 +513,43 @@ public class TerrainManager : MonoBehaviour
             {
                 layerNumber = Constants.INVALID_TILE_LAYER;
                 return false;
+            }
+
+            // Check If Removing codes actually results in change
+            {
+                Dictionary<Vector3Int, int> codesToKeepInTiles = new Dictionary<Vector3Int, int>()
+                {
+                    { position,                                           0b0011 },
+                    { new Vector3Int(position.x - 1, position.y, 0),      0b1011 },
+                    { new Vector3Int(position.x + 1, position.y, 0),      0b0111 },
+                    { new Vector3Int(position.x, position.y + 1, 0),      0b1100 },
+                    { new Vector3Int(position.x - 1, position.y + 1, 0),  0b1101 },
+                    { new Vector3Int(position.x + 1, position.y + 1, 0),  0b1110 },
+                };
+
+                Tilemap tilemap = GetTilemapLayer(proposedLayerNumber);
+                if (tilemap == null)
+                {
+                    layerNumber = Constants.INVALID_TILE_LAYER;
+                    return false;
+                }
+
+                bool codeChangeFound = false;
+                foreach (KeyValuePair<Vector3Int, int> pair in codesToKeepInTiles)
+                {
+                    TileBase existingTile = tilemap.GetTile(pair.Key);
+                    if (existingTile == null)
+                        continue;
+
+                    int existingTileCode = landTilemapInfo.tileNameToCode[existingTile.name];
+                    if ((existingTileCode & pair.Value) != existingTileCode)
+                        codeChangeFound = true;
+                }
+                if (!codeChangeFound)
+                {
+                    layerNumber = Constants.INVALID_TILE_LAYER;
+                    return false;
+                }
             }
 
             //Check layer up
@@ -595,7 +621,7 @@ public class TerrainManager : MonoBehaviour
         TileInformation aboveTileInformation = TileInformationManager.Instance.GetTileInformation(aboveTilePosition);
 
         //Sand is placeable
-        if (TileLocationManager.isWater.HasFlag(mainTileLocation))
+        if (TileLocation.Water.HasFlag(mainTileLocation))
         {
             //Scan for outside map
             for (int i = -2; i <= 2; i++) {
@@ -622,12 +648,6 @@ public class TerrainManager : MonoBehaviour
                 new Vector3Int(position.x + 1, position.y + 1, 0),
                 new Vector3Int(position.x - 1, position.y + 1, 0),
             };
-            //Check if land already there
-            if (mainTile.layerNum != aboveTileInformation.layerNum)
-            {
-                layerNumber = Constants.INVALID_TILE_LAYER;
-                return false;
-            }
             //First check easy stuff
             foreach (Vector3Int positionToCheck in positionsToCheck)
             {
@@ -638,16 +658,16 @@ public class TerrainManager : MonoBehaviour
                 }
                 //Check if any of the tiles are water
                 TileInformation tile = TileInformationManager.Instance.GetTileInformation(positionToCheck);
-                if (TileLocationManager.isWater.HasFlag(tile.tileLocation)) {
+                if (TileLocation.Water.HasFlag(tile.tileLocation)) {
                     layerNumber = Constants.INVALID_TILE_LAYER;
                     return false;
                 }
             }
+
             //Check if placeable above
             bool placeableAbove = true;
             foreach (Vector3Int positionToCheck in positionsToCheck) {
                 TileInformation tile = TileInformationManager.Instance.GetTileInformation(positionToCheck);
-                TileLocation location = tile.tileLocation;
 
                 //Check if on correct location
                 if (tile.layerNum < mainTile.layerNum)
@@ -660,7 +680,8 @@ public class TerrainManager : MonoBehaviour
             //Placeable above
             if (placeableAbove) {
                 layerNumber = mainTile.layerNum + 1;
-                return true;
+                if (CheckIfAddingCodesResultsInChange(layerNumber))
+                    return true;
             }
             //Check if placeable below
             bool placeableBelow = true;
@@ -683,12 +704,42 @@ public class TerrainManager : MonoBehaviour
             //Placeable below
             if (placeableBelow) {
                 layerNumber = aboveTileInformation.layerNum + 1;
-                return true;
+                if (CheckIfAddingCodesResultsInChange(layerNumber))
+                    return true;
             }
 
             //If not placeable above or below
             layerNumber = Constants.INVALID_TILE_LAYER;
             return false;
+
+            bool CheckIfAddingCodesResultsInChange(int layerNum)
+            {
+                Dictionary<Vector3Int, int> codesToAddToTiles = new Dictionary<Vector3Int, int>()
+                {
+                    { position,                                            0b1100 },
+                    { new Vector3Int(position.x - 1, position.y, 0),       0b0100 },
+                    { new Vector3Int(position.x + 1, position.y, 0),       0b1000 },
+                    { new Vector3Int(position.x, position.y + 1, 0),       0b0011 },
+                    { new Vector3Int(position.x - 1, position.y + 1, 0),   0b0010 },
+                    { new Vector3Int(position.x + 1, position.y + 1, 0),   0b0001 },
+                };
+
+                Tilemap tilemap = GetTilemapLayer(layerNum);
+                if (tilemap == null)
+                    return true;
+
+                foreach (KeyValuePair<Vector3Int, int> pair in codesToAddToTiles)
+                {
+                    TileBase existingTile = tilemap.GetTile(pair.Key);
+                    if (existingTile == null)
+                        return true;
+
+                    int existingTileCode = landTilemapInfo.tileNameToCode[existingTile.name];
+                    if ((existingTileCode | pair.Value) != existingTileCode)
+                        return true;
+                }
+                return false;
+            }
         }
     }
 
@@ -696,45 +747,19 @@ public class TerrainManager : MonoBehaviour
     // On removeMode - 1 in code is bits to keep
     private bool AddOrRemoveTileCode(Vector3Int position, int code, TilemapInformation tilemapInfo, Tilemap tilemap, bool addMode, out int newCode)
     {
-        newCode = Constants.EMPTY_TILECODE;
-
         if (!TileInformationManager.Instance.PositionInMap(position))
         {
+            newCode = Constants.EMPTY_TILECODE;
             return false;
         }
 
         TileBase existingTile = tilemap.GetTile(position);
+        int existingCode = (existingTile == null) ? 0 : tilemapInfo.tileNameToCode[existingTile.name];
 
-        int existingCode;
-        if (existingTile == null)
-        {
-            existingCode = 0;
-        }
-        else if (tilemapInfo.tileNameToCode.TryGetValue(existingTile.name, out int c))
-        {
-            existingCode = c;
-        }
-        else
-        {
-            Debug.LogError("No code associated with tile: " + existingTile.name);
-            return false;
-        }
+        newCode = addMode ? code | existingCode : code & existingCode;
 
-        if (addMode)
-            newCode = code | existingCode;
-        else
-            newCode = code & existingCode;
-
-        if (tilemapInfo.codeToTile.TryGetValue(newCode, out TileBase tile))
-        {
-            tilemap.SetTile(position, tile);
-            return true;
-        }
-        else
-        {
-            Debug.LogError("No tile associated with code: " + newCode);
-            return false;
-        }
+        tilemap.SetTile(position, tilemapInfo.codeToTile[newCode]);
+        return true;
     }
 
     private bool SetTileCode(Vector3Int position, int code, TilemapInformation tilemapInfo, Tilemap tilemap)
@@ -742,15 +767,7 @@ public class TerrainManager : MonoBehaviour
         if (!TileInformationManager.Instance.PositionInMap(position))
             return false;
 
-        if (tilemapInfo.codeToTile.TryGetValue(code, out TileBase tile))
-        {
-            tilemap.SetTile(position, tile);
-            return true;
-        }
-        else
-        {
-            Debug.Log("No tile associated with code: " + code);
-            return false;
-        }
+        tilemap.SetTile(position, tilemapInfo.codeToTile[code]);
+        return true;
     }
 }

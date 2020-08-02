@@ -38,4 +38,5 @@ MonoBehaviour:
       type: 3}
     xSize: 1
     ySize: 1
+  size: {x: 0, y: 0}
   dropItem: {fileID: 11400000, guid: e72757bb851d8304b9764e46834e9d20, type: 2}

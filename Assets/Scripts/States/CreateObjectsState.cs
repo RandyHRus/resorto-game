@@ -2,51 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using System;
 
-public class CreateObjectsState : MonoBehaviour, IPlayerState
+[CreateAssetMenu(menuName = "States/Create Objects")]
+public class CreateObjectsState : PlayerState
 {
     [SerializeField] private Sprite defaultIndicatorSprite = null;
-
-    private GameObject indicator;
-    private SpriteRenderer indicatorRenderer;
     private ObjectRotation objectRotation;
 
     private ObjectInformation selectedObject;
+    private TilesIndicatorManager indicatorManager;
 
-    private static CreateObjectsState _instance;
-    public static CreateObjectsState Instance { get { return _instance; } }
-
-    private void Awake()
-    {
-        //Singleton
-        {
-            if (_instance != null && _instance != this)
-            {
-                Destroy(this.gameObject);
-            }
-            else
-            {
-                _instance = this;
-            }
-        }
-        {
-            indicator = new GameObject("Indicator");
-            indicatorRenderer = indicator.AddComponent<SpriteRenderer>();
-            indicatorRenderer.sortingLayerName = "Indicator";
-            indicator.SetActive(false);
-        }
-    }
-
-    public bool AllowMovement
+    public override bool AllowMovement
     {
         get { return true; }
     }
 
 
     //args[0] = InventoryItem
-    public void StartState(object[] args)
+    public override void StartState(object[] args)
     {
-        indicator.SetActive(true);
         objectRotation = ObjectRotation.front;
 
         ObjectItemInformation selectedItem = (ObjectItemInformation)args[0];
@@ -55,62 +30,61 @@ public class CreateObjectsState : MonoBehaviour, IPlayerState
             Debug.LogError("No item selected! This should not happen!");
 
         selectedObject = selectedItem.ObjectToPlace;
+
+        indicatorManager = new TilesIndicatorManager();
     }
 
-    public bool TryEndState()
+    public override bool TryEndState()
     {
-        indicator.SetActive(false);
+        indicatorManager.HideCurrentTiles();
         return true;
     }
 
-    public void Execute()
+    public override void Execute()
     {
-        Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
-        bool objectIsPlaceable = TileObjectsManager.Instance.ObjectPlaceable(mouseTilePosition, selectedObject, out ObjectType modifiedType, objectRotation);
-
-        //Indicator things
-        {
-            Sprite proposedSprite;
-            if (selectedObject.HasSprite)
-                proposedSprite = selectedObject.GetSpriteInformation(objectRotation).sprite;
-            else
-                proposedSprite = defaultIndicatorSprite;
-
-            indicator.transform.position = new Vector2(mouseTilePosition.x, mouseTilePosition.y);
-
-            //Change indicator sprite
-            if (indicatorRenderer.sprite != proposedSprite)
-                indicatorRenderer.sprite = proposedSprite;
-
-            //Change indicator color
-            if (objectIsPlaceable)
-                indicatorRenderer.color = ResourceManager.Instance.Green;
-            else
-                indicatorRenderer.color = ResourceManager.Instance.Red;
-        }
-
-        if (Input.GetButtonDown("RotateObject"))
+        if (Input.GetButtonDown("RotateObject") && selectedObject.HasSprite)
         {
             objectRotation += 1;
-            if ((int)objectRotation == 4) objectRotation = 0;
+            if ((int)objectRotation == Enum.GetNames(typeof(ObjectRotation)).Length)
+                objectRotation = 0;
 
             int tryCount = 0;
 
-            while (selectedObject.GetSpriteInformation(objectRotation).sprite == null)
+            while (selectedObject.GetSpriteInformation(objectRotation).Sprite == null)
             {
                 objectRotation += 1;
-                if ((int)objectRotation == 4) objectRotation = 0;
+                if ((int)objectRotation == Enum.GetNames(typeof(ObjectRotation)).Length) objectRotation = 0;
                 tryCount++;
                 if (tryCount >= 4)
                 {
-                    Debug.Log("No sprite set for object!");
+                    Debug.LogError("No sprite set for object!");
                     break;
                 }
             }
         }
-        else if (objectIsPlaceable && Input.GetButtonDown("Primary"))
+
+        Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
+        bool objectIsPlaceable = TileObjectsManager.ObjectPlaceable(mouseTilePosition, selectedObject, out ObjectType modifiedType, out float yOffset, objectRotation);
+
+        //Indicator things
         {
-            TileObjectsManager.Instance.CreateObject(selectedObject, mouseTilePosition, modifiedType, objectRotation);
+            Sprite proposedSprite = (selectedObject.HasSprite) ? selectedObject.GetSpriteInformation(objectRotation).Sprite : defaultIndicatorSprite;
+
+            if (indicatorManager.SwapCurrentTiles(mouseTilePosition))
+            {
+                indicatorManager.Offset(mouseTilePosition, new Vector2(0, yOffset));
+                indicatorManager.SetSprite(mouseTilePosition, proposedSprite);
+                indicatorManager.SetColor(mouseTilePosition, objectIsPlaceable ? ResourceManager.Instance.Green : ResourceManager.Instance.Red);
+            }
+        }
+
+        //Create object
+        if (objectIsPlaceable && CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
+        {
+            if (TileObjectsManager.TryCreateObject(selectedObject, mouseTilePosition, out ObjectOnTile objectOnTile, objectRotation))
+            {
+                InventoryManager.Instance.RemoveItem(InventoryManager.Instance.SelectedSlotIndex, 1);
+            }
         }
     }
 }

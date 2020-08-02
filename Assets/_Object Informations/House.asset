@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fdb4b6060ef40e4aab2f277e4627212, type: 3}
+  m_Name: House
+  m_EditorClassIdentifier: 
+  objectName: House
+  prefab: {fileID: 7544428992630327720, guid: 27169c8c6a8071d4284b0ada7d0698a9, type: 3}
+  collision: 1
+  objectsCanBePlacedOnTop: 0
+  type: 1
+  location: 0
+  hasSprite: 0
+  front:
+    sprite: {fileID: 0}
+    xSize: 0
+    ySize: 0
+  left:
+    sprite: {fileID: 0}
+    xSize: 0
+    ySize: 0
+  back:
+    sprite: {fileID: 0}
+    xSize: 0
+    ySize: 0
+  right:
+    sprite: {fileID: 0}
+    xSize: 0
+    ySize: 0
+  size: {x: 5, y: 2}
+  dropItem: {fileID: 0}

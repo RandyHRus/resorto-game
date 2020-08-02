@@ -74,13 +74,13 @@ public class CollisionManager : MonoBehaviour
             return true;
 
         //If water and no ground object, means there is collision with water
-        if (TileLocationManager.isWater.HasFlag(tile.tileLocation))
+        if (TileLocation.Water.HasFlag(tile.tileLocation))
         {
-            if (tile.objectTypeToObject[ObjectType.ground] == null)
+            if (tile.ObjectTypeToObject[ObjectType.ground] == null)
                 return true;
         }
 
-        if (TileLocationManager.isCliff.HasFlag(tile.tileLocation))
+        if (TileLocation.Cliff.HasFlag(tile.tileLocation))
             return true;
 
         if (tile.layerNum != tileLayer)
@@ -160,12 +160,12 @@ public class CollisionManager : MonoBehaviour
     {
         TileInformation tile = TileInformationManager.Instance.GetTileInformation(tilePosition);
 
-        if (tile == null || tile.objectTypeToObject[ObjectType.standard] == null)
+        if (tile == null || tile.ObjectTypeToObject[ObjectType.standard] == null)
             return false;
 
         if (tileLayer != tile.layerNum)
             return false;
 
-        return (tile.objectTypeToObject[ObjectType.standard].ObjectInfo == stairsObject && tile.objectTypeToObject[ObjectType.standard].Rotation == rotation);
+        return (tile.ObjectTypeToObject[ObjectType.standard].ObjectInfo == stairsObject && tile.ObjectTypeToObject[ObjectType.standard].Rotation == rotation);
     }
 }

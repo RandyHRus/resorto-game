@@ -5,16 +5,25 @@ using UnityEngine.UI;
 
 public class RegionSelection : Selection
 {
-    public RegionSelection(RegionInformation info, Transform parent): base(ResourceManager.Instance.RegionSelection, parent)
+    public RegionSelection(RegionInformation info, Transform parentPanel): base(ResourceManager.Instance.RegionSelection, parentPanel)
     {
-        ObjectTransform.Find("Name").GetComponent<Text>().text = info.name;
-        ObjectTransform.Find("RegionIcon").GetComponent<Image>().sprite = info.icon;
+        foreach (Transform t in ObjectTransform)
+        {
+            if (t.tag == "Name Field")
+            {
+                t.GetComponent<Text>().text = info.name;
+            }
+            else if (t.tag == "Icon Field")
+            {
+                t.GetComponent<Image>().sprite = info.Icon;
+            }
+        }
 
-        AddListener(ObjectInScene.GetComponent<Button>(), info.id);
+        AddListener(ObjectInScene.GetComponent<Button>(), info);
     }
 
-    private void AddListener(Button button, int regionId)
+    private void AddListener(Button button, RegionInformation info)
     {
-        button.onClick.AddListener(delegate { RegionsManager.Instance.SetSelectedRegion(regionId); });
+        button.onClick.AddListener(delegate { PlayerStateMachine.Instance.TrySwitchState<CreateRegionState>(new object[] { info }); } );
     }
 }

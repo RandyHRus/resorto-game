@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FishingState : MonoBehaviour, IPlayerState
+[CreateAssetMenu(menuName = "States/Fishing")]
+public class FishingState : PlayerState
 {
     [SerializeField] private GameObject fishingLinePrefab = null;
-    [SerializeField] private GameObject player = null;
-    [SerializeField] private Canvas progressBarCanvas = null;
 
+    private Canvas progressBarCanvas;
     private ProgressBar progressBar;
     private GameObject fishingLineInstance;
     private LineRenderer lineRenderer;
@@ -18,6 +18,7 @@ public class FishingState : MonoBehaviour, IPlayerState
     private Vector3[] points;
     private ContactFilter2D fishFilter;
     private FishingStates fishingState;
+    private GameObject player;
 
     private HashSet<GameObject> fishInRange  = new HashSet<GameObject>();
 
@@ -41,21 +42,8 @@ public class FishingState : MonoBehaviour, IPlayerState
     private float fishScanRadius = FishManager.FISH_SEEING_DISTANCE;
     #endregion
 
-    private static FishingState _instance;
-    public static FishingState Instance { get { return _instance; } }
-    private void Awake()
+    public override void Initialize()
     {
-        //Singleton
-        {
-            if (_instance != null && _instance != this)
-            {
-                Destroy(this.gameObject);
-            }
-            else
-            {
-                _instance = this;
-            }
-        }
         //Configure fishing line object
         {
             fishingLineInstance = Instantiate(fishingLinePrefab);
@@ -70,13 +58,11 @@ public class FishingState : MonoBehaviour, IPlayerState
 
             points = new Vector3[numPoints];
         }
-        //Configure progress bar
-        {
-            progressBar = new ProgressBar(progressBarCanvas);
-            progressBar.Show(false);
-        }
         //Find components
         {
+            progressBarCanvas = GameObject.FindGameObjectWithTag("IndicatorsCanvas").GetComponent<Canvas>();
+            player = GameObject.FindGameObjectWithTag("Player");
+
             animator = player.GetComponent<Animator>();
             playerTransform = player.transform;
 
@@ -89,6 +75,11 @@ public class FishingState : MonoBehaviour, IPlayerState
                 }
             }
         }
+        //Configure progress bar
+        {
+            progressBar = new ProgressBar(progressBarCanvas);
+            progressBar.Show(false);
+        }
         //Create fish contact filter
         {
             fishFilter = new ContactFilter2D();
@@ -98,14 +89,14 @@ public class FishingState : MonoBehaviour, IPlayerState
         }
     }
 
-    public bool AllowMovement
+    public override bool AllowMovement
     {
         get { return (fishingState == FishingStates.None); }
     }
 
-    public void Execute()
+    public override void Execute()
     {
-        if (Input.GetButtonDown("Primary"))
+        if (CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
         {
             if (fishingState == FishingStates.None)
             {
@@ -114,12 +105,12 @@ public class FishingState : MonoBehaviour, IPlayerState
         }
     }
 
-    public void StartState(object[] args)
+    public override void StartState(object[] args)
     {
         animator.SetLayerWeight(animator.GetLayerIndex("Fishing"), 1);
     }
 
-    public bool TryEndState()
+    public override bool TryEndState()
     {
         if (fishingState == FishingStates.None)
         {
@@ -177,10 +168,10 @@ public class FishingState : MonoBehaviour, IPlayerState
                     animator.speed = 0;
                 }
                 fishingRod.gameObject.SetActive(true);
-                progressBar.RectTransform.anchoredPosition = (new Vector2(playerTransform.position.x, playerTransform.position.y + 1.5f));
+                progressBar.ObjectTransform.position = (new Vector2(playerTransform.position.x, playerTransform.position.y + 1.5f));
                 progressBar.Show(true);
 
-                StartCoroutine(Charging());
+                Coroutines.Instance.StartCoroutine(Charging());
                 break;
 
             case (FishingStates.LineCasting):
@@ -189,7 +180,7 @@ public class FishingState : MonoBehaviour, IPlayerState
                 progressBar.Show(false);
 
                 float chargeTimer = (float)args[0];
-                StartCoroutine(LineCasting(chargeTimer));
+                Coroutines.Instance.StartCoroutine(LineCasting(chargeTimer));
 
                 break;
 
@@ -198,7 +189,7 @@ public class FishingState : MonoBehaviour, IPlayerState
 
                 Vector2 lineMiddlePosition = (Vector2)args[0];
                 Vector2 lineEndPosition = (Vector2)args[1];
-                StartCoroutine(LineBobbing(lineMiddlePosition, lineEndPosition));
+                Coroutines.Instance.StartCoroutine(LineBobbing(lineMiddlePosition, lineEndPosition));
 
                 break;
 
@@ -207,7 +198,7 @@ public class FishingState : MonoBehaviour, IPlayerState
                 lineRenderer.positionCount = 2;
 
                 Transform fishTransform = (Transform)args[0];
-                StartCoroutine(FishHooked(fishTransform));
+                Coroutines.Instance.StartCoroutine(FishHooked(fishTransform));
                 break;
 
             default:
@@ -338,7 +329,7 @@ public class FishingState : MonoBehaviour, IPlayerState
 
         while (fishingState == FishingStates.Bobbing)
         {
-            StartCoroutine(AlertNearbyFishToTarget(lineEndPosition));
+            Coroutines.Instance.StartCoroutine(AlertNearbyFishToTarget(lineEndPosition));
 
             Vector2 lineStartPosition = fishingRod.position;
 
@@ -351,7 +342,7 @@ public class FishingState : MonoBehaviour, IPlayerState
 
             timer += Time.deltaTime;
 
-            if (Input.GetButtonDown("Primary"))
+            if (CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
             {
                 SwitchFishingState(FishingStates.None, null);
                 break;
@@ -373,7 +364,7 @@ public class FishingState : MonoBehaviour, IPlayerState
             fishingLineTransform.position = lineEndPosition; //For moving bobber to end of line
             lineRenderer.SetPositions(new Vector3[] { lineStartPosition, lineEndPosition });
 
-            if (Input.GetButtonDown("Primary"))
+            if (CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
                 clickCount--;
 
             if (clickCount <= 0)
@@ -397,7 +388,7 @@ public class FishingState : MonoBehaviour, IPlayerState
             foreach (Collider2D fishCollider in results)
             {
                 GameObject obj = fishCollider.gameObject;
-                fishCollider.gameObject.GetComponent<FishBehaviour>().SetTarget(lineEndPosition);
+                fishCollider.gameObject.GetComponent<FishBehaviour>().SetTarget(this, lineEndPosition);
                 fishInRange.Add(obj);
             }
 

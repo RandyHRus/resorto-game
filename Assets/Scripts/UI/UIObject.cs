@@ -8,6 +8,10 @@ public abstract class UIObject
     public RectTransform RectTransform { get; }
     public Transform ObjectTransform { get; }
 
+    public delegate void Destroyed();
+    public event Destroyed OnDestroy;
+
+    //Instantiates a object
     public UIObject(GameObject prefab, Transform parent)
     {
         ObjectInScene = GameObject.Instantiate(prefab);
@@ -16,8 +20,22 @@ public abstract class UIObject
         ObjectTransform.SetParent(parent, false);
     }
 
+    //Existing object
+    public UIObject(GameObject instance)
+    {
+        ObjectInScene = instance;
+        RectTransform = ObjectInScene.GetComponent<RectTransform>();
+        ObjectTransform = ObjectInScene.transform;
+    }
+
     public void Show(bool show)
     {
         ObjectInScene.SetActive(show);
+    }
+
+    public virtual void Destroy()
+    {
+        OnDestroy?.Invoke();
+        GameObject.Destroy(ObjectInScene);
     }
 }

@@ -4,30 +4,30 @@ using UnityEngine;
 
 public class DropItems
 {
-    private static readonly float nearbyItemsScanRadius = 3f;
+    private static readonly float dropNearbyItemsScanRadius = 1f;
 
-    public static void DropItem(Vector2 position, InventoryItemInformation itemInfo, int count)
+    public static DroppedItem DropItem(Vector2 position, InventoryItemInformation itemInfo, int count, bool pickupableInstantly)
     {
         //Try to group same items
-        Collider2D[] results = Physics2D.OverlapCircleAll(position, nearbyItemsScanRadius, 1 << LayerMask.NameToLayer("DropItems"));
+        Collider2D[] results = Physics2D.OverlapCircleAll(position, dropNearbyItemsScanRadius, 1 << LayerMask.NameToLayer("DropItems"));
 
-        bool foundSameItem = false;
         foreach (Collider2D col in results)
         {
             DroppedItem groundItem = col.GetComponent<DroppedItem>();
             if (groundItem.ItemInfo == itemInfo)
             {
-                foundSameItem = true;
                 groundItem.AddToStack(count);
+                return groundItem;
             }
         }
 
-        if (!foundSameItem)
+        //If no same item found
         {
             GameObject droppedItemPrefab = ResourceManager.Instance.DroppedItem;
-            GameObject dropItem = GameObject.Instantiate(droppedItemPrefab, position, Quaternion.identity);
-            dropItem.GetComponent<DroppedItem>().Initialize(itemInfo, count);
+            GameObject obj = GameObject.Instantiate(droppedItemPrefab, position, Quaternion.identity);
+            DroppedItem droppedItem = obj.GetComponent<DroppedItem>();
+            droppedItem.Initialize(itemInfo, count, pickupableInstantly);
+            return droppedItem;
         }
-
     }
 }

@@ -13,7 +13,10 @@ public class Seashell : MonoBehaviour, ITileObjectFunctions
 
     public void ClickInteract()
     {
-        objectData.RemoveFromTile();
+        if (TileObjectsManager.TryRemoveObject(objectData.OccupiedTiles[0], out ObjectInformation removedObjectInfo))
+        {
+            InventoryManager.Instance.AddItem(removedObjectInfo.DropItem, 1);
+        }
     }
 
     public void StepOff()

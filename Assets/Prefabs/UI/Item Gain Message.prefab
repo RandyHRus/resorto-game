@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6374193299856663332}
   m_Layer: 5
   m_Name: Count text
-  m_TagString: Item Count Field
+  m_TagString: Count Field
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -107,7 +107,7 @@ RectTransform:
   m_GameObject: {fileID: 1935393822957239702}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3.2, y: 3.2, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1865582056337556270}
   - {fileID: 438640671464111214}
@@ -259,7 +259,7 @@ GameObject:
   - component: {fileID: 8292529433494996651}
   m_Layer: 5
   m_Name: Item name text
-  m_TagString: Item Name Field
+  m_TagString: Name Field
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -336,7 +336,7 @@ GameObject:
   - component: {fileID: 4440602752711385389}
   m_Layer: 5
   m_Name: Item icon
-  m_TagString: Item Icon Field
+  m_TagString: Icon Field
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

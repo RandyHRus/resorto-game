@@ -1,54 +1,45 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class DefaultState : MonoBehaviour, IPlayerState
+[CreateAssetMenu(menuName = "States/Default")]
+public class DefaultState : PlayerState
 {
-    [SerializeField] private GameObject player = null;
+    private GameObject player = null;
     private Transform playerTransform;
 
-    private ContactFilter2D npcFilter;
-    [SerializeField] private GameObject talkIndicatorInstance = null;
-    private Transform talkIndicatorTransform;
+    [SerializeField] private Sprite talkIndicatorSprite = null, entryIndicatorSprite = null;
+
+    private GameObject interactIndicatorInstance = null;
+    private Transform interactIndicatorTransform;
+    private Image interactIndicatorImage;
+
+    private float interactRange = 4f;
 
 
-    private static DefaultState _instance;
-    public static DefaultState Instance { get { return _instance; } }
-    private void Awake()
+    public override void Initialize()
     {
-        //Singleton
-        {
-            if (_instance != null && _instance != this)
-            {
-                Destroy(this.gameObject);
-            }
-            else
-            {
-                _instance = this;
-            }
-        }
+        interactIndicatorInstance = GameObject.FindGameObjectWithTag("Interact Indicator");
+
+        interactIndicatorTransform = interactIndicatorInstance.transform;
+        interactIndicatorImage = interactIndicatorInstance.GetComponent<Image>();
+        interactIndicatorInstance.SetActive(false);
+
+        player = GameObject.FindGameObjectWithTag("Player");
         playerTransform = player.transform;
-
-        npcFilter = new ContactFilter2D();
-        npcFilter.useTriggers = false;
-        npcFilter.SetLayerMask(1 << LayerMask.NameToLayer("NPC"));
-        npcFilter.useLayerMask = true;
-
-        talkIndicatorTransform = talkIndicatorInstance.transform;
-        talkIndicatorInstance.SetActive(false);
     }
 
-    public bool AllowMovement { get { return true; } }
+    public override bool AllowMovement { get { return true; } }
 
-    public void Execute()
+    public override void Execute()
     {
         //Check for nearby NPC's
         {
-            //Find closest NPC
+            //Find closest Interactable
             Transform tMin = null;
 
-            List<Collider2D> results = new List<Collider2D>();
-            Physics2D.OverlapBox(playerTransform.position, new Vector2(2.5f, 2.5f), 0f, npcFilter, results);
+            Collider2D[] results = Physics2D.OverlapBoxAll(playerTransform.position, new Vector2(2.5f, 2.5f), 0f, 1 << LayerMask.NameToLayer("Interactable"));
 
             float minDist = Mathf.Infinity;
             Vector2 currentPos = playerTransform.position;
@@ -64,49 +55,75 @@ public class DefaultState : MonoBehaviour, IPlayerState
                 }
             }
 
-            if (talkIndicatorInstance.activeSelf != (tMin != null))
-                talkIndicatorInstance.SetActive(tMin != null);
+            if (interactIndicatorInstance.activeSelf != (tMin != null))
+                interactIndicatorInstance.SetActive(tMin != null);
 
-            if (tMin != null)
-            {
-                talkIndicatorTransform.position = new Vector2(tMin.position.x, tMin.position.y + 1.5f);
-
-                //Try to start dialogue
-                if (Input.GetButtonDown("Interact"))
+            if (tMin != null) {
+                switch (tMin.tag)
                 {
-                    INPCDialogue dialogueComponent = tMin.GetComponent<INPCDialogue>();
+                    case ("NPC"):
 
-                    if (dialogueComponent.GetStandardDialogue(out Dialogue dialogue))
-                    {
-                        object[] args = new object[] { dialogueComponent.Name, dialogue };
-                        PlayerStatesManager.Instance.TrySwitchState(PlayerTalkingState.Instance, args);
-                    }
+                        interactIndicatorImage.sprite = talkIndicatorSprite;
+                        interactIndicatorTransform.position = new Vector2(tMin.position.x, tMin.position.y + 1.5f);
+
+                        if (Input.GetButtonDown("Interact"))
+                        {
+                            INPCDialogue dialogueComponent = tMin.GetComponent<INPCDialogue>();
+
+                            if (dialogueComponent.GetStandardDialogue(out Dialogue dialogue))
+                            {
+                                object[] args = new object[] { dialogueComponent.Name, dialogue };
+                                PlayerStateMachine.Instance.TrySwitchState<PlayerTalkingState>(args);
+                            }
+                        }
+                        break;
+
+                    case ("Entry"):
+
+                        interactIndicatorImage.sprite = entryIndicatorSprite;
+                        interactIndicatorTransform.position = new Vector2(tMin.position.x, tMin.position.y + 1f);
+
+                        if (Input.GetButtonDown("Interact"))
+                        {
+                            SceneTransitions.TransitionScene("A");
+                        }
+
+                        break;
                 }
             }
         }
 
         //Interact with tile object
         {
-            if (Input.GetButtonDown("Fire2"))
+            if (CheckMouseOverUI.GetButtonDownAndNotOnUI("Secondary"))
             {
                 Vector3Int mouseTilePos = TileInformationManager.Instance.GetMouseTile();
                 TileInformation mouseTileInfo = TileInformationManager.Instance.GetTileInformation(mouseTilePos);
                 if (mouseTileInfo != null)
                 {
-                    mouseTileInfo.ClickInteract();
+                    if (Vector2.Distance(new Vector2(mouseTilePos.x, mouseTilePos.y), playerTransform.position) < interactRange)
+                    {
+                        mouseTileInfo.ClickInteract();
+                    }
+                    else
+                    {
+                        new WarningMessage("Too far away!");
+                    }
                 }
             }
         }
+
+        //
     }
 
-    public void StartState(object[] args)
+    public override void StartState(object[] args)
     {
         //Nothing needed yet
     }
 
-    public bool TryEndState()
+    public override bool TryEndState()
     {
-        talkIndicatorInstance.SetActive(false);
+        interactIndicatorInstance.SetActive(false);
         return true;
     }
 }

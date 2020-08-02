@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerTalkingState : MonoBehaviour, IPlayerState
+[CreateAssetMenu(menuName = "States/Player talking")]
+public class PlayerTalkingState : PlayerState
 {
-    [SerializeField] private GameObject dialogueBox = null;
-    [SerializeField] private Text dialogueText = null;
-    [SerializeField] private Text nameText = null;
+    private GameObject dialogueBox = null;
+    private Text dialogueText = null;
+    private Text nameText = null;
 
     private bool dialoguePlaying;
     private bool dialogueTyping;
@@ -16,24 +17,22 @@ public class PlayerTalkingState : MonoBehaviour, IPlayerState
     private Coroutine typeCoroutine;
     private Dictionary<int, DialogueElement> dialogueMap;
 
-    private float dialogueLettersPerSecond = 60f; //DialogueSpeed
+    private readonly float dialogueLettersPerSecond = 60f; //DialogueSpeed
 
-    private static PlayerTalkingState _instance;
-    public static PlayerTalkingState Instance { get { return _instance; } }
+    public override bool AllowMovement { get { return false; } }
 
-    public bool AllowMovement { get { return false; } }
-
-    private void Awake()
+    public override void Initialize()
     {
-        //Singleton
+        dialogueBox = GameObject.FindGameObjectWithTag("DialogueBox");
+        foreach (Transform t in dialogueBox.transform)
         {
-            if (_instance != null && _instance != this)
+            if (t.tag == "Name Field")
             {
-                Destroy(this.gameObject);
+                nameText = t.GetComponent<Text>();
             }
-            else
+            else if (t.tag == "Text Field")
             {
-                _instance = this;
+                dialogueText = t.GetComponent<Text>();
             }
         }
 
@@ -42,7 +41,7 @@ public class PlayerTalkingState : MonoBehaviour, IPlayerState
 
     //args[0] = name
     //args[1] = dialogue
-    public void StartState(object[] args)
+    public override void StartState(object[] args)
     {
         if (dialoguePlaying)
             return;
@@ -63,18 +62,18 @@ public class PlayerTalkingState : MonoBehaviour, IPlayerState
         if (dialogueMap.TryGetValue(nextNode, out currentElement))
         {
             nextNode = currentElement.NextNode;
-            typeCoroutine = StartCoroutine(TypeDialogueNode(currentElement));
+            typeCoroutine = Coroutines.Instance.StartCoroutine(TypeDialogueNode(currentElement));
         }
     }
 
-    public void Execute()
+    public override void Execute()
     {
         if (Input.GetButtonDown("Submit"))
         {
             //Case when dialogue was already typing, show full dialogue node text
             if (dialogueTyping)
             {
-                StopCoroutine(typeCoroutine);
+                Coroutines.Instance.StopCoroutine(typeCoroutine);
                 dialogueText.text = currentElement.Text;
                 dialogueTyping = false;
             }
@@ -86,7 +85,7 @@ public class PlayerTalkingState : MonoBehaviour, IPlayerState
             else if (dialogueMap.TryGetValue(nextNode, out currentElement))
             {
                 nextNode = currentElement.NextNode;
-                typeCoroutine = StartCoroutine(TypeDialogueNode(currentElement));
+                typeCoroutine = Coroutines.Instance.StartCoroutine(TypeDialogueNode(currentElement));
             }
             else
             {
@@ -100,10 +99,10 @@ public class PlayerTalkingState : MonoBehaviour, IPlayerState
     {
         dialogueBox.SetActive(false);
         dialoguePlaying = false;
-        PlayerStatesManager.Instance.TrySwitchState(DefaultState.Instance, null);
+        PlayerStateMachine.Instance.TrySwitchState<DefaultState>();
     }
 
-    public bool TryEndState()
+    public override bool TryEndState()
     {
         return !dialoguePlaying;
     }

@@ -9,6 +9,8 @@ public class FishBehaviour : MonoBehaviour
     private Transform fishTransform;
     private FishState state = FishState.Idle;
 
+    private FishingState targetFishingState; 
+
     private float fadeOutSpeed = 0.5f;
     private float fadeInSpeed = 1f;
     private float maxAlpha = 0.6f;
@@ -35,7 +37,7 @@ public class FishBehaviour : MonoBehaviour
     bool fadeOutWaiting = false;
     bool fadeInRunning = false;
 
-    public void SetTarget(Vector2 target) //Ex. bobber location changed
+    public void SetTarget(FishingState stateInstance, Vector2 target) //Ex. bobber location changed
     {
         if (state != FishState.Targeting)
         {
@@ -56,6 +58,8 @@ public class FishBehaviour : MonoBehaviour
                 }
             }
         }
+
+        targetFishingState = stateInstance;
     }
 
     public void StartFlee()
@@ -108,7 +112,7 @@ public class FishBehaviour : MonoBehaviour
                 }
             case (FishState.Hooked):
                 {
-                    FishingState.Instance.OnFishBite(gameObject);
+                    targetFishingState.OnFishBite(gameObject);
                     anim.speed = 1.3f;
                     StartCoroutine(Hooked());
                     break;

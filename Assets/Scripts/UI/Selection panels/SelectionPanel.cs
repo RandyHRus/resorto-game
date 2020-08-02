@@ -11,7 +11,7 @@ public class SelectionPanel: UIObject
 
     private readonly int PADDING = 3;
 
-    public SelectionPanel(Canvas canvas, Vector2 position) : base(ResourceManager.Instance.SelectionPanel, canvas.transform)
+    public SelectionPanel(Transform parent, Vector2 position) : base(ResourceManager.Instance.SelectionPanel, parent)
     {
         RectTransform.anchoredPosition = position;
         contentTransform = ObjectTransform.Find("Viewport/Content");

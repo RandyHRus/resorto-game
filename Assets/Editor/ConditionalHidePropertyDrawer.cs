@@ -43,7 +43,7 @@ public class ConditionalHidePropertyDrawer : PropertyDrawer
 
         if (sourcePropertyValue != null)
         {
-            enabled = sourcePropertyValue.boolValue;
+            enabled = condHAtt.flip? !sourcePropertyValue.boolValue : sourcePropertyValue.boolValue;
         }
         else
         {

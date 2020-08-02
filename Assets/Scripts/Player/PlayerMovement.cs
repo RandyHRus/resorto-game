@@ -18,6 +18,9 @@ public class PlayerMovement : MonoBehaviour
 
     private int currentTileLayer; //Starts at 0 which means the player is on the sand layer, which means we need to check collision at land layer 0
 
+    public delegate void OnPlayerMove();
+    public static event OnPlayerMove PlayerMoved;
+
     private static PlayerMovement _instance;
     public static PlayerMovement Instance { get { return _instance; } }
     private void Awake()
@@ -56,6 +59,8 @@ public class PlayerMovement : MonoBehaviour
 
     public void Execute()
     {
+        Vector3 previousPos = playerTransform.position;
+
         int animDirectionX, animDirectionY; // -1 or 1
         //Animation
         {
@@ -64,7 +69,7 @@ public class PlayerMovement : MonoBehaviour
             animator.SetBool("Walking", animDirectionX != 0 || animDirectionY != 0); //This should not be affected by mouse click function part below
         }
         //Point to direction of mouse on mouseclick
-        if (Input.GetButton("Primary"))
+        if (CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
         {
             float angle = MathFunctions.GetAngleBetweenPoints(playerTransform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition));
             //Set 4 way direction (For fishing etc)
@@ -111,6 +116,9 @@ public class PlayerMovement : MonoBehaviour
             else
                 StairsMovement();
         }
+
+        if (playerTransform.position != previousPos)
+            PlayerMoved?.Invoke();
 
     }
 

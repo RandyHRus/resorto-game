@@ -17,6 +17,10 @@ public class ObjectInformation : ScriptableObject
     [SerializeField] private bool objectsCanBePlacedOnTop = false;
     public bool ObjectsCanBePlacedOnTop => objectsCanBePlacedOnTop;
 
+    //Only used when ObjectType is onTop
+    [ConditionalHide("objectsCanBePlacedOnTop", true, false), SerializeField] private int onTopOffsetInPixels = 0;
+    public int OnTopOffsetInPixels => onTopOffsetInPixels;
+
     [SerializeField] private ObjectType type = ObjectType.standard;
     public ObjectType Type => type;
 
@@ -26,22 +30,25 @@ public class ObjectInformation : ScriptableObject
     [SerializeField] private bool hasSprite = true;
     public bool HasSprite => hasSprite;
 
-    [ConditionalHide("hasSprite", true), SerializeField] private SpriteInformation front = null;
-    public SpriteInformation Front => front;
+    [ConditionalHide("hasSprite", true, false), SerializeField] private ObjectSpriteInformation front = null;
+    public ObjectSpriteInformation Front => front;
 
-    [ConditionalHide("hasSprite", true), SerializeField] private SpriteInformation left = null;
-    public SpriteInformation Left => left;
+    [ConditionalHide("hasSprite", true, false), SerializeField] private ObjectSpriteInformation left = null;
+    public ObjectSpriteInformation Left => left;
 
-    [ConditionalHide("hasSprite", true), SerializeField] private SpriteInformation back = null;
-    public SpriteInformation Back => back;
+    [ConditionalHide("hasSprite", true, false), SerializeField] private ObjectSpriteInformation back = null;
+    public ObjectSpriteInformation Back => back;
 
-    [ConditionalHide("hasSprite", true), SerializeField] private SpriteInformation right = null;
-    public SpriteInformation Right => right;
+    [ConditionalHide("hasSprite", true, false), SerializeField] private ObjectSpriteInformation right = null;
+    public ObjectSpriteInformation Right => right;
+
+    [ConditionalHide("hasSprite", true, true), SerializeField] private Vector2Int size = new Vector2Int();
+    public Vector2Int SizeWhenNoSprite => size;
 
     [SerializeField] private InventoryItemInformation dropItem = null;
     public InventoryItemInformation DropItem => dropItem;
 
-    public SpriteInformation GetSpriteInformation(ObjectRotation rotation)
+    public ObjectSpriteInformation GetSpriteInformation(ObjectRotation rotation)
     {
         switch (rotation) {
             case (ObjectRotation.front):
@@ -59,11 +66,17 @@ public class ObjectInformation : ScriptableObject
 }
 
 [System.Serializable]
-public class SpriteInformation
+public class ObjectSpriteInformation
 {
-    public Sprite sprite;
-    public int xSize;
-    public int ySize;
+
+    [SerializeField] private Sprite sprite = null;
+    public Sprite Sprite => sprite;
+
+    [SerializeField] private int xSize = 0;
+    public int XSize => xSize;
+
+    [SerializeField] private int ySize = 0;
+    public int YSize => ySize;
 }
 
 public enum ObjectRotation

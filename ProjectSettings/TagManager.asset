@@ -7,11 +7,18 @@ TagManager:
   - TileGrid
   - Stairs
   - Canvas
-  - Item Count Field
-  - Item Name Field
-  - Item Icon Field
   - FishingRod
   - Image component
+  - NPC
+  - Entry
+  - Count Field
+  - Name Field
+  - Icon Field
+  - ShowRegionTilemap
+  - Interact Indicator
+  - IndicatorsCanvas
+  - DialogueBox
+  - Text Field
   layers:
   - Default
   - TransparentFX
@@ -21,7 +28,7 @@ TagManager:
   - UI
   - 
   - 
-  - NPC
+  - Interactable
   - Fish
   - DropItems
   - 
@@ -58,14 +65,17 @@ TagManager:
   - name: LandTileMap
     uniqueID: 1110310775
     locked: 0
+  - name: Flooring
+    uniqueID: 3971888085
+    locked: 0
   - name: GroundObjects
     uniqueID: 3802279067
     locked: 0
-  - name: Drop item
-    uniqueID: 2124954675
-    locked: 0
   - name: DynamicY
     uniqueID: 1543667321
+    locked: 0
+  - name: Drop item
+    uniqueID: 2124954675
     locked: 0
   - name: FishingLine
     uniqueID: 846413029
@@ -87,6 +97,9 @@ TagManager:
     locked: 0
   - name: UI
     uniqueID: 1969182901
+    locked: 0
+  - name: UI 2
+    uniqueID: 3753193171
     locked: 0
   - name: Above UI
     uniqueID: 3303314261

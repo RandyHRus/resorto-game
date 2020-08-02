@@ -2,87 +2,60 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TerrainState : MonoBehaviour, IPlayerState
+[CreateAssetMenu(menuName = "States/Terrain")]
+public class TerrainState : PlayerState
 {
     [SerializeField] private Sprite landIndicatorSprite = null;
     [SerializeField] private Sprite sandIndicatorSprite = null;
     private bool coroutineRunning = false;
-    private GameObject indicator;
-    private SpriteRenderer indicatorRenderer;
 
-    private static TerrainState _instance;
-    public static TerrainState Instance { get { return _instance; } }
-    private void Awake()
-    {
-        //Singleton
-        {
-            if (_instance != null && _instance != this)
-            {
-                Destroy(this.gameObject);
-            }
-            else
-            {
-                _instance = this;
-            }
-        }
-        //Setup indicator
-        {
-            indicator = new GameObject("Terrain Indicator");
-            indicatorRenderer = indicator.AddComponent<SpriteRenderer>();
-            indicatorRenderer.sortingLayerName = "Indicator";
-            indicator.SetActive(false);
-        }
-    }
+    private TilesIndicatorManager indicatorManager;
 
-    public bool AllowMovement
+
+    public override bool AllowMovement
     {
         get { return true; }
     }
 
-    public void StartState(object[] args)
+    public override void StartState(object[] args)
     {
-        indicator.SetActive(true);
+        indicatorManager = new TilesIndicatorManager();
     }
 
-    public bool TryEndState()
+    public override bool TryEndState()
     {
-        if (coroutineRunning)
-        {
-            return false;
-        }
-        else
-        {
-            indicator.SetActive(false);
-            return true;
-        }
+        indicatorManager.HideCurrentTiles();
+        return !coroutineRunning;
     }
 
-    public void Execute()
+    public override void Execute()
     {
         if (coroutineRunning)
             return;
 
         Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
 
-        indicator.transform.position = new Vector2(mouseTilePosition.x, mouseTilePosition.y);
-        indicatorRenderer.sprite = landIndicatorSprite;
-        indicatorRenderer.color = ResourceManager.Instance.Red;
+        if (indicatorManager.SwapCurrentTiles(mouseTilePosition))
+        {
+            indicatorManager.SetSprite(mouseTilePosition, landIndicatorSprite);
+            indicatorManager.SetColor(mouseTilePosition, ResourceManager.Instance.Red);
+        }
 
         {
             if (TerrainManager.Instance.TerrainRemoveable(mouseTilePosition, out int layerNumber))
             {
-                indicatorRenderer.color = ResourceManager.Instance.Yellow;
+                indicatorManager.SetColor(mouseTilePosition, ResourceManager.Instance.Yellow);
 
-                if (Input.GetButtonDown("Secondary"))
+                if (CheckMouseOverUI.GetButtonDownAndNotOnUI("Secondary"))
                 {
                     if (layerNumber == 0)
                     {
-                        StartCoroutine(RemoveSand());
+                        Coroutines.Instance.StartCoroutine(RemoveSand());
                         return;
                     }
                     else if (layerNumber >= 1)
                     {
-                        StartCoroutine(RemoveLand(layerNumber));
+                        Coroutines.Instance.StartCoroutine(RemoveLand(layerNumber));
                         return;
                     }
                 }
@@ -91,21 +64,21 @@ public class TerrainState : MonoBehaviour, IPlayerState
         {
             if (TerrainManager.Instance.TerrainPlaceable(mouseTilePosition, out int layerNumber))
             {
-                indicatorRenderer.color = ResourceManager.Instance.Green;
+                indicatorManager.SetColor(mouseTilePosition, ResourceManager.Instance.Green);
 
                 if (layerNumber == 0)
-                    indicatorRenderer.sprite = sandIndicatorSprite;
+                    indicatorManager.SetSprite(mouseTilePosition, sandIndicatorSprite);
 
-                if (Input.GetButtonDown("Primary"))
+                if (CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
                 {
                     if (layerNumber == 0)
                     {
-                        StartCoroutine(PlaceSand());
+                        Coroutines.Instance.StartCoroutine(PlaceSand());
                         return;
                     }
                     else if (layerNumber >= 1)
                     {
-                        StartCoroutine(PlaceLand(layerNumber));
+                        Coroutines.Instance.StartCoroutine(PlaceLand(layerNumber));
                         return;
                     }
                 }
@@ -116,8 +89,7 @@ public class TerrainState : MonoBehaviour, IPlayerState
     IEnumerator PlaceSand()
     {
         coroutineRunning = true;
-        indicatorRenderer.sprite = null;
-
+        indicatorManager.HideCurrentTiles();
         Vector3Int previousTilePosition = new Vector3Int(-1, -1, -1);
 
         while (Input.GetButton("Primary"))
@@ -141,7 +113,7 @@ public class TerrainState : MonoBehaviour, IPlayerState
     IEnumerator RemoveSand()
     {
         coroutineRunning = true;
-        indicatorRenderer.sprite = null;
+        indicatorManager.HideCurrentTiles();
         Vector3Int previousTilePosition = new Vector3Int(-1, -1, -1);
 
         while (Input.GetButton("Secondary"))
@@ -165,7 +137,7 @@ public class TerrainState : MonoBehaviour, IPlayerState
     IEnumerator PlaceLand(int layerNumber)
     {
         coroutineRunning = true;
-        indicatorRenderer.sprite = null;
+        indicatorManager.HideCurrentTiles();
         Vector3Int previousTilePosition = new Vector3Int(-1, -1, -1);
 
         while (Input.GetButton("Primary"))
@@ -189,7 +161,7 @@ public class TerrainState : MonoBehaviour, IPlayerState
     IEnumerator RemoveLand(int layerNumber)
     {
         coroutineRunning = true;
-        indicatorRenderer.sprite = null;
+        indicatorManager.HideCurrentTiles();
         Vector3Int previousTilePosition = new Vector3Int(-1, -1, -1);
 
         while (Input.GetButton("Secondary"))
