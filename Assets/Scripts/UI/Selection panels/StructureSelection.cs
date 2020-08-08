@@ -7,7 +7,10 @@ public class StructureSelection : Selection
 {
     private static SelectionPanel currentShownVariantSelection = null;
 
-    public StructureSelection(StructureInformation info, SelectionPanel structureVariantsPanel,Transform parentPanel): base(ResourceManager.Instance.StructureSelection, parentPanel)
+    private SelectionPanel structureVariantsPanel;
+    private StructureInformation structureInfo;
+
+    public StructureSelection(StructureInformation info, SelectionPanel structureVariantsPanel, SelectionPanel parentPanel) : base(ResourceManager.Instance.StructureSelection, parentPanel)
     {
         foreach (Transform t in ObjectTransform)
         {
@@ -21,18 +24,17 @@ public class StructureSelection : Selection
             }
         }
 
-        AddListener(ObjectInScene.GetComponent<Button>(), info, structureVariantsPanel);
+        this.structureVariantsPanel = structureVariantsPanel;
+        this.structureInfo = info;
     }
 
-    private void AddListener(Button button, StructureInformation info, SelectionPanel structureVariantsPanel)
+    public override void OnClick()
     {
-        button.onClick.AddListener(delegate {
+        base.OnClick();
 
-            if (currentShownVariantSelection != null)
-                currentShownVariantSelection.Show(false);
+        currentShownVariantSelection?.Show(false);
 
-            currentShownVariantSelection = structureVariantsPanel;
-            structureVariantsPanel.Show(true);
-        });
+        currentShownVariantSelection = structureVariantsPanel;
+        structureVariantsPanel.Show(true);
     }
 }

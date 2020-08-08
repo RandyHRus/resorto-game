@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class UIObject
+public class UIObject
 {
     public GameObject ObjectInScene { get; }
     public RectTransform RectTransform { get; }

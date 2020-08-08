@@ -144,7 +144,7 @@ public class TilesIndicatorManager
     }
 
     //Remember to hide tiles before object destruction
-    public void HideCurrentTiles()
+    public void ClearCurrentTiles()
     {
         foreach (Vector3Int pos in currentTileIndicatorPositions)
         {

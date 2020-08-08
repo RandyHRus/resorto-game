@@ -3,17 +3,33 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "States/Create Stairs")]
-public class CreateStairsState : PlayerState
+public class CreateStairsState : CreateBuildState
 {
     private TilesIndicatorManager indicatorManager;
 
     private StairsVariant stairsVariant;
 
-    public override bool AllowMovement { get { return true; } }
-
     public override void Execute()
     {
-        
+        Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
+        bool placeable = StairsManager.StairsPlaceable(mouseTilePosition, out BuildRotation rot);
+
+        //Indicator things
+        Sprite proposedSprite = stairsVariant.GetSprite(rot);
+        if (indicatorManager.SwapCurrentTiles(mouseTilePosition))
+        {
+            indicatorManager.SetSprite(mouseTilePosition, proposedSprite);
+            indicatorManager.SetColor(mouseTilePosition, placeable ? ResourceManager.Instance.Green : ResourceManager.Instance.Red);
+        }
+
+        //Create stairs
+        if (placeable && CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
+        {
+            if (StairsManager.TryCreateStairs(stairsVariant, mouseTilePosition))
+            {
+                indicatorManager.ClearCurrentTiles(); //Resets tiles so that sprite color (etc) can be changed
+            }
+        }
     }
 
     public override void StartState(object[] args)
@@ -25,7 +41,7 @@ public class CreateStairsState : PlayerState
 
     public override bool TryEndState()
     {
-        indicatorManager.HideCurrentTiles();
+        indicatorManager.ClearCurrentTiles();
         return true;
     }
 }

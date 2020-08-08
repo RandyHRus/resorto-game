@@ -149,9 +149,9 @@ public class PlayerMovement : MonoBehaviour
             var proposedX = playerTransform.position.x + movement.x;
             var proposedY = playerTransform.position.y + movement.y;
 
-            if (CollisionManager.Instance.CheckForCollisionMovement(playerTransform.position, new Vector2(proposedX, proposedY), currentTileLayer, out bool collisionX, out bool collisionY))
+            if (CollisionManager.CheckForCollisionMovement(playerTransform.position, new Vector2(proposedX, proposedY), currentTileLayer, out bool collisionX, out bool collisionY))
             {
-                if (CollisionManager.Instance.CheckForStairsMovement(playerTransform.position, new Vector2(proposedX, proposedY), currentTileLayer, out Vector3Int goal))
+                if (CollisionManager.CheckForStairsMovement(playerTransform.position, new Vector2(proposedX, proposedY), currentTileLayer, out Vector3Int goal))
                 {
                     //Start stairs Movement
                     StartStairsMovement(goal);
@@ -194,8 +194,7 @@ public class PlayerMovement : MonoBehaviour
                 if (!foundTile)
                 {
                     TileInformation t = TileInformationManager.Instance.GetTileInformation(beforeTile);
-                    if (t != null)
-                        t.StepOff();
+                    t.BuildsOnTile.StepOff();
                 }
                 else
                     afterTiles.Remove(beforeTile);
@@ -204,8 +203,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 //We removed all duplicates in last loop so we can directly call step on function
                 TileInformation t = TileInformationManager.Instance.GetTileInformation(afterTile);
-                if (t != null)
-                    t.StepOn();
+                t.BuildsOnTile.StepOn();
             }
         }
     }
@@ -236,7 +234,7 @@ public class PlayerMovement : MonoBehaviour
         walkingOnStairs = true;
         beginTile = new Vector3Int(Mathf.RoundToInt(playerTransform.position.x), Mathf.RoundToInt(playerTransform.position.y), 0);
         endTile = goal;
-        endTileLayer = (endTile.y > beginTile.y) ? currentTileLayer + 1 : currentTileLayer - 1;
+        endTileLayer = TileInformationManager.Instance.GetTileInformation(goal).layerNum;
         stairsXDirection = (endTile.x != beginTile.x) ? (int)Mathf.Sign(endTile.x - beginTile.x) : 0; // -1 left, 0 none, 1 right
         stairsYDirection = (endTile.y != beginTile.y) ? (int)Mathf.Sign(endTile.y - beginTile.y) : 0; // -1 left, 0 none, 1 right
         StairsSortingDepth = (endTile.y < beginTile.y) ? DynamicZDepth.GetDynamicZDepth(endTile, DynamicZDepth.PLAYER_ON_STAIRS) : DynamicZDepth.GetDynamicZDepth(beginTile, DynamicZDepth.PLAYER_ON_STAIRS);
@@ -296,9 +294,9 @@ public class PlayerMovement : MonoBehaviour
         {
             foreach (Vector3Int corner in proposedCornerTiles)
             {
-                if (corner == beginTile && CollisionManager.Instance.CheckForCollisionOnTile(corner, currentTileLayer))
+                if (corner == beginTile && CollisionManager.CheckForCollisionOnTile(corner, currentTileLayer))
                     return;
-                else if (corner == endTile && CollisionManager.Instance.CheckForCollisionOnTile(corner, endTileLayer))
+                else if (corner == endTile && CollisionManager.CheckForCollisionOnTile(corner, endTileLayer))
                     return;
             }
         }

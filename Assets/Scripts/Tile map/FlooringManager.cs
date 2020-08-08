@@ -32,7 +32,7 @@ public class FlooringManager
         if (info == null || belowInfo == null)
             return false;
 
-        if (!info.TileIsEmpty() || !belowInfo.TileIsEmpty())
+        if (info.BuildsOnTile.TopMostBuild != null|| belowInfo.BuildsOnTile.TopMostBuild != null)
             return false;
 
         if (info.NormalFlooringGroup != null)
@@ -58,7 +58,7 @@ public class FlooringManager
         if (info == null)
             return false;
 
-        if (!info.TileIsEmpty())
+        if (info.BuildsOnTile.TopMostBuild != null)
             return false;
 
         if (info.GetTopFlooringGroup() == null)
@@ -153,12 +153,13 @@ public class FlooringManager
         foreach (KeyValuePair<Vector3Int, FlooringNormalPartOnTile> pair in floorings)
         {
             TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(pair.Key);
-            tileInfo.SetNormalFlooringGroup(group);
+            tileInfo.NormalFlooringGroup = group;
+            tileInfo.layerNum++;
         }
         foreach (Vector3Int p in supportPositions)
         {
             TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(p);
-            tileInfo.SetSupportFlooringGroup(group);
+            tileInfo.SupportFlooringGroup = group;
         }
 
         //The support object
@@ -257,6 +258,15 @@ public class FlooringManager
             Tuple.Create(new Vector3Int(p.x - 1, p.y,     0), 0b1000)
         };
 
+        List<Tuple<Vector3Int, int>> codeToAddFromStairs = new List<Tuple<Vector3Int, int>>()
+        {
+            Tuple.Create(new Vector3Int(p.x,     p.y + 1, 0), 0b0001),
+            Tuple.Create(new Vector3Int(p.x + 1, p.y - 1, 0), 0b0010),
+            Tuple.Create(new Vector3Int(p.x,     p.y - 2, 0), 0b0100),
+            Tuple.Create(new Vector3Int(p.x - 1, p.y - 1, 0), 0b1000)
+        };
+
+        //Add code from neighbours
         foreach (Tuple<Vector3Int, int> t in codeToAddFromNeighbours)
         {
             TileInformation info = TileInformationManager.Instance.GetTileInformation(t.Item1);
@@ -265,13 +275,23 @@ public class FlooringManager
             {
                 if (PositionHasFlooringVariant(flooringVariant, t.Item1, out FlooringNormalPartOnTile flooring) && info.NormalFlooringGroup.Rotation == r)
                     resultCode = resultCode | t.Item2;
-                else if (positionsToBeAddedOrRemoved.Contains(t.Item1))
+                else if (positionsToBeAddedOrRemoved != null && positionsToBeAddedOrRemoved.Contains(t.Item1))
                     resultCode = resultCode | t.Item2;
             }
             else
             {
-                if (PositionHasFlooringVariant(flooringVariant, t.Item1, out FlooringNormalPartOnTile flooring) && !positionsToBeAddedOrRemoved.Contains(t.Item1))
+                if (PositionHasFlooringVariant(flooringVariant, t.Item1, out FlooringNormalPartOnTile flooring) && (positionsToBeAddedOrRemoved == null || !positionsToBeAddedOrRemoved.Contains(t.Item1)))
                     resultCode = resultCode | t.Item2;
+            }
+        }
+
+        //Add code from stairs
+        foreach (Tuple<Vector3Int, int> t in codeToAddFromStairs)
+        {
+            TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(t.Item1);
+            if (tileInfo?.BuildsOnTile.TopMostBuild?.BuildInfo is StairsVariant stairs)
+            {
+                resultCode = resultCode | t.Item2;
             }
         }
 
@@ -337,7 +357,33 @@ public class FlooringManager
         }
 
         //Actual removal
-        tileInfo.RemoveFlooring();
+        {
+            FlooringGroup topGroup = tileInfo.GetTopFlooringGroup();
+
+            if (topGroup == null)
+                throw new System.Exception("No flooring to remove!");
+
+            topGroup.Destroy();
+
+            //Clear tiles
+            {
+                //Clear normal floorings
+                foreach (KeyValuePair<Vector3Int, FlooringNormalPartOnTile> pair in topGroup.NormalFloorings)
+                {
+                    TileInformation checkTileInfo = TileInformationManager.Instance.GetTileInformation(pair.Key);
+                    if (checkTileInfo.NormalFlooringGroup.FlooringVariant.GetType() == typeof(DockFlooringVariant))
+                        checkTileInfo.layerNum--;
+                    checkTileInfo.NormalFlooringGroup = null;
+                }
+
+                //Clear support floorings
+                foreach (Vector3Int s in topGroup.SupportFloorings)
+                {
+                    TileInformation checkTileInfo = TileInformationManager.Instance.GetTileInformation(s);
+                    checkTileInfo.SupportFlooringGroup = null;
+                }
+            }
+        }
 
         return true;
     }

@@ -39,9 +39,9 @@ public class PlaceHouseState : PlayerState
 
         if (objectIsPlaceable && CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
         {
-            if (TileObjectsManager.TryCreateObject(houseObject, mouseTilePosition, out ObjectOnTile objectOnTile))
+            if (TileObjectsManager.TryCreateObject(houseObject, mouseTilePosition, out BuildOnTile buildOnTile))
             {
-                objectOnTile.GameObjectOnTile.GetComponent<HouseInformationLoader>().LoadInformation(houseInfo);
+                buildOnTile.GameObjectOnTile.GetComponent<HouseInformationLoader>().LoadInformation(houseInfo);
             }
         }
 
@@ -55,7 +55,7 @@ public class PlaceHouseState : PlayerState
 
     public override bool TryEndState()
     {
-        indicatorManager.HideCurrentTiles();
+        indicatorManager.ClearCurrentTiles();
         return true;
     }
 }

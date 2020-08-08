@@ -12,27 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fdb4b6060ef40e4aab2f277e4627212, type: 3}
   m_Name: Darkwood chest
   m_EditorClassIdentifier: 
-  objectName: Darkwood chest
+  _name: Darkwood chest
+  useDefaultPrefab: 1
   prefab: {fileID: 894459066522538927, guid: 7cde5efd092ffff45b58d983ff7de982, type: 3}
   collision: 1
   objectsCanBePlacedOnTop: 0
-  type: 1
+  onTopOffsetInPixels: 0
+  type: 0
   location: 0
   hasSprite: 1
-  front:
+  frontSprite:
     sprite: {fileID: 21300000, guid: 4c1f12c1740807b4cafa282e521b8640, type: 3}
-    xSize: 1
-    ySize: 1
-  left:
+    size: {x: 1, y: 1}
+  rightSprite:
     sprite: {fileID: 0}
-    xSize: 0
-    ySize: 0
-  back:
+    size: {x: 0, y: 0}
+  backSprite:
     sprite: {fileID: 0}
-    xSize: 0
-    ySize: 0
-  right:
+    size: {x: 0, y: 0}
+  leftSprite:
     sprite: {fileID: 0}
-    xSize: 0
-    ySize: 0
+    size: {x: 0, y: 0}
+  sizeWhenNoSprite: {x: 0, y: 0}
   dropItem: {fileID: 11400000, guid: 8189142d4f299db4ba97246685aade1e, type: 2}

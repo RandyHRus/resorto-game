@@ -5,7 +5,9 @@ using UnityEngine.UI;
 
 public class RegionSelection : Selection
 {
-    public RegionSelection(RegionInformation info, Transform parentPanel): base(ResourceManager.Instance.RegionSelection, parentPanel)
+    RegionInformation info;
+
+    public RegionSelection(RegionInformation info, SelectionPanel parentPanel): base(ResourceManager.Instance.RegionSelection, parentPanel)
     {
         foreach (Transform t in ObjectTransform)
         {
@@ -19,11 +21,12 @@ public class RegionSelection : Selection
             }
         }
 
-        AddListener(ObjectInScene.GetComponent<Button>(), info);
+        this.info = info;
     }
 
-    private void AddListener(Button button, RegionInformation info)
+    public override void OnClick()
     {
-        button.onClick.AddListener(delegate { PlayerStateMachine.Instance.TrySwitchState<CreateRegionState>(new object[] { info }); } );
+        base.OnClick();
+        PlayerStateMachine.Instance.TrySwitchState<CreateRegionState>(new object[] { info });
     }
 }

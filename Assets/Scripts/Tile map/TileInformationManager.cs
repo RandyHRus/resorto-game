@@ -67,155 +67,174 @@ public class TileInformation
     public int layerNum; //Water or sand is 0, land will be >1
     public TileLocation tileLocation;
     public RegionInformation region;
-    public ObjectOnTile TopMostObject { get; private set; }
     public bool Collision { get; private set; }
-    public Dictionary<ObjectType, ObjectOnTile> ObjectTypeToObject { get; private set; }
-    public FlooringGroup NormalFlooringGroup { get; private set; }
-    public FlooringGroup SupportFlooringGroup { get; private set; }
+
+    private FlooringGroup normalFlooringGroup;
+    public FlooringGroup NormalFlooringGroup
+    {
+        get
+        {
+            return normalFlooringGroup;
+        }
+        set
+        {
+            if (value != null && normalFlooringGroup != null)
+                throw new System.Exception("Normal flooring already set!");
+
+            normalFlooringGroup = value;
+        }
+    }
+
+    private FlooringGroup supportFlooringGroup;
+    public FlooringGroup SupportFlooringGroup
+    {
+        get
+        {
+            return supportFlooringGroup;
+        }
+        set
+        {
+            if (value != null && supportFlooringGroup != null)
+                throw new System.Exception("Support flooring already set!");
+
+            supportFlooringGroup = value;
+        }
+    }
+
     public int[] waterBGTracker;
+
+    public BuildGroupOnTile BuildsOnTile { get; private set; }
 
     public TileInformation()
     {
-        TopMostObject = null;
         layerNum = 0;
         tileLocation = TileLocation.Unknown;       
         Collision = false;
         region = null;
 
-        ObjectTypeToObject = new Dictionary<ObjectType, ObjectOnTile>
-        {
-            [ObjectType.onTop] = null,
-            [ObjectType.standard] = null,
-            [ObjectType.ground] = null
-        };
-
         NormalFlooringGroup = null;
         SupportFlooringGroup = null;
 
         waterBGTracker = new int[4];
+        BuildsOnTile = null;
+
+        this.BuildsOnTile = new BuildGroupOnTile(this);
     }
 
-    public void SetTileObject(ObjectType type, ObjectOnTile objOnTile)
+    public void RefreshTile()
     {
-        ObjectTypeToObject[type] = objOnTile;
-        RefreshTopMostObject();
         RefreshCollision();
-    }
-
-    public void RemoveTopMostTileObject()
-    {
-        if (TopMostObject != null)
-        {
-            //Actual destroy object part
-            UnityEngine.Object.Destroy(TopMostObject.GameObjectOnTile);
-
-            //Clear tiles
-            foreach (Vector3Int checkPos in TopMostObject.OccupiedTiles)
-            {
-                TileInformationManager.Instance.GetTileInformation(checkPos).ClearTileObject(TopMostObject.ModifiedType);
-            }
-        }
-    }
-
-    private void ClearTileObject(ObjectType type)
-    {
-        ObjectTypeToObject[type] = null;
-        RefreshTopMostObject();
-        RefreshCollision();
-    }
-
-    public void SetNormalFlooringGroup(FlooringGroup flooringGroup)
-    {
-        this.NormalFlooringGroup = flooringGroup;
-    }
-
-    public void SetSupportFlooringGroup(FlooringGroup flooringGroup)
-    {
-        this.SupportFlooringGroup = flooringGroup;
     }
 
     public FlooringGroup GetTopFlooringGroup()
     {
-        return NormalFlooringGroup != null ? NormalFlooringGroup : SupportFlooringGroup;
-    }
-
-    public void RemoveFlooring()
-    {
-        FlooringGroup topGroup = GetTopFlooringGroup();
-
-        if (topGroup == null)
-            return;
-
-        topGroup.Destroy();
-
-        //Clear tiles
-        {
-            //Clear normal floorings
-            foreach (KeyValuePair<Vector3Int, FlooringNormalPartOnTile> pair in topGroup.NormalFloorings)
-            {
-                TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(pair.Key);
-                tileInfo.NormalFlooringGroup = null;
-            }
-
-            //Clear support floorings
-            foreach (Vector3Int s in topGroup.SupportFloorings)
-            {
-                TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(s);
-                tileInfo.SupportFlooringGroup = null;
-            }
-        }
-    }
-
-    private void RefreshTopMostObject()
-    {
-        if (ObjectTypeToObject[ObjectType.onTop] != null)
-            TopMostObject = ObjectTypeToObject[ObjectType.onTop];
-        else if (ObjectTypeToObject[ObjectType.standard] != null)
-            TopMostObject = ObjectTypeToObject[ObjectType.standard];
-        else if (ObjectTypeToObject[ObjectType.ground] != null)
-            TopMostObject = ObjectTypeToObject[ObjectType.ground];
-        else
-            TopMostObject = null;
-    }
-
-    public bool TileIsEmpty()
-    {
-        return (ObjectTypeToObject[ObjectType.onTop] == null &&
-                ObjectTypeToObject[ObjectType.standard] == null &&
-                ObjectTypeToObject[ObjectType.ground] == null);
-    }
-
-    public void StepOn()
-    {
-        if (TopMostObject != null && TopMostObject.Functions != null)
-            TopMostObject.Functions.StepOn();
-    }
-
-    public void StepOff()
-    {
-        if (TopMostObject != null && TopMostObject.Functions != null)
-            TopMostObject.Functions.StepOff();
-    }
-
-    public void ClickInteract()
-    {
-        if (TopMostObject != null && TopMostObject.Functions != null)
-            TopMostObject.Functions.ClickInteract();
+        return NormalFlooringGroup ?? SupportFlooringGroup ?? null;
     }
 
     private void RefreshCollision()
     {
-        Collision = ((ObjectTypeToObject[ObjectType.onTop] != null    && ObjectTypeToObject[ObjectType.onTop].ObjectInfo.Collision) || 
-                (ObjectTypeToObject[ObjectType.standard] != null && ObjectTypeToObject[ObjectType.standard].ObjectInfo.Collision) || 
-                (ObjectTypeToObject[ObjectType.ground] != null   && ObjectTypeToObject[ObjectType.ground].ObjectInfo.Collision));
+        Collision = ((BuildsOnTile.ObjectTypeToObject[ObjectType.OnTop] != null && BuildsOnTile.ObjectTypeToObject[ObjectType.OnTop].BuildInfo.Collision) ||
+                (BuildsOnTile.ObjectTypeToObject[ObjectType.Standard] != null && BuildsOnTile.ObjectTypeToObject[ObjectType.Standard].BuildInfo.Collision) ||
+                (BuildsOnTile.ObjectTypeToObject[ObjectType.Ground] != null && BuildsOnTile.ObjectTypeToObject[ObjectType.Ground].BuildInfo.Collision));
     }
 }
 
-public class ObjectOnTile
+public class BuildGroupOnTile
 {
-    public ObjectOnTile(GameObject gameObjectOnTile, ObjectInformation objectInfo, List<Vector3Int> occupiedTiles, ObjectRotation rotation, ObjectType modifiedType)
+    public TileInformation ParentTile { get; private set; }
+    public Dictionary<ObjectType, BuildOnTile> ObjectTypeToObject { get; private set; }
+    public BuildOnTile TopMostBuild { get; private set; }
+
+    public BuildGroupOnTile(TileInformation parentTile)
     {
-        this.ObjectInfo = objectInfo;
+        ObjectTypeToObject = new Dictionary<ObjectType, BuildOnTile>
+        {
+            [ObjectType.OnTop] = null,
+            [ObjectType.Standard] = null,
+            [ObjectType.Ground] = null
+        };
+
+        TopMostBuild = null;
+        this.ParentTile = parentTile;
+    }
+
+    public void SetTileObject(BuildOnTile objOnTile)
+    {
+        if (ObjectTypeToObject[objOnTile.ModifiedType] != null)
+            throw new System.Exception("Object already exists!");
+
+        ObjectTypeToObject[objOnTile.ModifiedType] = objOnTile;
+        RefreshTopMostObject();
+        ParentTile.RefreshTile();
+    }
+
+    private void ClearTileObject(ObjectType type)
+    {
+        if (ObjectTypeToObject[type] == null)
+            throw new System.Exception("Nothing to clear!");
+
+        ObjectTypeToObject[type] = null;
+        RefreshTopMostObject();
+        ParentTile.RefreshTile();
+    }
+
+    private void RefreshTopMostObject()
+    {
+        TopMostBuild = ObjectTypeToObject[ObjectType.OnTop] ?? ObjectTypeToObject[ObjectType.Standard] ?? ObjectTypeToObject[ObjectType.Ground] ?? null;
+    }
+
+    public void StepOn()
+    {
+        if (TopMostBuild != null && TopMostBuild.Functions != null)
+            TopMostBuild.Functions.StepOn();
+    }
+
+    public void StepOff()
+    {
+        if (TopMostBuild != null && TopMostBuild.Functions != null)
+            TopMostBuild.Functions.StepOff();
+    }
+
+    public void ClickInteract()
+    {
+        if (TopMostBuild != null && TopMostBuild.Functions != null)
+            TopMostBuild.Functions.ClickInteract();
+    }
+
+    public ObjectType RemoveTopMostTileObject()
+    {
+        if (TopMostBuild == null)
+            throw new System.Exception("Nothing to remove!");
+
+        //Actual destroy object part
+        UnityEngine.Object.Destroy(TopMostBuild.GameObjectOnTile);
+
+        ObjectType type = TopMostBuild.ModifiedType;
+        //Clear tiles
+        foreach (Vector3Int checkPos in TopMostBuild.OccupiedTiles)
+        {
+            TileInformationManager.Instance.GetTileInformation(checkPos).BuildsOnTile.ClearTileObject(type);
+        }
+
+        return type;
+    }
+}
+
+public class BuildOnTile
+{
+    public ITileObjectFunctions Functions { get; private set; }
+    public List<Vector3Int> OccupiedTiles { get; private set; }
+    public IBuildable BuildInfo { get; private set; }
+    public GameObject GameObjectOnTile { get; private set; }
+    public BuildRotation Rotation { get; private set; }
+    public ObjectType ModifiedType { get; private set; }
+
+    public delegate void OnBuildRemove(BuildOnTile sender);
+    public event OnBuildRemove OnBuildRemoved;
+
+    public BuildOnTile(GameObject gameObjectOnTile, IBuildable buildInfo, List<Vector3Int> occupiedTiles, BuildRotation rotation, ObjectType modifiedType)
+    {
+        this.BuildInfo = buildInfo;
         this.GameObjectOnTile = gameObjectOnTile;
         this.Rotation = rotation;
         this.OccupiedTiles = occupiedTiles;
@@ -227,12 +246,10 @@ public class ObjectOnTile
         this.ModifiedType = modifiedType;
     }
 
-    public ITileObjectFunctions Functions { get; private set; }
-    public List<Vector3Int> OccupiedTiles { get; private set; }
-    public ObjectInformation ObjectInfo { get; private set; }
-    public GameObject GameObjectOnTile { get; private set; }
-    public ObjectRotation Rotation { get; private set; }
-    public ObjectType ModifiedType { get; private set; }
+    public void IndicateBuildRemoved()
+    {
+        OnBuildRemoved?.Invoke(this);
+    }
 }
 
 public class FlooringGroup
@@ -240,10 +257,11 @@ public class FlooringGroup
     public FlooringRotation Rotation { get; private set; }
     public Dictionary<Vector3Int, FlooringNormalPartOnTile> NormalFloorings { get; private set; }
     public HashSet<Vector3Int> SupportFloorings { get; private set; }
-    private List<GameObject> supportObjects;
+    private List<GameObject> supportObjects;  //Only used for docks for now
     public FlooringVariantBase FlooringVariant { get; private set; }
     public Vector2Int BottomLeft { get; private set; } //This is the bottom left EXCLUDING the supports
     public Vector2Int TopRight { get; private set; }
+    private List<BuildOnTile> connectedBuilds; //Stairs if on dock etc...
 
     public FlooringGroup(Dictionary<Vector3Int, FlooringNormalPartOnTile> normalFloorings, HashSet<Vector3Int> supportFloorings,
         Vector2Int bottomLeft, Vector2Int topRight, List<GameObject> supportObjects, FlooringVariantBase flooringVariant, FlooringRotation rotation)
@@ -255,6 +273,19 @@ public class FlooringGroup
         this.supportObjects = supportObjects;
         this.BottomLeft = bottomLeft;
         this.TopRight = topRight;
+        this.connectedBuilds = new List<BuildOnTile>();
+    }
+
+    public void AddConnectedBuild(BuildOnTile build)
+    {
+        connectedBuilds.Add(build);
+        build.OnBuildRemoved += OnConnectedBuildRemoved;
+    }
+
+    private void OnConnectedBuildRemoved(BuildOnTile sender)
+    {
+        connectedBuilds.Remove(sender);
+        sender.OnBuildRemoved -= OnConnectedBuildRemoved;
     }
 
     public void Destroy()
@@ -267,6 +298,14 @@ public class FlooringGroup
         foreach (GameObject s in supportObjects)
         {
             UnityEngine.Object.Destroy(s);
+        }
+
+        for (int i = connectedBuilds.Count -1; i >= 0; i--)
+        {
+            if (!RemoveManager.TryRemoveBuild(connectedBuilds[i]))
+            {
+                throw new System.Exception("Failed to remove build for some reason...");
+            }
         }
     }
 }
@@ -293,10 +332,16 @@ public enum TileLocation
     WaterEdge = 1 << 1,
     Grass = 1 << 2,
     Sand = 1 << 3,
+
     CliffFront = 1 << 4,
     CliffBack = 1 << 5,
+    CliffRight = 1 << 6,
+    CliffLeft = 1 << 7,
+    CliffCornerCurveOut = 1 << 8,
+    CliffCornerCurveIn = 1 << 9,
+    CliffDoubleCorner = 1 << 10,
 
+    Cliff = CliffFront | CliffBack | CliffRight | CliffLeft | CliffCornerCurveOut | CliffCornerCurveIn,
     Water = DeepWater | WaterEdge,
-    Cliff = CliffFront | CliffBack,
     Land = Grass | Sand
 }

@@ -71,6 +71,11 @@ public class PlayerStateMachine : MonoBehaviour, IStateMachine
         }
     }
 
+    public PlayerState GetPlayerStateInstance<T>()
+    {
+        return typeToStateInstance[typeof(T)];
+    }
+
     public void TrySwitchState<T>(object[] args = null)
     {
         TrySwitchState(typeof(T), args);

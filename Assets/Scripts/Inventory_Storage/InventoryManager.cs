@@ -31,9 +31,9 @@ public class InventoryManager : MonoBehaviour
 
     private GameObject itemDropSlot;
 
-    private readonly int slotStartY = -20;
-    private readonly int slotStartX = 20;
-    private readonly int slotPadding = 20;
+    private readonly int slotStartY = -40;
+    private readonly int slotStartX = 40;
+    private readonly int slotPadding = 40;
 
     private KeyCode[] numberKeys = {
          KeyCode.Alpha1,

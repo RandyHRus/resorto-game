@@ -35,11 +35,30 @@ public class TerrainManager : MonoBehaviour
         }
     }
 
+    private class TilemapInformationWithLocation: TilemapInformation
+    {
+        public Dictionary<int, TileLocation> codeToLocation = new Dictionary<int, TileLocation>();
+
+        public TilemapInformationWithLocation(TileToCodeWithLocation[] tileToCodeList): base(tileToCodeList)
+        {
+            foreach (TileToCodeWithLocation t in tileToCodeList)
+            {
+                codeToLocation.Add(System.Convert.ToInt32(t.code, 2), t.tileLocation);
+            }
+        }
+    }
+
     [System.Serializable]
-    public struct TileToCode
+    public class TileToCode
     {
         public string code;
         public TileBase tile;
+    }
+
+    [System.Serializable]
+    public class TileToCodeWithLocation : TileToCode
+    {
+        public TileLocation tileLocation;
     }
 
     #region Terrain Tile Codes
@@ -61,8 +80,8 @@ public class TerrainManager : MonoBehaviour
      *  |     |   - 1 = grass
      *  |4___3|   - 0 = cliff
     */
-    [SerializeField] private TileToCode[] landTileCodes = null;
-    private TilemapInformation landTilemapInfo;
+    [SerializeField] private TileToCodeWithLocation[] landTileCodes = null;
+    private TilemapInformationWithLocation landTilemapInfo;
 
     /*
     *  water back ground tiles
@@ -95,7 +114,7 @@ public class TerrainManager : MonoBehaviour
         //Initialize Tilemap informations
         {
             sandWaterTilemapInfo = new TilemapInformation(sandWaterTileCodes);
-            landTilemapInfo      = new TilemapInformation(landTileCodes);
+            landTilemapInfo      = new TilemapInformationWithLocation(landTileCodes);
             waterBGTilemapInfo   = new TilemapInformation(waterBGTileCodes);
         }
     }
@@ -358,17 +377,7 @@ public class TerrainManager : MonoBehaviour
             if (newTileIsGrass && !existingTileIsGrass)
                 tile.layerNum++;
 
-            if (newTileIsGrass) //Full grass
-            {
-                tile.tileLocation = TileLocation.Grass;
-            }
-            else
-            {
-                if ((newCode & 0b1100) == 0b1100 || newCode == 0b0100 || newCode == 0b1000)
-                    tile.tileLocation = TileLocation.CliffFront;
-                else
-                    tile.tileLocation = TileLocation.CliffBack;
-            }
+            tile.tileLocation = landTilemapInfo.codeToLocation[newCode];
         }
         return true;
     }
@@ -430,16 +439,9 @@ public class TerrainManager : MonoBehaviour
                         tile.tileLocation = TileLocation.Grass;
                     }
                 }
-                else if (newTileIsGrass)
-                {
-                    tile.tileLocation = TileLocation.Grass;
-                }
                 else
                 {
-                    if ((newCode & 0b1100) == 0b1100 || newCode == 0b0100 || newCode == 0b1000)
-                        tile.tileLocation = TileLocation.CliffFront;
-                    else
-                        tile.tileLocation = TileLocation.CliffBack;
+                    tile.tileLocation = landTilemapInfo.codeToLocation[newCode];
                 }
             }
 
@@ -484,7 +486,7 @@ public class TerrainManager : MonoBehaviour
 
         if (mainTileLocation == TileLocation.Sand)
         {
-            if (checkForObjectsAtPosition(position, 0)) {
+            if (checkForBuildAtPosition(position, 0)) {
                 layerNumber = Constants.INVALID_TILE_LAYER;
                 return false;
             }
@@ -505,7 +507,7 @@ public class TerrainManager : MonoBehaviour
             {
                 proposedLayerNumber = aboveTileInformation.layerNum;
             }
-            else if (aboveTileInformation.tileLocation == TileLocation.CliffBack && aboveTileInformation.layerNum + 1 == mainTile.layerNum)
+            else if (TileLocation.Cliff.HasFlag(aboveTileInformation.tileLocation) && aboveTileInformation.layerNum + 1 == mainTile.layerNum)
             {
                 proposedLayerNumber = proposedLayerNumber = mainTile.layerNum;
             }
@@ -568,7 +570,7 @@ public class TerrainManager : MonoBehaviour
                 //Check for objects
                 foreach (Vector3Int positionToCheck in positionsToCheck)
                 {
-                    if (checkForObjectsAtPosition(positionToCheck, objectLayerNumToCheck)) {
+                    if (checkForBuildAtPosition(positionToCheck, objectLayerNumToCheck)) {
                         layerNumber = Constants.INVALID_TILE_LAYER;
                         return false;
                     }
@@ -594,10 +596,10 @@ public class TerrainManager : MonoBehaviour
             return true;
         }
 
-        bool checkForObjectsAtPosition(Vector3Int pos, int layerNum)
+        bool checkForBuildAtPosition(Vector3Int pos, int layerNum)
         {
             TileInformation info = TileInformationManager.Instance.GetTileInformation(pos);
-            if (info.layerNum == layerNum && !info.TileIsEmpty())
+            if (info.layerNum == layerNum && info.BuildsOnTile.TopMostBuild != null)
             {
                 return true;
             }
@@ -623,10 +625,19 @@ public class TerrainManager : MonoBehaviour
         //Sand is placeable
         if (TileLocation.Water.HasFlag(mainTileLocation))
         {
+            //Look for docks
+            if (mainTile.GetTopFlooringGroup() != null)
+            {
+                layerNumber = Constants.INVALID_TILE_LAYER;
+                return false;
+            }
+
             //Scan for outside map
             for (int i = -2; i <= 2; i++) {
                 for (int j = -2; j <= 2; j++) {
-                    if (!TileInformationManager.Instance.PositionInMap(new Vector3Int(position.x + i, position.y + j, 0)))
+
+                    TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(new Vector3Int(position.x + i, position.y + j, 0));
+                    if (tileInfo == null)
                     {
                         layerNumber = Constants.INVALID_TILE_LAYER;
                         return false;
@@ -674,7 +685,7 @@ public class TerrainManager : MonoBehaviour
                     placeableAbove = false;
 
                 //Check for objects
-                if (!tile.TileIsEmpty())
+                if (tile.BuildsOnTile.TopMostBuild != null || tile.GetTopFlooringGroup() != null)
                     placeableAbove = false;
             }
             //Placeable above
@@ -695,7 +706,7 @@ public class TerrainManager : MonoBehaviour
                     placeableBelow = false;
 
                 //Check for objects (but only if they are on below)
-                if (!tile.TileIsEmpty())
+                if (tile.BuildsOnTile.TopMostBuild != null || tile.GetTopFlooringGroup() != null)
                 {
                     if (aboveTileInformation.layerNum == tile.layerNum)
                         placeableBelow = false;

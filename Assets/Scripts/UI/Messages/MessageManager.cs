@@ -15,7 +15,7 @@ public class MessageManager : MonoBehaviour
     public Canvas Canvas => canvas;
 
     private float boxFadeSpeed = 0.01f;
-    private int paddingBetween = 30;
+    private int paddingBetween = 60;
     private int maxMessages = 5;
 
     private Queue<MessageBox> messageBoxes;
@@ -43,7 +43,7 @@ public class MessageManager : MonoBehaviour
 
     public void ShowMessage(MessageBox newMessageBox)
     {
-        newMessageBox.RectTransform.anchoredPosition = new Vector2(-40, 20);
+        newMessageBox.RectTransform.anchoredPosition = new Vector2(-80, 40);
         foreach (MessageBox messageBox in messageBoxes)
         {
             Vector2 pos = messageBox.RectTransform.anchoredPosition;

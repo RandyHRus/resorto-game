@@ -41,7 +41,7 @@ public class CreateFlooringState : PlayerState
         //CreateFloor
         if (floorPlaceable && CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
         {
-            indicatorManager.HideCurrentTiles();
+            indicatorManager.ClearCurrentTiles();
             Coroutines.Instance.StartCoroutine(PlaceFloor());
         }
     }
@@ -82,6 +82,10 @@ public class CreateFlooringState : PlayerState
             {
                 for (int j = minY; j <= maxY; j++)
                 {
+                    Vector3Int pos = new Vector3Int(i, j, 0);
+                    if (!TileInformationManager.Instance.PositionInMap(pos))
+                        continue;
+
                     int tilePlaceable = floorPlaceableCache[i, j];
                     if (tilePlaceable != 0)
                     {
@@ -110,7 +114,7 @@ public class CreateFlooringState : PlayerState
             yield return 0;
         }
         coroutineRunning = false;
-        indicatorManager.HideCurrentTiles();
+        indicatorManager.ClearCurrentTiles();
 
         if (placeable)
         {       
@@ -136,7 +140,7 @@ public class CreateFlooringState : PlayerState
 
     public override bool TryEndState()
     {
-        indicatorManager.HideCurrentTiles();
+        indicatorManager.ClearCurrentTiles();
         return !coroutineRunning;
     }
 }

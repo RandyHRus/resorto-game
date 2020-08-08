@@ -5,10 +5,10 @@ using UnityEngine.Tilemaps;
 using System;
 
 [CreateAssetMenu(menuName = "States/Create Objects")]
-public class CreateObjectsState : PlayerState
+public class CreateObjectsState : CreateBuildState
 {
     [SerializeField] private Sprite defaultIndicatorSprite = null;
-    private ObjectRotation objectRotation;
+    private BuildRotation objectRotation;
 
     private ObjectInformation selectedObject;
     private TilesIndicatorManager indicatorManager;
@@ -22,7 +22,7 @@ public class CreateObjectsState : PlayerState
     //args[0] = InventoryItem
     public override void StartState(object[] args)
     {
-        objectRotation = ObjectRotation.front;
+        objectRotation = BuildRotation.Front;
 
         ObjectItemInformation selectedItem = (ObjectItemInformation)args[0];
 
@@ -36,7 +36,7 @@ public class CreateObjectsState : PlayerState
 
     public override bool TryEndState()
     {
-        indicatorManager.HideCurrentTiles();
+        indicatorManager.ClearCurrentTiles();
         return true;
     }
 
@@ -45,7 +45,7 @@ public class CreateObjectsState : PlayerState
         if (Input.GetButtonDown("RotateObject") && selectedObject.HasSprite)
         {
             objectRotation += 1;
-            if ((int)objectRotation == Enum.GetNames(typeof(ObjectRotation)).Length)
+            if ((int)objectRotation == Enum.GetNames(typeof(BuildRotation)).Length)
                 objectRotation = 0;
 
             int tryCount = 0;
@@ -53,7 +53,7 @@ public class CreateObjectsState : PlayerState
             while (selectedObject.GetSpriteInformation(objectRotation).Sprite == null)
             {
                 objectRotation += 1;
-                if ((int)objectRotation == Enum.GetNames(typeof(ObjectRotation)).Length) objectRotation = 0;
+                if ((int)objectRotation == Enum.GetNames(typeof(BuildRotation)).Length) objectRotation = 0;
                 tryCount++;
                 if (tryCount >= 4)
                 {
@@ -61,6 +61,7 @@ public class CreateObjectsState : PlayerState
                     break;
                 }
             }
+            indicatorManager.ClearCurrentTiles();
         }
 
         Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
@@ -81,9 +82,10 @@ public class CreateObjectsState : PlayerState
         //Create object
         if (objectIsPlaceable && CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
         {
-            if (TileObjectsManager.TryCreateObject(selectedObject, mouseTilePosition, out ObjectOnTile objectOnTile, objectRotation))
+            if (TileObjectsManager.TryCreateObject(selectedObject, mouseTilePosition, out BuildOnTile buildOnTile, objectRotation))
             {
                 InventoryManager.Instance.RemoveItem(InventoryManager.Instance.SelectedSlotIndex, 1);
+                indicatorManager.ClearCurrentTiles();
             }
         }
     }

@@ -23,7 +23,7 @@ public class UIPanelsManager : MonoBehaviour
             _instance = this;
         }
 
-        houseCustomizationMenuObject = new UIObjectProxy(houseCustomizationMenuInstance);
+        houseCustomizationMenuObject = new UIObject(houseCustomizationMenuInstance);
     }
 
     private void Update()

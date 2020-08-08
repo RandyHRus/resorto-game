@@ -6,6 +6,7 @@ public class SelectionPanel: UIObject
 {
     private Transform contentTransform;
 
+    private Selection currentSelected;
     private List<Selection> selections;
     private float panelContentHeight = 0;
 
@@ -17,6 +18,13 @@ public class SelectionPanel: UIObject
         contentTransform = ObjectTransform.Find("Viewport/Content");
         selections = new List<Selection>();
         panelContentHeight = PADDING;
+    }
+
+    public void ChangeSelectedSelection(Selection selection)
+    {
+        currentSelected?.Highlight(false);
+        selection.Highlight(true);
+        currentSelected = selection;
     }
 
     public void InsertSelection(Selection selection)

@@ -88,20 +88,21 @@ public class MapVisualizer : MonoBehaviour
                 Vector3Int pos = new Vector3Int(x, y, 0);
                 TileInformation info = TileInformationManager.Instance.GetTileInformation(pos);
 
-                ObjectOnTile topMostObject = info.TopMostObject;
-
                 Color32 proposedColor;
-                if (topMostObject != null)
+
+                BuildGroupOnTile buildsOnTile = info.BuildsOnTile;
+                BuildOnTile topMostBuild = buildsOnTile.TopMostBuild;
+                if (topMostBuild != null)
                 {
-                    switch (topMostObject.ModifiedType)
+                    switch (topMostBuild.ModifiedType)
                     {
-                        case (ObjectType.onTop):
+                        case (ObjectType.OnTop):
                             proposedColor = colorDict[(int)ObjectsAndFloorings.OntopObject];
                             break;
-                        case (ObjectType.standard):
+                        case (ObjectType.Standard):
                             proposedColor = colorDict[(int)ObjectsAndFloorings.StandardObject];
                             break;
-                        case (ObjectType.ground):
+                        case (ObjectType.Ground):
                             proposedColor = colorDict[(int)ObjectsAndFloorings.GroundObject];
                             break;
                         default:
@@ -204,6 +205,7 @@ public class MapVisualizer : MonoBehaviour
         GroundObject,
         NormalFlooring,
         SupportFlooring,
+        Structure,
         None
     }
 }

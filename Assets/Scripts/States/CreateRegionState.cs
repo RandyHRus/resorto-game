@@ -39,7 +39,7 @@ public class CreateRegionState : PlayerState
         }
         else
         {
-            indicatorManager.HideCurrentTiles();
+            indicatorManager.ClearCurrentTiles();
             ShowRegions(false);
             return true;
         }
@@ -77,7 +77,7 @@ public class CreateRegionState : PlayerState
 
         if (regionPlaceable && CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
         {
-            indicatorManager.HideCurrentTiles();
+            indicatorManager.ClearCurrentTiles();
             Coroutines.Instance.StartCoroutine(PlaceRegion(selectedRegion));
         }
     }
@@ -177,7 +177,7 @@ public class CreateRegionState : PlayerState
         }
 
         coroutineRunning = false;
-        indicatorManager.HideCurrentTiles();
+        indicatorManager.ClearCurrentTiles();
 
         if (placeable)
         {

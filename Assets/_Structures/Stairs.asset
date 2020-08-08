@@ -15,5 +15,5 @@ MonoBehaviour:
   structureName: Stairs
   icon: {fileID: -7434801320922324287, guid: dbf0a41331dfe2f4c8ca69d87db71a29, type: 3}
   variants:
-  - {fileID: 0}
-  onSelectState: {fileID: 0}
+  - {fileID: 11400000, guid: 3af80ff009526084188141062fd8a821, type: 2}
+  onSelectState: {fileID: 11400000, guid: debaacea61314a04486a32956ab83c53, type: 2}

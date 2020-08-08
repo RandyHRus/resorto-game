@@ -12,31 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fdb4b6060ef40e4aab2f277e4627212, type: 3}
   m_Name: Darkwood large table
   m_EditorClassIdentifier: 
-  objectName: Darkwood large table
+  _name: Darkwood large table
+  useDefaultPrefab: 1
   prefab: {fileID: 3136490521668604779, guid: 0efde20ab5335684ea881ff6006be637, type: 3}
   collision: 1
   objectsCanBePlacedOnTop: 1
   onTopOffsetInPixels: 7
-  type: 1
+  type: 0
   location: 0
   hasSprite: 1
-  front:
+  frontSprite:
     sprite: {fileID: 4855592963271061882, guid: 3061e288efac0f444bcef049fce37b89,
       type: 3}
-    xSize: 4
-    ySize: 2
-  left:
+    size: {x: 2, y: 4}
+  rightSprite:
     sprite: {fileID: 8650862501231152914, guid: 3061e288efac0f444bcef049fce37b89,
       type: 3}
-    xSize: 2
-    ySize: 4
-  back:
+    size: {x: 4, y: 2}
+  backSprite:
     sprite: {fileID: 0}
-    xSize: 0
-    ySize: 0
-  right:
+    size: {x: 0, y: 0}
+  leftSprite:
     sprite: {fileID: 0}
-    xSize: 0
-    ySize: 0
-  size: {x: 0, y: 0}
+    size: {x: 0, y: 0}
+  sizeWhenNoSprite: {x: 0, y: 0}
   dropItem: {fileID: 11400000, guid: 04492999d5a6acc448ef696446fb4732, type: 2}

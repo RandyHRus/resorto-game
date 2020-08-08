@@ -103,7 +103,7 @@ public class DefaultState : PlayerState
                 {
                     if (Vector2.Distance(new Vector2(mouseTilePos.x, mouseTilePos.y), playerTransform.position) < interactRange)
                     {
-                        mouseTileInfo.ClickInteract();
+                        mouseTileInfo.BuildsOnTile.ClickInteract();
                     }
                     else
                     {

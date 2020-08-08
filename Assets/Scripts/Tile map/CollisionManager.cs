@@ -2,33 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CollisionManager : MonoBehaviour
+public class CollisionManager
 {
     public static float boxColliderSizeX = 0.625f;
     public static float boxColliderSizeY = 0.2f;
     public static float BUFFER = 1 / 16f;
 
-    public ObjectInformation stairsObject;
-
-    private static CollisionManager _instance;
-    public static CollisionManager Instance { get { return _instance; } }
-    private void Awake()
-    {
-        //Singleton
-        {
-            if (_instance != null && _instance != this)
-            {
-                Destroy(this.gameObject);
-            }
-            else
-            {
-                _instance = this;
-            }
-        }
-    }
-
     //Check if object will collide if moved to a proposed position
-    public bool CheckForCollisionMovement(Vector2 currentPosition, Vector2 proposedPosition, int tileLayer, out bool collisionX, out bool collisionY)
+    public static bool CheckForCollisionMovement(Vector2 currentPosition, Vector2 proposedPosition, int tileLayer, out bool collisionX, out bool collisionY)
     {
         float xChange = proposedPosition.x - currentPosition.x;
         float yChange = proposedPosition.y - currentPosition.y;
@@ -64,7 +45,7 @@ public class CollisionManager : MonoBehaviour
     }
 
 
-    public bool CheckForCollisionOnTile(Vector3Int tilePosition, int tileLayer)
+    public static bool CheckForCollisionOnTile(Vector3Int tilePosition, int tileLayer)
     {
         TileInformation tile = TileInformationManager.Instance.GetTileInformation(tilePosition);
         if (!TileInformationManager.Instance.PositionInMap(tilePosition))
@@ -73,10 +54,10 @@ public class CollisionManager : MonoBehaviour
         if (tile.Collision) //TODO could be changed to precise collision checking?
             return true;
 
-        //If water and no ground object, means there is collision with water
+        //If water and no dock, there is collision
         if (TileLocation.Water.HasFlag(tile.tileLocation))
         {
-            if (tile.ObjectTypeToObject[ObjectType.ground] == null)
+            if (tile.NormalFlooringGroup == null)
                 return true;
         }
 
@@ -89,7 +70,7 @@ public class CollisionManager : MonoBehaviour
         return false;
     }
 
-    public bool CheckForStairsMovement(Vector2 currentPosition, Vector2 proposedPosition, int tileLayer, out Vector3Int goalTile)
+    public static bool CheckForStairsMovement(Vector2 currentPosition, Vector2 proposedPosition, int tileLayer, out Vector3Int goalTile)
     {
         float xChange = proposedPosition.x - currentPosition.x;
         if (xChange != 0)
@@ -100,14 +81,14 @@ public class CollisionManager : MonoBehaviour
 
             if (xChange < 0)
             {
-                if (CheckForStairsTile(tilePositionToCheckUp, tileLayer, ObjectRotation.left) &&
-                    CheckForStairsTile(tilePositionToCheckDown, tileLayer, ObjectRotation.left))
+                if (CheckForStairsTile(tilePositionToCheckUp, tileLayer, BuildRotation.Right) &&
+                    CheckForStairsTile(tilePositionToCheckDown, tileLayer, BuildRotation.Right))
                 {
                     goalTile = new Vector3Int(Mathf.RoundToInt(currentPosition.x - 2), Mathf.RoundToInt(currentPosition.y + 1), 0);
                     return true;
                 }
-                else if (CheckForStairsTile(new Vector3Int(tilePositionToCheckUp.x, tilePositionToCheckUp.y - 1, 0), tileLayer - 1, ObjectRotation.right) &&
-                         CheckForStairsTile(new Vector3Int(tilePositionToCheckDown.x, tilePositionToCheckDown.y - 1, 0), tileLayer - 1, ObjectRotation.right))
+                else if (CheckForStairsTile(new Vector3Int(tilePositionToCheckUp.x, tilePositionToCheckUp.y - 1, 0), tileLayer - 1, BuildRotation.Left) &&
+                         CheckForStairsTile(new Vector3Int(tilePositionToCheckDown.x, tilePositionToCheckDown.y - 1, 0), tileLayer - 1, BuildRotation.Left))
                 {
                     goalTile = new Vector3Int(Mathf.RoundToInt(currentPosition.x - 2), Mathf.RoundToInt(currentPosition.y - 1), 0);
                     return true;
@@ -115,14 +96,14 @@ public class CollisionManager : MonoBehaviour
             }
             else if (xChange > 0)
             {
-                if (CheckForStairsTile(tilePositionToCheckUp, tileLayer, ObjectRotation.right) &&
-                    CheckForStairsTile(tilePositionToCheckDown, tileLayer, ObjectRotation.right))
+                if (CheckForStairsTile(tilePositionToCheckUp, tileLayer, BuildRotation.Left) &&
+                    CheckForStairsTile(tilePositionToCheckDown, tileLayer, BuildRotation.Left))
                 {
                     goalTile = new Vector3Int(Mathf.RoundToInt(currentPosition.x + 2), Mathf.RoundToInt(currentPosition.y + 1), 0);
                     return true;
                 }
-                else if (CheckForStairsTile(new Vector3Int(tilePositionToCheckUp.x, tilePositionToCheckUp.y - 1, 0), tileLayer - 1, ObjectRotation.left) &&
-                         CheckForStairsTile(new Vector3Int(tilePositionToCheckDown.x, tilePositionToCheckDown.y - 1, 0), tileLayer - 1, ObjectRotation.left))
+                else if (CheckForStairsTile(new Vector3Int(tilePositionToCheckUp.x, tilePositionToCheckUp.y - 1, 0), tileLayer - 1, BuildRotation.Right) &&
+                         CheckForStairsTile(new Vector3Int(tilePositionToCheckDown.x, tilePositionToCheckDown.y - 1, 0), tileLayer - 1, BuildRotation.Right))
                 {
                     goalTile = new Vector3Int(Mathf.RoundToInt(currentPosition.x + 2), Mathf.RoundToInt(currentPosition.y - 1), 0);
                     return true;
@@ -138,17 +119,36 @@ public class CollisionManager : MonoBehaviour
             Vector3Int tilePositionToCheckRight = new Vector3Int(Mathf.RoundToInt(currentPosition.x + boxColliderSizeX / 2f), Mathf.RoundToInt(proposedPosition.y + (yDir * (boxColliderSizeY / 2f + BUFFER))), 0);
 
             //First check for stairs
-            if (yChange > 0 && CheckForStairsTile(tilePositionToCheckLeft, tileLayer, ObjectRotation.front) && CheckForStairsTile(tilePositionToCheckRight, tileLayer, ObjectRotation.front))
+            if (yChange > 0)
             {
-                goalTile = new Vector3Int(Mathf.RoundToInt(currentPosition.x), Mathf.RoundToInt(currentPosition.y + 3), 0);
-                return true;
+                if (CheckForStairsTile(tilePositionToCheckLeft, tileLayer, BuildRotation.Front) && 
+                    CheckForStairsTile(tilePositionToCheckRight, tileLayer, BuildRotation.Front))
+                {
+                    goalTile = new Vector3Int(Mathf.RoundToInt(currentPosition.x), Mathf.RoundToInt(currentPosition.y + 3), 0);
+                    return true;
+                }
+                else if (CheckForStairsTile(tilePositionToCheckLeft, tileLayer - 1, BuildRotation.Back) &&
+                         CheckForStairsTile(tilePositionToCheckRight, tileLayer - 1, BuildRotation.Back))
+                {
+                    goalTile = new Vector3Int(Mathf.RoundToInt(currentPosition.x), Mathf.RoundToInt(currentPosition.y + 2), 0);
+                    return true;
+                }
+
             }
-            else if (yChange < 0 && 
-                CheckForStairsTile(new Vector3Int(tilePositionToCheckLeft.x, tilePositionToCheckLeft.y - 1, 0), tileLayer - 1, ObjectRotation.front) && 
-                CheckForStairsTile(new Vector3Int(tilePositionToCheckRight.x, tilePositionToCheckRight.y - 1, 0), tileLayer - 1, ObjectRotation.front))
+            else if (yChange < 0)
             {
-                goalTile = new Vector3Int(Mathf.RoundToInt(currentPosition.x), Mathf.RoundToInt(currentPosition.y - 3), 0);
-                return true;
+                if (CheckForStairsTile(new Vector3Int(tilePositionToCheckLeft.x, tilePositionToCheckLeft.y - 1, 0), tileLayer - 1, BuildRotation.Front) &&
+                    CheckForStairsTile(new Vector3Int(tilePositionToCheckRight.x, tilePositionToCheckRight.y - 1, 0), tileLayer - 1, BuildRotation.Front))
+                {
+                    goalTile = new Vector3Int(Mathf.RoundToInt(currentPosition.x), Mathf.RoundToInt(currentPosition.y - 3), 0);
+                    return true;
+                }
+                else if (CheckForStairsTile(tilePositionToCheckLeft, tileLayer, BuildRotation.Back) &&
+                         CheckForStairsTile(tilePositionToCheckRight, tileLayer, BuildRotation.Back))
+                {
+                    goalTile = new Vector3Int(Mathf.RoundToInt(currentPosition.x), Mathf.RoundToInt(currentPosition.y - 2), 0);
+                    return true;
+                }
             }
         }
 
@@ -156,16 +156,21 @@ public class CollisionManager : MonoBehaviour
         return false;
     }
 
-    public bool CheckForStairsTile(Vector3Int tilePosition, int tileLayer, ObjectRotation rotation)
-    {
+    public static bool CheckForStairsTile(Vector3Int tilePosition, int tileLayer, BuildRotation rotation)
+    {     
         TileInformation tile = TileInformationManager.Instance.GetTileInformation(tilePosition);
 
-        if (tile == null || tile.ObjectTypeToObject[ObjectType.standard] == null)
+        if (tile == null)
             return false;
 
         if (tileLayer != tile.layerNum)
             return false;
 
-        return (tile.ObjectTypeToObject[ObjectType.standard].ObjectInfo == stairsObject && tile.ObjectTypeToObject[ObjectType.standard].Rotation == rotation);
+        BuildOnTile build = tile.BuildsOnTile.TopMostBuild;
+
+        if (build == null)
+            return false;
+
+        return (build.BuildInfo.GetType() == typeof(StairsVariant) && build.Rotation == rotation);
     }
 }

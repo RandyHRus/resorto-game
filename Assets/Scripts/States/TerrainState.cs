@@ -24,7 +24,7 @@ public class TerrainState : PlayerState
 
     public override bool TryEndState()
     {
-        indicatorManager.HideCurrentTiles();
+        indicatorManager.ClearCurrentTiles();
         return !coroutineRunning;
     }
 
@@ -89,7 +89,7 @@ public class TerrainState : PlayerState
     IEnumerator PlaceSand()
     {
         coroutineRunning = true;
-        indicatorManager.HideCurrentTiles();
+        indicatorManager.ClearCurrentTiles();
         Vector3Int previousTilePosition = new Vector3Int(-1, -1, -1);
 
         while (Input.GetButton("Primary"))
@@ -113,7 +113,7 @@ public class TerrainState : PlayerState
     IEnumerator RemoveSand()
     {
         coroutineRunning = true;
-        indicatorManager.HideCurrentTiles();
+        indicatorManager.ClearCurrentTiles();
         Vector3Int previousTilePosition = new Vector3Int(-1, -1, -1);
 
         while (Input.GetButton("Secondary"))
@@ -137,7 +137,7 @@ public class TerrainState : PlayerState
     IEnumerator PlaceLand(int layerNumber)
     {
         coroutineRunning = true;
-        indicatorManager.HideCurrentTiles();
+        indicatorManager.ClearCurrentTiles();
         Vector3Int previousTilePosition = new Vector3Int(-1, -1, -1);
 
         while (Input.GetButton("Primary"))
@@ -161,7 +161,7 @@ public class TerrainState : PlayerState
     IEnumerator RemoveLand(int layerNumber)
     {
         coroutineRunning = true;
-        indicatorManager.HideCurrentTiles();
+        indicatorManager.ClearCurrentTiles();
         Vector3Int previousTilePosition = new Vector3Int(-1, -1, -1);
 
         while (Input.GetButton("Secondary"))

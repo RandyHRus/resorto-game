@@ -97,7 +97,7 @@ public class TouristBehaviour : MonoBehaviour
             Vector2 proposedPos = Vector2.MoveTowards(currentPos, target, moveSpeed * Time.deltaTime);
 
             bool stop = false;
-            if (CollisionManager.Instance.CheckForCollisionMovement(currentPos, proposedPos, tileLayer, out bool collisionX, out bool collisionY))
+            if (CollisionManager.CheckForCollisionMovement(currentPos, proposedPos, tileLayer, out bool collisionX, out bool collisionY))
             {
                 stop = true;
             }

@@ -15,11 +15,11 @@ public class BottomBarUIManager : MonoBehaviour
     {
         //Set up region panel
         {
-            regionPanel = new SelectionPanel(bottomBarCanvas.transform, new Vector2(10, 30));
+            regionPanel = new SelectionPanel(bottomBarCanvas.transform, new Vector2(20, 60));
 
             foreach (RegionInformation info in regionInformationsToShowInList)
             {
-                Selection selection = new RegionSelection(info, regionPanel.ObjectTransform);
+                Selection selection = new RegionSelection(info, regionPanel);
                 regionPanel.InsertSelection(selection);
             }
 
@@ -28,21 +28,20 @@ public class BottomBarUIManager : MonoBehaviour
 
         //Set up structures panel
         {
-            structuresPanel = new SelectionPanel(bottomBarCanvas.transform, new Vector2(10, 30));
+            structuresPanel = new SelectionPanel(bottomBarCanvas.transform, new Vector2(20, 60));
 
             foreach (StructureInformation structureInfo in structuresInformationToShowInList)
             {
-                SelectionPanel variantsPanel = new SelectionPanel(structuresPanel.ObjectTransform, new Vector2(80, 0));
+                SelectionPanel variantsPanel = new SelectionPanel(structuresPanel.ObjectTransform, new Vector2(160, 0));
 
                 foreach (StructureVariantInformation variantInfo in structureInfo.Variants)
                 {
-                    Selection selection = new StructureVariantSelection(structureInfo, variantInfo, regionPanel.ObjectTransform);
-                    variantsPanel.InsertSelection(selection);
+                    Selection variantSelection = new StructureVariantSelection(structureInfo, variantInfo, variantsPanel);
+                    variantsPanel.InsertSelection(variantSelection);
                 }
-                {
-                    Selection selection = new StructureSelection(structureInfo, variantsPanel, regionPanel.ObjectTransform);
-                    structuresPanel.InsertSelection(selection);
-                }
+
+                Selection structuresSelection = new StructureSelection(structureInfo, variantsPanel, structuresPanel);
+                structuresPanel.InsertSelection(structuresSelection);
 
                 variantsPanel.Show(false);
             }
@@ -53,7 +52,7 @@ public class BottomBarUIManager : MonoBehaviour
 
     public void BreakModeButtonPressed()
     {
-        PlayerStateMachine.Instance.TrySwitchState<RemoveObjectsState>();
+        PlayerStateMachine.Instance.TrySwitchState<RemoveState>();
     }
 
     public void TerrainModeButtonClicked()

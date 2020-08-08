@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dde73f30acc06934b8e52f67861b5511, type: 3}
   m_Name: Darkwood stairs
   m_EditorClassIdentifier: 
-  variantName: Darkwood stairs
+  _name: Darkwood stairs
   icon: {fileID: -7434801320922324287, guid: dbf0a41331dfe2f4c8ca69d87db71a29, type: 3}
   stairsSprites:
   - {fileID: -1049936094656903154, guid: dbf0a41331dfe2f4c8ca69d87db71a29, type: 3}
   - {fileID: 1816777119973348795, guid: dbf0a41331dfe2f4c8ca69d87db71a29, type: 3}
+  - {fileID: -4396000479493200869, guid: dbf0a41331dfe2f4c8ca69d87db71a29, type: 3}
   - {fileID: -7434801320922324287, guid: dbf0a41331dfe2f4c8ca69d87db71a29, type: 3}

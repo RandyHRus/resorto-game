@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fdb4b6060ef40e4aab2f277e4627212, type: 3}
   m_Name: Red flower bush
   m_EditorClassIdentifier: 
-  objectName: Red flower bush
+  _name: Red flower bush
+  useDefaultPrefab: 1
   prefab: {fileID: 3136490521668604779, guid: 0efde20ab5335684ea881ff6006be637, type: 3}
   collision: 1
   objectsCanBePlacedOnTop: 0
@@ -20,22 +21,18 @@ MonoBehaviour:
   type: 1
   location: 0
   hasSprite: 1
-  front:
+  frontSprite:
     sprite: {fileID: -2770932246066905560, guid: 7ee3b5941b4bc6541b6f4c74f180d5c5,
       type: 3}
-    xSize: 1
-    ySize: 1
-  left:
+    size: {x: 1, y: 1}
+  rightSprite:
     sprite: {fileID: 0}
-    xSize: 0
-    ySize: 0
-  back:
+    size: {x: 0, y: 0}
+  backSprite:
     sprite: {fileID: 0}
-    xSize: 0
-    ySize: 0
-  right:
+    size: {x: 0, y: 0}
+  leftSprite:
     sprite: {fileID: 0}
-    xSize: 0
-    ySize: 0
-  size: {x: 0, y: 0}
+    size: {x: 0, y: 0}
+  sizeWhenNoSprite: {x: 0, y: 0}
   dropItem: {fileID: 0}

@@ -12,27 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fdb4b6060ef40e4aab2f277e4627212, type: 3}
   m_Name: Orange seashell
   m_EditorClassIdentifier: 
-  objectName: Orange seashell
+  _name: Orange seashell
+  useDefaultPrefab: 0
   prefab: {fileID: 3543150490001620808, guid: 03327b3b53be74541be44f0ba1c8c1c5, type: 3}
   collision: 0
   objectsCanBePlacedOnTop: 1
-  type: 2
+  onTopOffsetInPixels: 0
+  type: 1
   location: 0
   hasSprite: 1
-  front:
+  frontSprite:
     sprite: {fileID: 21300000, guid: bc2aa280a96aa4942a328c811bb1ed72, type: 3}
-    xSize: 1
-    ySize: 1
-  left:
+    size: {x: 1, y: 1}
+  rightSprite:
     sprite: {fileID: 0}
-    xSize: 0
-    ySize: 0
-  back:
+    size: {x: 0, y: 0}
+  backSprite:
     sprite: {fileID: 0}
-    xSize: 0
-    ySize: 0
-  right:
+    size: {x: 0, y: 0}
+  leftSprite:
     sprite: {fileID: 0}
-    xSize: 0
-    ySize: 0
+    size: {x: 0, y: 0}
+  sizeWhenNoSprite: {x: 0, y: 0}
   dropItem: {fileID: 11400000, guid: d484f800d6a69a646bda8c888c8aeb99, type: 2}

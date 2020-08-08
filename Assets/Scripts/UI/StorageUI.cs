@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class StorageUI : UIObject
 {
-    private static int edgesPadding = 5;
-    private static int spaceBetweenSlots = 20;
+    private static int edgesPadding = 10;
+    private static int spaceBetweenSlots = 40;
 
     private ItemSlotUI[] slots;
 

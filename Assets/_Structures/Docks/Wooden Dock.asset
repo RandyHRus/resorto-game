@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ac530c09ad92b3449142be34f96aba4, type: 3}
   m_Name: Wooden Dock
   m_EditorClassIdentifier: 
-  variantName: Wooden Dock
+  _name: Wooden dock
   icon: {fileID: 7970258618468354628, guid: dbf0a41331dfe2f4c8ca69d87db71a29, type: 3}
   flooringSprites:
   - {fileID: 7970258618468354628, guid: dbf0a41331dfe2f4c8ca69d87db71a29, type: 3}

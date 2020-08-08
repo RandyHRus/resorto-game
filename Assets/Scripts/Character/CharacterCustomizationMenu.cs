@@ -185,6 +185,6 @@ public class CharacterCustomizationMenu : MonoBehaviour
 
     public void Finish()
     {
-        SceneManager.LoadScene("Main");
+        SceneManager.LoadScene("Loading");
     }
 }
