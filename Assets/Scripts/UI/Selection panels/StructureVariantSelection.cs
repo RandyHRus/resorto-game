@@ -15,7 +15,8 @@ public class StructureVariantSelection : Selection
         {
             if (t.tag == "Name Field")
             {
-                t.GetComponent<Text>().text = variantInfo.name;
+                OutlinedText text = new OutlinedText(t.gameObject);
+                text.SetText(variantInfo.name);
             }
             else if (t.tag == "Icon Field")
             {

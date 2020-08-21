@@ -6,12 +6,19 @@ using UnityEngine.UI;
 public class CurrencyManager : MonoBehaviour
 {
     private int totalCurrency;
-    [SerializeField] private Text currencyText = null;
+    [SerializeField] private GameObject currencyTextObj = null;
 
+    private OutlinedText text;
+
+    private void Awake()
+    {
+        text = new OutlinedText(currencyTextObj);
+
+    }
     private void Update()
     {
         //TODO fix only update ui when number updated
-        currencyText.text = totalCurrency.ToString();
+        text.SetText(totalCurrency.ToString());
     }
 
 

@@ -5,35 +5,37 @@ using UnityEngine.UI;
 
 public class InventoryManager : MonoBehaviour
 {
-    [SerializeField] private GameObject dropitemSlotPrefab = null;
     [SerializeField] private InventoryItemInformation[] starterItems = null;
-    [SerializeField] private PlayerItemDrops playerItemDrops = null;
     [SerializeField] private Transform inventoryCanvas = null;
     [SerializeField] private Transform inventoryAboveCanvas = null;
+    [SerializeField] private Transform playerTransform = null;
 
-    private readonly int slotCapacity = 5;
     private readonly int inventorySize_h = 10;
     private readonly int inventorySize_v = 3;
     private int totalSlotCount;
 
-    bool isInventoryOpen;
+    private readonly float itemDropHeight = 0.5f;
+
+    public bool IsInventoryOpen { get; private set; }
 
     private Storage inventory;
-    private ItemSlotUI[] inventorySlotsUI;
+    public DraggingItemInventorySlot MouseDraggingSlot { get; private set; } = null;
 
-    private ItemSlotInformation mouseDraggingSlotInformation = null;
-    private ItemSlotUI mouseDraggingSlotUI = null;
+    private int selectedSlotIndex = -1;
+    public StorageItemInventorySlot SelectedSlot => inventory.GetStorageSlotInformation(selectedSlotIndex);
 
-    private ItemSlotInformation selectedSlotInformation = null;
-    private ItemSlotUI selectedSlotUI = null;
-    private Color32 selectedSlotColor = new Color32(189, 189, 189, 255);
-    public int SelectedSlotIndex { get; set; } = -1;
+    private Dictionary<StorageItemInventorySlot, ItemSlotUI> inventorySlotToUI = new Dictionary<StorageItemInventorySlot, ItemSlotUI>();
+    private ItemSlotUI draggingSlotUI;
 
-    private GameObject itemDropSlot;
+    private DropItemInventorySlot itemDropSlot;
+    private DropItemInventorySlotUI itemDropSlotUI;
 
     private readonly int slotStartY = -40;
     private readonly int slotStartX = 40;
-    private readonly int slotPadding = 40;
+    private readonly int slotPadding = 36;
+
+    private float minDropXSpeed = 0.8f;
+    private float maxDropXSpeed = 1.2f;
 
     private KeyCode[] numberKeys = {
          KeyCode.Alpha1,
@@ -69,12 +71,10 @@ public class InventoryManager : MonoBehaviour
         //Create inventory as storage
         {
             totalSlotCount = inventorySize_h * inventorySize_v;
-            inventory = new Storage(inventorySize_h, inventorySize_v, slotCapacity);
+            inventory = new Storage(inventorySize_h, inventorySize_v);
         }
         //Create UI
         {
-            inventorySlotsUI = new ItemSlotUI[totalSlotCount];
-
             for (int k = 0; k < inventorySize_v; k++)
             {
                 int slotPosY = slotStartY - (k * slotPadding);
@@ -83,17 +83,13 @@ public class InventoryManager : MonoBehaviour
                 {
                     int index = i + (inventorySize_h * k);
 
-                    ItemSlotUI slotUI = new ItemSlotUI(inventory.GetSlotInformation(index), inventoryCanvas);
-                    inventorySlotsUI[index] = slotUI;
+                    StorageItemInventorySlot slot = inventory.GetStorageSlotInformation(index);
+                    ItemSlotUI slotUI = new ItemSlotUI(slot, inventoryCanvas);
+                    inventorySlotToUI.Add(slot, slotUI);
                     //Move slot to position
                     {
                         int slotPosX = slotStartX + i * slotPadding;
                         slotUI.RectTransform.anchoredPosition = (new Vector2(slotPosX, slotPosY));
-                    }
-                    //Button
-                    {
-                        InventorySlotClick script = slotUI.ObjectInScene.AddComponent<InventorySlotClick>();
-                        script.slot = inventory.GetSlotInformation(index);
                     }
                 }
             }
@@ -103,15 +99,15 @@ public class InventoryManager : MonoBehaviour
                 int slotPosX = slotStartX + (inventorySize_h * slotPadding);
                 int slotPosY = slotStartY - ((inventorySize_v-1) * slotPadding);
 
-                itemDropSlot = Instantiate(dropitemSlotPrefab);
-                itemDropSlot.transform.SetParent(inventoryCanvas, false);
-                itemDropSlot.GetComponent<RectTransform>().anchoredPosition = new Vector2(slotPosX, slotPosY);
+                itemDropSlot = new DropItemInventorySlot();
+                itemDropSlotUI = new DropItemInventorySlotUI(itemDropSlot, inventoryCanvas);
+                itemDropSlotUI.RectTransform.anchoredPosition = new Vector2(slotPosX, slotPosY);
             }
             //Create mouse dragging slot
             {
-                mouseDraggingSlotInformation = new ItemSlotInformation(slotCapacity);
-                mouseDraggingSlotUI = new ItemSlotUI(mouseDraggingSlotInformation, inventoryAboveCanvas);
-                mouseDraggingSlotUI.ObjectInScene.GetComponent<Image>().enabled = false;
+                MouseDraggingSlot = new DraggingItemInventorySlot();
+                draggingSlotUI = new DraggingItemSlotUI(MouseDraggingSlot, inventoryAboveCanvas);
+                draggingSlotUI.ObjectInScene.GetComponent<Image>().enabled = false;
             }
         }
     }
@@ -124,16 +120,13 @@ public class InventoryManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetButtonDown("Inventory"))
-        {
-            ToggleInventory(!isInventoryOpen);
-        } 
-
+        /*
         if (Input.GetButtonDown("Cancel"))
         {
             ToggleInventory(false);
             SelectItemSlot(-1);
         }
+        */
 
         //Set selected slot with number keys
         for (int i = 0; i < numberKeys.Length; i++)
@@ -149,19 +142,19 @@ public class InventoryManager : MonoBehaviour
         {
             if (Input.GetAxis("Mouse ScrollWheel") < 0f) // forward
             {
-                SelectedSlotIndex++;
-                if (SelectedSlotIndex >= inventorySize_h)
-                    SelectedSlotIndex = 0;
+                selectedSlotIndex++;
+                if (selectedSlotIndex >= inventorySize_h)
+                    selectedSlotIndex = 0;
 
-                SelectItemSlot(SelectedSlotIndex);
+                SelectItemSlot(selectedSlotIndex);
             }
             if (Input.GetAxis("Mouse ScrollWheel") > 0f) // forward
             {
-                SelectedSlotIndex--;
-                if (SelectedSlotIndex < 0)
-                    SelectedSlotIndex = inventorySize_h - 1;
+                selectedSlotIndex--;
+                if (selectedSlotIndex < 0)
+                    selectedSlotIndex = inventorySize_h - 1;
 
-                SelectItemSlot(SelectedSlotIndex);
+                SelectItemSlot(selectedSlotIndex);
             }
 
             //TODO REMOVE
@@ -171,10 +164,11 @@ public class InventoryManager : MonoBehaviour
             }
         }
 
-        if (isInventoryOpen)
+        //Move dragging slot
+        if (IsInventoryOpen)
         {
             Vector2 mouseToWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mouseDraggingSlotUI.ObjectTransform.position = (new Vector2(mouseToWorld.x, mouseToWorld.y));
+            draggingSlotUI.ObjectTransform.position = (new Vector2(mouseToWorld.x, mouseToWorld.y));
         }
     }
 
@@ -187,69 +181,14 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    public void ClickItemSlot_primary(ItemSlotInformation slot)
-    {
-        if (isInventoryOpen)
-        {
-            InventoryItemInformation item = slot.Item;
-            int count = slot.Count;
-
-            //Just put mouse item in inventory slot
-            if (item == null)
-            {
-                slot.SetSlot(mouseDraggingSlotInformation.Item, mouseDraggingSlotInformation.Count);
-                mouseDraggingSlotInformation.SetSlot(null, 0);
-            }
-            //Fill slot with dragging item
-            else if (item.Equals(mouseDraggingSlotInformation.Item))
-            {
-                FillSlotToCapacity(slot, item, mouseDraggingSlotInformation.Count, out int remains);
-                mouseDraggingSlotInformation.SetSlot(item, remains);
-            }
-            //Switch slots items
-            else
-            {
-                slot.SetSlot(mouseDraggingSlotInformation.Item, mouseDraggingSlotInformation.Count);
-                mouseDraggingSlotInformation.SetSlot(item, count);
-            }
-        }
-    }
-
-    public void ClickItemSlot_secondary(ItemSlotInformation slot)
-    {
-        if (isInventoryOpen)
-        {
-            InventoryItemInformation item = slot.Item;
-            int count = slot.Count;
-
-            if (item == null || item == mouseDraggingSlotInformation.Item)
-            {
-                if (mouseDraggingSlotInformation.Item != null)
-                {
-                    FillSlotToCapacity(slot, mouseDraggingSlotInformation.Item, 1, out int remains);
-                    if (remains == 0)
-                        mouseDraggingSlotInformation.SetSlot(mouseDraggingSlotInformation.Item, mouseDraggingSlotInformation.Count - 1);
-                }
-            }
-            else if (mouseDraggingSlotInformation.Item == null)
-            {
-                int half = count / 2;
-                int otherHalf = count - half;
-
-                slot.SetSlot(item, half);
-                mouseDraggingSlotInformation.SetSlot(item, otherHalf);
-            }
-        }
-    }
-
     //Select -1 to unselect slot
     public void SelectItemSlot(int i)
     {
         //unhighlight previously selected slot
-        if (selectedSlotInformation != null)
+        if (selectedSlotIndex != -1)
         {
-            selectedSlotUI.ObjectInScene.GetComponent<Image>().color = Color.white;
-            selectedSlotInformation.OnItemChanged -= OnSelectedItemChanged;
+            inventorySlotToUI[SelectedSlot].StartShrink();
+            ((StorageItemInventorySlot)inventorySlotToUI[SelectedSlot].Slot).ItemChanged -= OnSelectedItemChanged;
         }
 
         //Unselect slots
@@ -263,25 +202,16 @@ public class InventoryManager : MonoBehaviour
             return;
         }
 
-        selectedSlotInformation = inventory.GetSlotInformation(i);
-        selectedSlotUI = inventorySlotsUI[i];
-        selectedSlotUI.ObjectInScene.GetComponent<Image>().color = selectedSlotColor; //Highlight selected slot,
-        SelectedSlotIndex = i;
-        selectedSlotInformation.OnItemChanged += OnSelectedItemChanged;
+        StorageItemInventorySlot slotInfo = inventory.GetStorageSlotInformation(i);
+        inventorySlotToUI[slotInfo].StartEnlarge();
+        selectedSlotIndex = i;
+        slotInfo.ItemChanged += OnSelectedItemChanged;
         OnSelectedItemChanged();
     }
 
     public void OnSelectedItemChanged()
     {
-        PlayerStateMachine.Instance.OnSelectedItemChanged(selectedSlotInformation.Item);
-    }
-
-    public void RemoveItem(int slotIndex, int count)
-    {
-        ItemSlotInformation slot = inventory.GetSlotInformation(SelectedSlotIndex);
-        if (slot.Count - count < 0)
-            Debug.Log("Tried to remove too many items");
-        slot.SetSlot(slot.Item, slot.Count - count);
+        PlayerStateMachine.Instance.OnSelectedItemChanged(inventory.GetStorageSlotInformation(selectedSlotIndex).Item);
     }
 
     public void RemoveItem(InventoryItemInformation item, int count)
@@ -296,59 +226,66 @@ public class InventoryManager : MonoBehaviour
 
         for (int i = 0; i < totalSlotCount; i++)
         {
-            ItemSlotInformation slot = inventory.GetSlotInformation(i);
+            StorageItemInventorySlot slot = inventory.GetStorageSlotInformation(i);
             if (slot.Item == null || (item == slot.Item))
             {
                 //Add items
-                FillSlotToCapacity(slot, item, count, out count);
+                slot.FillSlotToCapacity(item, count, out count);
             }
         }
         if (count > 0)
         {
             Debug.Log("Could not add all items");
-            playerItemDrops.DropItem(item, count);
+            DropItem(item, count);
         }
-    }
-
-    private void FillSlotToCapacity(ItemSlotInformation slot, InventoryItemInformation item, int toAdd, out int remains)
-    {
-        if (slot.Count + toAdd <= slot.Capacity)
-        {
-            slot.SetSlot(item, slot.Count + toAdd);
-            remains = 0;
-            return;
-        }
-        else if (slot.Count < slot.Capacity)
-        {
-            toAdd -= slot.Capacity - slot.Count;
-            slot.SetSlot(item, slot.Capacity);
-            remains = toAdd;
-            return;
-        }
-
-        remains = toAdd;
     }
 
     public void ToggleInventory(bool show)
     {
-        isInventoryOpen = show;
+        IsInventoryOpen = show;
 
-        for (int i = 1; i < inventorySize_v; i++) {
-            for (int j = 0; j < inventorySize_h; j++) {
-                inventorySlotsUI[j + (inventorySize_h * i)].Show(show);
+        if (show) {
+            if (SelectedSlot != null)
+                inventorySlotToUI[SelectedSlot].StartShrink();
+
+            selectedSlotIndex = -1;
+        }
+        else
+        {
+            //Shrink previously hoverred over slot
+            for (int i = 1; i < inventorySize_v; i++)
+            {
+                for (int j = 0; j < inventorySize_h; j++)
+                {
+                    inventorySlotToUI[inventory.GetStorageSlotInformation(j + (inventorySize_h * i))].StartShrink();
+                }
             }
         }
 
-        mouseDraggingSlotUI.Show(show);
-        itemDropSlot.SetActive(show);
+
+        for (int i = 1; i < inventorySize_v; i++) {
+            for (int j = 0; j < inventorySize_h; j++) {
+                inventorySlotToUI[inventory.GetStorageSlotInformation(j + (inventorySize_h * i))].Show(show);
+            }
+        }
+
+        //slotToUI[SelectedSlot].Show(show);
+
+        itemDropSlotUI.Show(show);
     }
 
     public void DropDraggingItem()
     {
-        if (mouseDraggingSlotInformation.Item != null)
+        if (MouseDraggingSlot.Item != null)
         {
-            playerItemDrops.DropItem(mouseDraggingSlotInformation.Item, mouseDraggingSlotInformation.Count);
-            mouseDraggingSlotInformation.SetSlot(null, 0);
+            DropItem(MouseDraggingSlot.Item, MouseDraggingSlot.Count);
+            MouseDraggingSlot.SetSlot(null, 0);
         }
+    }
+
+    private void DropItem(InventoryItemInformation item, int count)
+    {
+        float xSpeed = PlayerDirection.Instance.VisualDirection.DirectionVector.x * Random.Range(minDropXSpeed, maxDropXSpeed);
+        DropItems.DropItem(playerTransform.position, itemDropHeight, item, count, xSpeed);
     }
 }

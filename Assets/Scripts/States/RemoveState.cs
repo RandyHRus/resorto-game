@@ -57,7 +57,7 @@ public class RemoveState : PlayerState
             {
                 if (RemoveManager.TryRemoveBuild(mouseTilePosition, out IBuildable buildInfo))
                 {
-                    
+                    buildInfo.OnRemove(build);
                 }
             }
             else if (flooringRemovable)

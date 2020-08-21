@@ -10,9 +10,10 @@ public class WarningMessage : MessageBox
         Transform t = ObjectInScene.transform;
         foreach (Transform tr in t)
         {
-            if (tr.tag == "Name Field")
+            if (tr.tag == "Text Field")
             {
-                tr.GetComponent<Text>().text = text;
+                OutlinedText outlinedText = new OutlinedText(tr.gameObject);
+                outlinedText.SetText(text);
             }
         }
     }

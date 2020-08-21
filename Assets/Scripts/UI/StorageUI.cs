@@ -5,15 +5,15 @@ using UnityEngine;
 public class StorageUI : UIObject
 {
     private static int edgesPadding = 10;
-    private static int spaceBetweenSlots = 40;
+    private static int slotPadding = 36;
 
     private ItemSlotUI[] slots;
 
     public StorageUI(Storage storage) : base(ResourceManager.Instance.ResizablePanel, ResourceManager.Instance.InventoryCanvas.transform)
     {
         //Set up background
-        float panelSizeX = ((spaceBetweenSlots * storage.SlotCountX) + (2 * edgesPadding));
-        float panelSizeY = ((spaceBetweenSlots * storage.SlotCountY) + (2 * edgesPadding));
+        float panelSizeX = ((slotPadding * storage.SlotCountX) + (2 * edgesPadding));
+        float panelSizeY = ((slotPadding * storage.SlotCountY) + (2 * edgesPadding));
         RectTransform.sizeDelta = new Vector2(panelSizeX, panelSizeY);
 
         int posX = Screen.width / 2;
@@ -30,19 +30,14 @@ public class StorageUI : UIObject
             {
                 //Create slot UI
                 int index = x + (storage.SlotCountX * y);
-                ItemSlotUI slotUI = new ItemSlotUI(storage.GetSlotInformation(index), ObjectTransform);
+                ItemSlotUI slotUI = new ItemSlotUI(storage.GetStorageSlotInformation(index), ObjectTransform);
                 slots[index] = slotUI;
 
                 //Set position
                 {
-                    int slotPosX = edgesPadding + (spaceBetweenSlots * x) + (spaceBetweenSlots / 2);
-                    int slotPosY = -(edgesPadding + (spaceBetweenSlots * y) + (spaceBetweenSlots / 2));
+                    int slotPosX = edgesPadding + (slotPadding * x) + (slotPadding / 2);
+                    int slotPosY = -(edgesPadding + (slotPadding * y) + (slotPadding / 2));
                     slotUI.RectTransform.anchoredPosition = new Vector2(slotPosX, slotPosY);
-                }
-                //Button
-                {
-                    InventorySlotClick script = slotUI.ObjectInScene.AddComponent<InventorySlotClick>();
-                    script.slot = storage.GetSlotInformation(index);
                 }
             }
         }

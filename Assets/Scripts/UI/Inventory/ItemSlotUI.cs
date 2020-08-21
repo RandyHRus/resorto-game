@@ -3,21 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ItemSlotUI : UIObject
+public class ItemSlotUI : InventorySlotUI
 {
     private Image iconImage;
-    private Text itemCountText;
+    private OutlinedText itemCountText;
 
-    private ItemSlotInformation slotInfo;
-
-    public ItemSlotUI(ItemSlotInformation slotInfo, Transform parent) : base(ResourceManager.Instance.ItemSlot, parent)
+    public ItemSlotUI(ItemInventorySlot slotInfo, Transform parent) : base(slotInfo, ResourceManager.Instance.ItemSlot, parent)
     {
         Transform t = ObjectInScene.transform;
         foreach (Transform tr in t)
         {
             if (tr.tag == "Count Field")
             {
-                itemCountText = tr.GetComponent<Text>();
+                itemCountText = new OutlinedText(tr.gameObject);
             }
             else if (tr.tag == "Icon Field")
             {
@@ -26,37 +24,36 @@ public class ItemSlotUI : UIObject
         }
 
         iconImage.enabled = false; //To remove white square
-        itemCountText.enabled = false;
+        itemCountText.SetText("");
 
-        this.slotInfo = slotInfo;
-        this.slotInfo.OnSlotChanged += RefreshUI;
+        ((ItemInventorySlot)this.Slot).SlotChanged += RefreshUI;
 
         RefreshUI(); //Show UI
     }
 
     private void RefreshUI()
     {
-        if (slotInfo.Item == null)
+        ItemInventorySlot itemInventorySlot = ((ItemInventorySlot)this.Slot);
+
+        if (itemInventorySlot.Item == null)
         {
             iconImage.sprite = null;
             iconImage.enabled = false;
 
-            itemCountText.text = "";
-            itemCountText.enabled = false;
+            itemCountText.SetText("");
         }
         else
         {
-            iconImage.sprite = slotInfo.Item.ItemIcon;
+            iconImage.sprite = itemInventorySlot.Item.ItemIcon;
             iconImage.enabled = true;
 
-            itemCountText.text = slotInfo.Count.ToString();
-            itemCountText.enabled = true;
+            itemCountText.SetText(itemInventorySlot.Count.ToString());
         }
     }
 
     public new void Destroy()
     {
-        this.slotInfo.OnSlotChanged -= RefreshUI;
+        ((ItemInventorySlot)this.Slot).SlotChanged -= RefreshUI;
         base.Destroy();
     }
 }

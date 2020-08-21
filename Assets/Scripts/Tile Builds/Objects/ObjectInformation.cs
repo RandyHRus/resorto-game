@@ -56,6 +56,10 @@ public class ObjectInformation : ScriptableObject, IBuildable
 
     [SerializeField] private InventoryItemInformation dropItem = null;
 
+    private float dropHeight = 0.5f;
+    private float minDropXSpeed = -0.4f;
+    private float maxDropXSpeed = 0.4f;
+
     public ObjectSpriteInformation GetSpriteInformation(BuildRotation rotation)
     {
         switch (rotation)
@@ -78,7 +82,7 @@ public class ObjectInformation : ScriptableObject, IBuildable
         if (dropItem != null)
         {
             Vector3Int pos = build.OccupiedTiles[0];
-            DropItems.DropItem(new Vector2(pos.x, pos.y), dropItem, 1, true);
+            DropItems.DropItem(new Vector2(pos.x, pos.y), dropHeight, dropItem, 1, UnityEngine.Random.Range(minDropXSpeed, maxDropXSpeed));
         }
     }
 

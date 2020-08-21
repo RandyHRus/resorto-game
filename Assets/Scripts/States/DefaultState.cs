@@ -20,6 +20,8 @@ public class DefaultState : PlayerState
 
     public override void Initialize()
     {
+        base.Initialize();
+
         interactIndicatorInstance = GameObject.FindGameObjectWithTag("Interact Indicator");
 
         interactIndicatorTransform = interactIndicatorInstance.transform;
@@ -93,27 +95,44 @@ public class DefaultState : PlayerState
             }
         }
 
-        //Interact with tile object
+        //Click interact
         {
             if (CheckMouseOverUI.GetButtonDownAndNotOnUI("Secondary"))
             {
-                Vector3Int mouseTilePos = TileInformationManager.Instance.GetMouseTile();
-                TileInformation mouseTileInfo = TileInformationManager.Instance.GetTileInformation(mouseTilePos);
-                if (mouseTileInfo != null)
+                Vector2 mousePos = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                if (Vector2.Distance(mousePos, playerTransform.position) < interactRange)
                 {
-                    if (Vector2.Distance(new Vector2(mouseTilePos.x, mouseTilePos.y), playerTransform.position) < interactRange)
+                    bool nonTileClickableFound = false;
                     {
-                        mouseTileInfo.BuildsOnTile.ClickInteract();
+                        RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
+                        if (hit.collider != null)
+                        {
+                            INonTileClickable component = hit.transform.GetComponentInChildren<INonTileClickable>();
+                            if (component == null) component = hit.transform.GetComponentInParent<INonTileClickable>();
+                            if (component != null)
+                            {
+                                component.NearbyAndOnClick();
+                                nonTileClickableFound = true;
+                            }
+                        }
                     }
-                    else
+                    //Interact with tile objects
+                    if (nonTileClickableFound == false)
                     {
-                        new WarningMessage("Too far away!");
+                        Vector3Int mouseTilePos = TileInformationManager.Instance.GetMouseTile();
+                        TileInformation mouseTileInfo = TileInformationManager.Instance.GetTileInformation(mouseTilePos);
+                        if (mouseTileInfo != null)
+                        {
+                            mouseTileInfo.BuildsOnTile.ClickInteract();
+                        }
                     }
+                }
+                else
+                {
+                    new WarningMessage("Too far away!");
                 }
             }
         }
-
-        //
     }
 
     public override void StartState(object[] args)

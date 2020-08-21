@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerStateMachine : MonoBehaviour, IStateMachine
+public class PlayerStateMachine : MonoBehaviour
 {
     private PlayerState currentState;
 
@@ -43,6 +43,10 @@ public class PlayerStateMachine : MonoBehaviour, IStateMachine
         {
             TrySwitchState<DefaultState>();
         }
+        else if (Input.GetButtonDown("Inventory") && currentState != typeToStateInstance[typeof(InventoryState)])
+        {
+            TrySwitchState<InventoryState>();
+        }
 
         //Movement should go before current state execution
         //Thigns like changing plaeyr direction when fishing started will not work otherwise
@@ -76,9 +80,9 @@ public class PlayerStateMachine : MonoBehaviour, IStateMachine
         return typeToStateInstance[typeof(T)];
     }
 
-    public void TrySwitchState<T>(object[] args = null)
+    public void TrySwitchState<T>(object[] args = null) where T: PlayerState
     {
-        TrySwitchState(typeof(T), args);
+        TrySwitchState(typeof(T), args);    
     }
 
     public void TrySwitchState(Type type, object[] args = null)

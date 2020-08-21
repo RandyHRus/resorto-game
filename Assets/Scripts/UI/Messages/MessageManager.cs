@@ -14,9 +14,9 @@ public class MessageManager : MonoBehaviour
     [SerializeField] private Canvas canvas = null;
     public Canvas Canvas => canvas;
 
-    private float boxFadeSpeed = 0.01f;
-    private int paddingBetween = 60;
-    private int maxMessages = 5;
+    private float boxFadeSpeed = 1f;
+    private int paddingBetween = 50;
+    private int maxMessages = 6;
 
     private Queue<MessageBox> messageBoxes;
 
@@ -64,7 +64,7 @@ public class MessageManager : MonoBehaviour
         foreach (MessageBox messageBox in messageBoxes)
         {
             if (messageBox.timeRemaining <= 0 && messageBox.alpha > 0)
-                messageBox.alpha -= boxFadeSpeed;
+                messageBox.alpha -= boxFadeSpeed * Time.deltaTime;
             else
                 messageBox.timeRemaining -= Time.deltaTime;
         }

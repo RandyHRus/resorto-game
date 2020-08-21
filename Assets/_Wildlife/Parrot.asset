@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 721440aea209f6a41ae64109917dce04, type: 3}
+  m_Name: Parrot
+  m_EditorClassIdentifier: 
+  _name: Parrot
+  prefabChoices:
+  - {fileID: 1503651270462426369, guid: 6a73556374abdfe46959215d1ad035bf, type: 3}
+  - {fileID: 574701275274641981, guid: 659560883206916498cc5f9fe7bcee92, type: 3}
+  - {fileID: 238199736416280559, guid: b23e70e5a47d1c54191b0fa5a0eb2c32, type: 3}
+  - {fileID: 995575077280939080, guid: c0c374b32cad7af41a2f808caac022a3, type: 3}

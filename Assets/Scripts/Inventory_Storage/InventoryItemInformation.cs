@@ -19,5 +19,6 @@ public enum ItemTag
     Furniture,
     Tool,
     Seeds,
-    Resource
+    Resource,
+    Cosmetic
 }

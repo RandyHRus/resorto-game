@@ -16,7 +16,8 @@ public class StructureSelection : Selection
         {
             if (t.tag == "Name Field")
             {
-                t.GetComponent<Text>().text = info.name;
+                OutlinedText text = new OutlinedText(t.gameObject);
+                text.SetText(info.name);
             }
             else if (t.tag == "Icon Field")
             {

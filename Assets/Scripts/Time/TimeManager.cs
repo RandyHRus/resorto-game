@@ -11,7 +11,9 @@ public class TimeManager : MonoBehaviour
     public int hour;
     public int minute;
     private float timePassed;
-    [SerializeField] private Text timeText = null;
+    [SerializeField] private GameObject timeTextObj = null;
+
+    private OutlinedText text;
 
     private const int morningStart = 5;
     private const int midDayStart = 10;
@@ -49,6 +51,8 @@ public class TimeManager : MonoBehaviour
         {
             timePassed = 0;
         }
+
+        text = new OutlinedText(timeTextObj);
     }
 
     private int previousHour = -1;
@@ -88,7 +92,7 @@ public class TimeManager : MonoBehaviour
             if (minute < 10)
                 minuteString = "0" + minuteString;
 
-            timeText.text = "Day " + day + "  " + hourString + ":" + minuteString; //TODO seperate canvases to increase performance
+            text.SetText("Day " + day + "  " + hourString + ":" + minuteString);
         }
 
         if (hour != previousHour)

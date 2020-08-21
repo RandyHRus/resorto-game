@@ -84,7 +84,7 @@ public class CreateObjectsState : CreateBuildState
         {
             if (TileObjectsManager.TryCreateObject(selectedObject, mouseTilePosition, out BuildOnTile buildOnTile, objectRotation))
             {
-                InventoryManager.Instance.RemoveItem(InventoryManager.Instance.SelectedSlotIndex, 1);
+                InventoryManager.Instance.SelectedSlot.RemoveItem(1);
                 indicatorManager.ClearCurrentTiles();
             }
         }

@@ -5,7 +5,8 @@ using System.Linq;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed = 0f;
+    [SerializeField] private float moveSpeed = 1f;
+    [SerializeField] private float slowMoveSpeed = 0.65f;
     private Transform playerTransform;
     //private SpriteRenderer playerRenderer;
 
@@ -13,12 +14,11 @@ public class PlayerMovement : MonoBehaviour
     public static float boxColliderSizeY;
     public static float BUFFER;
 
-    public PlayerDirection direction;
     private Animator animator;
 
     private int currentTileLayer; //Starts at 0 which means the player is on the sand layer, which means we need to check collision at land layer 0
 
-    public delegate void OnPlayerMove();
+    public delegate void OnPlayerMove(Vector2 position, bool slow, Vector2 previousPosition);
     public static event OnPlayerMove PlayerMoved;
 
     private static PlayerMovement _instance;
@@ -38,7 +38,6 @@ public class PlayerMovement : MonoBehaviour
         }
 
         playerTransform = transform;
-        direction = new PlayerDirection();
         animator = GetComponent<Animator>();
 
         boxColliderSizeX = CollisionManager.boxColliderSizeX;
@@ -61,53 +60,12 @@ public class PlayerMovement : MonoBehaviour
     {
         Vector3 previousPos = playerTransform.position;
 
-        int animDirectionX, animDirectionY; // -1 or 1
         //Animation
         {
-            animDirectionX = (int)Input.GetAxisRaw("Horizontal");
-            animDirectionY = (int)Input.GetAxisRaw("Vertical");
-            animator.SetBool("Walking", animDirectionX != 0 || animDirectionY != 0); //This should not be affected by mouse click function part below
-        }
-        //Point to direction of mouse on mouseclick
-        if (CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
-        {
-            float angle = MathFunctions.GetAngleBetweenPoints(playerTransform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition));
-            //Set 4 way direction (For fishing etc)
-            {
-                if (angle > 315 || angle < 45)
-                {
-                    direction.SetDirection(PlayerDirectionEnum.right);
-                }
-                else if (angle >= 45 && angle <= 135)
-                {
-                    direction.SetDirection(PlayerDirectionEnum.back);
-                }
-                else if (angle > 135 && angle < 225)
-                {
-                    direction.SetDirection(PlayerDirectionEnum.left);
-                }
-                else //Should be (angle >= 225 && angle <= 315
-                {
-                    direction.SetDirection(PlayerDirectionEnum.front);
-                }
-            }
-            //Set direction for animation;
-            {
-                if (angle < 180)
-                    animDirectionY = 1;
-                else
-                    animDirectionY = -1;
-                if (angle < 90 || angle > 270)
-                    animDirectionX = 1;
-                else
-                    animDirectionX = -1;
-            }
-        }
-        {
-            if (animDirectionX != 0)
-                playerTransform.localScale = new Vector3(-animDirectionX, 1, 1);
-            if (animDirectionY != 0)
-                animator.SetFloat("Vertical", animDirectionY);
+            int moveH = (int)Input.GetAxisRaw("Horizontal");
+            int MoveV = (int)Input.GetAxisRaw("Vertical");
+            animator.SetBool("Walking", moveH != 0 || MoveV != 0);
+            animator.speed = Input.GetButton("Slow move") ? 0.5f : 1f;
         }
         //Movement
         {
@@ -118,7 +76,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         if (playerTransform.position != previousPos)
-            PlayerMoved?.Invoke();
+            PlayerMoved?.Invoke(playerTransform.position, Input.GetButton("Slow move"), previousPos);
 
     }
 
@@ -211,7 +169,7 @@ public class PlayerMovement : MonoBehaviour
     //Player should not be moving more than 1 block a frame!! It will break things!!
     private Vector2 GetMovementVector(int rawX, int rawY)
     {
-        Vector2 movement = new Vector2(rawX, rawY).normalized * Time.deltaTime * moveSpeed;
+        Vector2 movement = new Vector2(rawX, rawY).normalized * Time.deltaTime * (Input.GetButton("Slow move") ? slowMoveSpeed : moveSpeed);
         {
             if (Mathf.Abs(movement.x) > 0.5f)
                 movement.x = Mathf.Sign(movement.x) * 0.5f;
@@ -336,43 +294,4 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
-}
-
-public class PlayerDirection {
-    public PlayerDirectionEnum directionEnum;
-    public Vector2 directionVector;
-
-    public PlayerDirection() {
-        SetDirection(PlayerDirectionEnum.front);
-    }
-
-    public void SetDirection(PlayerDirectionEnum directionEnum)
-    {
-        this.directionEnum = directionEnum;
-        switch (directionEnum)
-        {
-            case (PlayerDirectionEnum.back):
-                directionVector = new Vector2(0, -1);
-                break;
-            case (PlayerDirectionEnum.front):
-                directionVector = new Vector2(0, 1);
-                break;
-            case (PlayerDirectionEnum.left):
-                directionVector = new Vector2(-1, 0);
-                break;
-            case (PlayerDirectionEnum.right):
-                directionVector = new Vector2(1, 0);
-                break;
-            default:
-                break;
-        }
-    }
-}
-
-public enum PlayerDirectionEnum
-{
-    back,
-    front,
-    left,
-    right
 }

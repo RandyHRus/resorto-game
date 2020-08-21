@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class ChestStorage : MonoBehaviour, ITileObjectFunctions
 {
-    private int capacity = 5;
     private Storage storage;
     private StorageUI ui;
 
@@ -13,7 +12,7 @@ public class ChestStorage : MonoBehaviour, ITileObjectFunctions
 
     private void Start()
     {
-        storage = new Storage(numOfSlotsX, numOfSlotsY, capacity);
+        storage = new Storage(numOfSlotsX, numOfSlotsY);
     }
 
     public void ClickInteract()

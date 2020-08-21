@@ -13,11 +13,14 @@ public class ItemGainMessage : MessageBox
         {
             if (tr.tag == "Count Field")
             {
-                tr.GetComponent<Text>().text = "x" + count.ToString();
+                OutlinedText text = new OutlinedText(tr.gameObject);
+                text.SetText("x" + count.ToString());
             }
             else if (tr.tag == "Name Field")
             {
-                tr.GetComponent<Text>().text = item.ItemName;
+                OutlinedText text = new OutlinedText(tr.gameObject);
+                text.SetText(item.ItemName);
+                text.SetColor(ResourceManager.Instance.ItemTagColors[(int)item.Tag]);
             }
             else if (tr.tag == "Icon Field")
             {

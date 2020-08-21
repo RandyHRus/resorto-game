@@ -67,7 +67,5 @@ public class RemoveManager
 
         if (tileInfo.BuildsOnTile.RemoveTopMostTileObject() != buildOnTile.ModifiedType)
             throw new System.Exception("Removed wrong type!");
-
-        removedBuildInfo.OnRemove(buildOnTile);
     }
 }

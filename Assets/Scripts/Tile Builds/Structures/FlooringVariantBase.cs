@@ -19,7 +19,6 @@ public class FlooringVariantBase : StructureVariantInformation
     {
         CodeToSprite = new Dictionary<int, Sprite>();
         //SpriteToCode = new Dictionary<Sprite, int>();
-        Debug.Log("Creating dictionary");
         for (int i = 0; i < flooringSprites.Length; i++)
         {
             CodeToSprite.Add(i, flooringSprites[i]);

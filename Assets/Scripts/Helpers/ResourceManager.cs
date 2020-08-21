@@ -23,6 +23,9 @@ public class ResourceManager : MonoBehaviour
     [SerializeField] private GameObject itemSlot = null;
     public GameObject ItemSlot => itemSlot;
 
+    [SerializeField] private GameObject dropItemInventorySlot = null;
+    public GameObject DropItemInventorySlot => dropItemInventorySlot;
+
     [SerializeField] private GameObject resizablePanel = null;
     public GameObject ResizablePanel => resizablePanel;
 

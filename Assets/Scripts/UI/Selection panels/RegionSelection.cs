@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class RegionSelection : Selection
 {
-    RegionInformation info;
+    private readonly RegionInformation info;
 
     public RegionSelection(RegionInformation info, SelectionPanel parentPanel): base(ResourceManager.Instance.RegionSelection, parentPanel)
     {
@@ -13,7 +13,8 @@ public class RegionSelection : Selection
         {
             if (t.tag == "Name Field")
             {
-                t.GetComponent<Text>().text = info.name;
+                OutlinedText text = new OutlinedText(t.gameObject);
+                text.SetText(info.name);
             }
             else if (t.tag == "Icon Field")
             {

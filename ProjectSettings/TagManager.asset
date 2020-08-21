@@ -19,6 +19,7 @@ TagManager:
   - IndicatorsCanvas
   - DialogueBox
   - Text Field
+  - Item Icon Field
   layers:
   - Default
   - TransparentFX
@@ -29,7 +30,7 @@ TagManager:
   - 
   - 
   - Interactable
-  - Fish
+  - Wildlife
   - DropItems
   - 
   - 
@@ -73,9 +74,6 @@ TagManager:
     locked: 0
   - name: DynamicY
     uniqueID: 1543667321
-    locked: 0
-  - name: Drop item
-    uniqueID: 2124954675
     locked: 0
   - name: FishingLine
     uniqueID: 846413029

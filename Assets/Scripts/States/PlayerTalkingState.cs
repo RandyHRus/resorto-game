@@ -7,8 +7,8 @@ using UnityEngine.UI;
 public class PlayerTalkingState : PlayerState
 {
     private GameObject dialogueBox = null;
-    private Text dialogueText = null;
-    private Text nameText = null;
+    private OutlinedText dialogueText = null;
+    private OutlinedText nameText = null;
 
     private bool dialoguePlaying;
     private bool dialogueTyping;
@@ -23,16 +23,18 @@ public class PlayerTalkingState : PlayerState
 
     public override void Initialize()
     {
+        base.Initialize();
+
         dialogueBox = GameObject.FindGameObjectWithTag("DialogueBox");
         foreach (Transform t in dialogueBox.transform)
         {
             if (t.tag == "Name Field")
             {
-                nameText = t.GetComponent<Text>();
+                nameText = new OutlinedText(t.gameObject);
             }
             else if (t.tag == "Text Field")
             {
-                dialogueText = t.GetComponent<Text>();
+                dialogueText = new OutlinedText(t.gameObject);
             }
         }
 
@@ -46,7 +48,7 @@ public class PlayerTalkingState : PlayerState
         if (dialoguePlaying)
             return;
 
-        nameText.text = (string)args[0];
+        nameText.SetText((string)args[0]);
         Dialogue dialogue = (Dialogue)args[1];
 
         dialogueMap = new Dictionary<int, DialogueElement>();
@@ -74,7 +76,7 @@ public class PlayerTalkingState : PlayerState
             if (dialogueTyping)
             {
                 Coroutines.Instance.StopCoroutine(typeCoroutine);
-                dialogueText.text = currentElement.Text;
+                dialogueText.SetText(currentElement.Text);
                 dialogueTyping = false;
             }
             //Case when no next node, End dialogue when NextNode does not exist in dialogue element
@@ -111,7 +113,8 @@ public class PlayerTalkingState : PlayerState
     {
         dialogueTyping = true;
 
-        dialogueText.text = "";
+        string currentText = "";
+        dialogueText.SetText(currentText);
 
         char[] textArray = element.Text.ToCharArray();
         int index = 0;
@@ -130,7 +133,8 @@ public class PlayerTalkingState : PlayerState
                 }
                 else
                 {
-                    dialogueText.text += textArray[i];
+                    currentText += textArray[i];
+                    dialogueText.SetText(currentText);
                     index++;
                 }
             }

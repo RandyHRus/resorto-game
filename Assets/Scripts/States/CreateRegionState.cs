@@ -19,6 +19,8 @@ public class CreateRegionState : PlayerState
 
     public override void Initialize()
     {
+        base.Initialize();
+
         showRegionTilemap = GameObject.FindGameObjectWithTag("ShowRegionTilemap").GetComponent<Tilemap>();
         ShowRegions(false);
     }

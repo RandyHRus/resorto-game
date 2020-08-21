@@ -5,10 +5,10 @@ using UnityEngine;
 public class CameraZoom : MonoBehaviour
 {
     Camera cam;
-    int currentIndex = 2;
+    int currentIndex = 1;
     float[] cameraSizes = new float[]
     {
-        3f, 5f, 8f, 11f, 13f 
+        4f, 8f, 12f, 16f 
     };
 
     void Start()

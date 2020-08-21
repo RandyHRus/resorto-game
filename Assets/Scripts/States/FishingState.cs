@@ -16,7 +16,7 @@ public class FishingState : PlayerState
     private Transform playerTransform;
     private Transform fishingRod;
     private Vector3[] points;
-    private ContactFilter2D fishFilter;
+    private ContactFilter2D wildlifeFilter;
     private FishingStates fishingState;
     private GameObject player;
 
@@ -39,11 +39,13 @@ public class FishingState : PlayerState
     private float bobHeight = 0.04f;
     private float bobSpeed = 3f;
     //**************************************
-    private float fishScanRadius = FishManager.FISH_SEEING_DISTANCE;
+    private float fishScanRadius = FishInformation.FISH_SEEING_DISTANCE;
     #endregion
 
     public override void Initialize()
     {
+        base.Initialize();
+
         //Configure fishing line object
         {
             fishingLineInstance = Instantiate(fishingLinePrefab);
@@ -82,10 +84,10 @@ public class FishingState : PlayerState
         }
         //Create fish contact filter
         {
-            fishFilter = new ContactFilter2D();
-            fishFilter.useTriggers = false;
-            fishFilter.SetLayerMask(1 << LayerMask.NameToLayer("Fish"));
-            fishFilter.useLayerMask = true;
+            wildlifeFilter = new ContactFilter2D();
+            wildlifeFilter.useTriggers = false;
+            wildlifeFilter.SetLayerMask(1 << LayerMask.NameToLayer("Fish"));
+            wildlifeFilter.useLayerMask = true;
         }
     }
 
@@ -233,7 +235,7 @@ public class FishingState : PlayerState
         yield return 0; //Wait a frame to get proper fishing rod position (HeightToEndOfRod could return 0 if this isn't here) TODO: maybe there is better way?
         fishingLineInstance.SetActive(true); //Needs to go after yield
 
-        Vector2 playerDirectionVector = PlayerMovement.Instance.direction.directionVector;
+        Vector2 playerDirectionVector = PlayerDirection.Instance.GetDirectionToMouse().DirectionVector;
 
         Vector2 lineEndPosition = new Vector2(0,0), lineMiddlePosition = new Vector2(0, 0);
 
@@ -358,7 +360,7 @@ public class FishingState : PlayerState
 
         while (fishingState == FishingStates.FishHooked)
         {
-            Vector2 lineEndPosition = fish.position + ((-fish.right) * FishManager.FISH_WORLD_WIDTH / 2);
+            Vector2 lineEndPosition = fish.position + ((-fish.right) * FishInformation.FISH_WORLD_WIDTH / 2);
             Vector2 lineStartPosition = fishingRod.position;
 
             fishingLineTransform.position = lineEndPosition; //For moving bobber to end of line
@@ -382,14 +384,17 @@ public class FishingState : PlayerState
         while (fishingState == FishingStates.Bobbing)
         {
             List<Collider2D> results = new List<Collider2D>();
-            Physics2D.OverlapCircle(lineEndPosition, fishScanRadius, fishFilter, results);
+            Physics2D.OverlapCircle(lineEndPosition, fishScanRadius, wildlifeFilter, results);
             fishInRange.Clear(); //Refresh every time
 
-            foreach (Collider2D fishCollider in results)
+            foreach (Collider2D c in results)
             {
-                GameObject obj = fishCollider.gameObject;
-                fishCollider.gameObject.GetComponent<FishBehaviour>().SetTarget(this, lineEndPosition);
-                fishInRange.Add(obj);
+                GameObject obj = c.gameObject;
+                if (obj.TryGetComponent<FishBehaviour>(out FishBehaviour component))
+                {
+                    component.SetTarget(this, lineEndPosition);
+                    fishInRange.Add(obj);
+                }
             }
 
             yield return new WaitForSeconds(1); //No need to do every frame.
