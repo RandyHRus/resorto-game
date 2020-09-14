@@ -8,7 +8,7 @@ public class ItemSlotUI : InventorySlotUI
     private Image iconImage;
     private OutlinedText itemCountText;
 
-    public ItemSlotUI(ItemInventorySlot slotInfo, Transform parent) : base(slotInfo, ResourceManager.Instance.ItemSlot, parent)
+    public ItemSlotUI(ItemInventorySlot slotInfo, Transform parent, Sprite overrideSprite = null) : base(slotInfo, ResourceManager.Instance.ItemSlot, parent)
     {
         Transform t = ObjectInScene.transform;
         foreach (Transform tr in t)
@@ -22,6 +22,9 @@ public class ItemSlotUI : InventorySlotUI
                 iconImage = tr.GetComponent<Image>();
             }
         }
+
+        if (overrideSprite != null)
+            ObjectInScene.GetComponent<Image>().sprite = overrideSprite;
 
         iconImage.enabled = false; //To remove white square
         itemCountText.SetText("");
@@ -44,10 +47,10 @@ public class ItemSlotUI : InventorySlotUI
         }
         else
         {
-            iconImage.sprite = itemInventorySlot.Item.ItemIcon;
+            iconImage.sprite = itemInventorySlot.Item.ItemInformation.ItemIcon;
             iconImage.enabled = true;
 
-            itemCountText.SetText(itemInventorySlot.Count.ToString());
+            itemCountText.SetText(itemInventorySlot.Count > 1 ? itemInventorySlot.Count.ToString() : "");
         }
     }
 

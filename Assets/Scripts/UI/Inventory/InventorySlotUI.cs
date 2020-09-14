@@ -26,14 +26,19 @@ public class InventorySlotUI : UIObject
 
     private IEnumerator Shrink()
     {
-        while (RectTransform.localScale.x > 1)
+        do
         {
+            yield return 0;
+            //If Slot is destroyed, stop
+            if (ObjectInScene == null)
+                yield break;
+
             float scale = RectTransform.localScale.x - (enlargeSpeed * Time.deltaTime);
             if (scale < 1)
                 scale = 1;
             RectTransform.localScale = new Vector2(scale, scale);
-            yield return 0;
         }
+        while (RectTransform.localScale.x > 1);
     }
 
     public virtual void StartEnlarge()
@@ -47,13 +52,18 @@ public class InventorySlotUI : UIObject
 
     private IEnumerator Enlarge()
     {
-        while (RectTransform.localScale.x < enlargeSize)
+        do
         {
+            yield return 0;
+            //If Slot is destroyed, stop
+            if (ObjectInScene == null)
+                yield break;
+
             float scale = RectTransform.localScale.x + (enlargeSpeed * Time.deltaTime);
             if (scale > enlargeSize)
                 scale = enlargeSize;
             RectTransform.localScale = new Vector2(scale, scale);
-            yield return 0;
         }
+        while (RectTransform.localScale.x < enlargeSize);
     }
 }

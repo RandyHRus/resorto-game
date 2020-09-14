@@ -6,12 +6,12 @@ public class StorageItemInventorySlot: ItemInventorySlot
 {
     private int capacity = 99;
 
-    public void SetSlot(InventoryItemInformation item, int count)
+    public void SetSlot(InventoryItemInstance item, int count)
     {
         if (count > capacity)
             Debug.LogError("Too many items in slot!");
 
-        InventoryItemInformation oldItem = this.Item;
+        InventoryItemInstance oldItem = this.Item;
 
         this.item = item;
         this.count = count;
@@ -24,7 +24,12 @@ public class StorageItemInventorySlot: ItemInventorySlot
 
         OnSlotChanged();
 
-        if (oldItem != this.Item)
+        if (oldItem == null)
+        {
+            if (this.Item != null)
+                OnItemChanged();
+        }
+        else if (!oldItem.Equals(this.Item))
         {
             OnItemChanged();
         }
@@ -37,9 +42,26 @@ public class StorageItemInventorySlot: ItemInventorySlot
         SetSlot(Item, this.Count - count);
     }
 
-    public void FillSlotToCapacity(InventoryItemInformation item, int toAdd, out int remains)
+    public void FillSlotToCapacity(InventoryItemInstance item, int toAdd, out int remains)
     {
-        if (Count + toAdd <= capacity)
+        if (!(this.Item == null || this.Item.Equals(this.Item)))
+            throw new System.Exception("Invalid item");
+
+        if (!item.ItemInformation.Stackable)
+        {
+            if (Count + toAdd <= 1)
+            {
+                remains = 0;
+                SetSlot(item, Count + toAdd);
+                return;
+            }
+            else
+            {
+                remains = toAdd;
+                return;
+            }
+        }
+        else if (Count + toAdd <= capacity)
         {
             SetSlot(item, Count + toAdd);
             remains = 0;
@@ -52,15 +74,17 @@ public class StorageItemInventorySlot: ItemInventorySlot
             remains = toAdd;
             return;
         }
-
-        remains = toAdd;
+        else
+        {
+            remains = toAdd;
+        }
     }
 
     public override void ClickSlot_primary()
     {
         StorageItemInventorySlot mouseDraggingSlotInformation = InventoryManager.Instance.MouseDraggingSlot;
 
-        InventoryItemInformation currentItem = Item;
+        InventoryItemInstance currentItem = Item;
         int currentCount = Count;
 
         //Just put mouse item in inventory slot
@@ -87,10 +111,10 @@ public class StorageItemInventorySlot: ItemInventorySlot
     {
         StorageItemInventorySlot mouseDraggingSlotInformation = InventoryManager.Instance.MouseDraggingSlot;
 
-        InventoryItemInformation currentItem = Item;
+        InventoryItemInstance currentItem = Item;
         int currentCount = Count;
 
-        if (currentItem == null || currentItem == mouseDraggingSlotInformation.Item)
+        if (currentItem == null || currentItem.Equals(mouseDraggingSlotInformation.Item))
         {
             if (mouseDraggingSlotInformation.Item != null)
             {

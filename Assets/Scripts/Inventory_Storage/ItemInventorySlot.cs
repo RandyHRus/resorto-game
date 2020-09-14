@@ -4,11 +4,11 @@ using UnityEngine;
 
 public abstract class ItemInventorySlot: InventorySlot
 {
-    protected InventoryItemInformation item = null;
-    public InventoryItemInformation Item => item;
+    protected InventoryItemInstance item = null;
+    public InventoryItemInstance Item => item;
 
     protected int count = 0;
-    public int Count => count;
+    public virtual int Count => count;
 
     public delegate void SlotChange();
     public event SlotChange SlotChanged;

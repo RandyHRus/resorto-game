@@ -43,6 +43,19 @@ public class IslandObjectsGenerator : MonoBehaviour
         GenerateBush();
     }
 
+    public void RemoveAllBuilds()
+    {
+        int mapSize = TileInformationManager.mapSize;
+
+        for (int i = 0; i < mapSize; i++)
+        {
+            for (int j = 0; j < mapSize; j++)
+            {
+                TileInformationManager.Instance.GetTileInformation(new Vector3Int(i, j, 0)).RemoveAllBuilds();
+            }
+        }
+    }
+
     private void GenerateGrass()
     {
         int mapSize = TileInformationManager.mapSize;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TileObjectsManager
+public static class TileObjectsManager
 {
     public static bool ObjectPlaceable(Vector3Int mainPos, ObjectInformation info, out ObjectType modifiedType, out float yOffset, BuildRotation rotation = BuildRotation.Front)
     {
@@ -14,12 +14,10 @@ public class TileObjectsManager
         if (mainTile == null)
             return false;
 
-        BuildGroupOnTile buildsOnTile = mainTile.BuildsOnTile;
-
         //So that you can lay ontop objects also in standard position
         if (proposedType == ObjectType.OnTop)
         {
-            if (buildsOnTile.ObjectTypeToObject[ObjectType.Standard] == null)
+            if (mainTile.ObjectTypeToObject[ObjectType.Standard] == null)
                 proposedType = ObjectType.Standard;
         }
 
@@ -58,7 +56,7 @@ public class TileObjectsManager
 
         if (modifiedType == ObjectType.OnTop)
         {
-            IBuildable belowBuildInfo = buildsOnTile.ObjectTypeToObject[ObjectType.Standard].BuildInfo;
+            IBuildable belowBuildInfo = mainTile.ObjectTypeToObject[ObjectType.Standard].BuildInfo;
             yOffset = belowBuildInfo.OnTopOffsetInPixels / 16f;
         }
         return true;
@@ -110,13 +108,13 @@ public class TileObjectsManager
             }
 
             //Check for valid objects
-            if (checkTile.BuildsOnTile.ObjectTypeToObject[proposedType] != null)
+            if (checkTile.ObjectTypeToObject[proposedType] != null)
                 return false;
 
             //Check if objects can be placed on top
-            if (proposedType == ObjectType.OnTop && (checkTile.BuildsOnTile.ObjectTypeToObject[ObjectType.Standard] != null && !checkTile.BuildsOnTile.ObjectTypeToObject[ObjectType.Standard].BuildInfo.ObjectsCanBePlacedOnTop))
+            if (proposedType == ObjectType.OnTop && (checkTile.ObjectTypeToObject[ObjectType.Standard] != null && !checkTile.ObjectTypeToObject[ObjectType.Standard].BuildInfo.ObjectsCanBePlacedOnTop))
                 return false;
-            else if (proposedType == ObjectType.Standard && (checkTile.BuildsOnTile.ObjectTypeToObject[ObjectType.Ground] != null && !checkTile.BuildsOnTile.ObjectTypeToObject[ObjectType.Ground].BuildInfo.ObjectsCanBePlacedOnTop))
+            else if (proposedType == ObjectType.Standard && (checkTile.ObjectTypeToObject[ObjectType.Ground] != null && !checkTile.ObjectTypeToObject[ObjectType.Ground].BuildInfo.ObjectsCanBePlacedOnTop))
                 return false;
 
             return true;
@@ -147,8 +145,8 @@ public class TileObjectsManager
                     proposedPos = new Vector2(mainPos.x, mainPos.y + yOffset);
                     break;
                 case (ObjectType.OnTop):
-                    BuildOnTile objectBelow = tileInfo.BuildsOnTile.ObjectTypeToObject[ObjectType.Standard];
-                    Vector3Int objectBelowMainPosition = objectBelow.OccupiedTiles[0];
+                    BuildOnTile objectBelow = tileInfo.ObjectTypeToObject[ObjectType.Standard];
+                    Vector3Int objectBelowMainPosition = (Vector3Int)objectBelow.BottomLeft;
                     proposedPos = new Vector3(mainPos.x, mainPos.y + yOffset, DynamicZDepth.GetDynamicZDepth(objectBelowMainPosition, DynamicZDepth.OBJECTS_ONTOP_OFFSET));
                     break;
                 default:
@@ -167,7 +165,7 @@ public class TileObjectsManager
             obj.name = info.Name;
         }
 
-        List<Vector3Int> tilesToOccupy = new List<Vector3Int>();
+        HashSet<Vector3Int> tilesToOccupy = new HashSet<Vector3Int>();
 
         //Set sprite
         if (info.HasSprite)
@@ -222,14 +220,8 @@ public class TileObjectsManager
         }
 
         //Actual set tiles part
-        buildOnTile = new BuildOnTile(obj, info, tilesToOccupy, rotation, modifiedType);
+        buildOnTile = new BuildOnTile(obj, info, tilesToOccupy, rotation, modifiedType, (Vector2Int)mainPos);
 
-        foreach (Vector3Int checkPos in tilesToOccupy)
-        {
-            TileInformation t = TileInformationManager.Instance.GetTileInformation(checkPos);
-
-            t.BuildsOnTile.SetTileObject(buildOnTile);
-        }
         return true;
     }
 }

@@ -72,10 +72,24 @@ public class ParrotBehaviour : WildlifeBehaviour, INonTileClickable
 
     public Coroutine FlyToTarget(Vector2 targetPos, CallBack callback)
     {
+        void Progress(Vector2 position)
+        {
+            Transform.position = new Vector3(position.x, position.y, DynamicZDepth.GetDynamicZDepth(position.y, DynamicZDepth.ParrotFlying));
+        }
+
+        void End(Vector2 position)
+        {
+            callback();
+        }
+
         if (targetingCoroutine != null)
             StopCoroutine(targetingCoroutine);
 
-        targetingCoroutine = StartCoroutine(FlyToTargetEnumerator(targetPos, callback));
+        Animator.SetBool("Flying", true);
+        innerTransform.localScale = new Vector3((Transform.position.x >= targetPos.x) ? -1 : 1, 1, 1);
+        Animator.SetFloat("yDirection", (Transform.position.y >= targetPos.y) ? -1 : 1);
+        targetingCoroutine = StartCoroutine(LerpEffect.LerpVectorSpeed(Transform.position, targetPos, flySpeed, Progress, End));
+
         return targetingCoroutine;
     }
 
@@ -106,31 +120,6 @@ public class ParrotBehaviour : WildlifeBehaviour, INonTileClickable
         }
 
         endFloat();
-    }
-
-    IEnumerator FlyToTargetEnumerator(Vector2 targetPos, CallBack endTarget)
-    {
-        Animator.SetBool("Flying", true);
-
-        Vector2 startPos = Transform.position;
-        float distanceTravelled = 0;
-        float distanceToTravel = Vector2.Distance(startPos, targetPos);
-
-        innerTransform.localScale = new Vector3((startPos.x >= targetPos.x) ? -1 : 1, 1, 1);
-        Animator.SetFloat("yDirection", (startPos.y >= targetPos.y) ? -1 : 1);
-
-        while (distanceTravelled < distanceToTravel)
-        {
-            distanceTravelled += Time.deltaTime * flySpeed;
-            if (distanceTravelled >= distanceToTravel)
-                distanceTravelled = distanceToTravel;
-
-            Vector2 proposedPos = Vector2.Lerp(startPos, targetPos, distanceTravelled / distanceToTravel);
-            Transform.position = new Vector3(proposedPos.x, proposedPos.y, DynamicZDepth.GetDynamicZDepth(proposedPos.y, DynamicZDepth.ParrotFlying));
-            yield return 0;
-        }
-
-        endTarget();
     }
 
     private abstract class ParrotState

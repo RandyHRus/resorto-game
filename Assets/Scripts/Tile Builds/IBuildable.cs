@@ -13,9 +13,12 @@ public interface IBuildable
 
     int OnTopOffsetInPixels { get; }
 
+    //Set to 0 if no transparency
+    int TransparencyCapableYSize { get; }
+
     Vector2Int GetSizeOnTile(BuildRotation rotation);
 
-    void OnRemove(BuildOnTile buildOnTile);
+    void OnRemoveThroughState(BuildOnTile buildOnTile);
 }
 
 public enum ObjectPlaceableLocation

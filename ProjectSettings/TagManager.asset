@@ -20,6 +20,10 @@ TagManager:
   - DialogueBox
   - Text Field
   - Item Icon Field
+  - Tag Field
+  - Length Field
+  - Color Field 2
+  - Color Field 1
   layers:
   - Default
   - TransparentFX

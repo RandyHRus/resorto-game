@@ -30,7 +30,7 @@ public class PlayerDirection : MonoBehaviour
         VisualDirection = new CharacterVisualDirection(transform);
         animator = GetComponent<Animator>();
 
-        PlayerMovement.PlayerMoved += (Vector2 pos, bool slow, Vector2 previousPos) => VisualDirection.SetDirectionOnMove(pos - previousPos);
+        PlayerMovement.PlayerMoved += (Vector2 pos, bool slow, Vector2 directionVector) => VisualDirection.SetDirectionOnMove(directionVector);
     }
 
     private void Update()
@@ -46,45 +46,27 @@ public class PlayerDirection : MonoBehaviour
     {
         float angle = MathFunctions.GetAngleBetweenPoints(transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition));
 
-        if (angle < 180)
+        if (angle <= 45 || angle >= 315)
         {
-            if (angle < 90 || angle > 270)
+            VisualDirection.SetDirection(CharacterVisualDirectionEnum.Right);
+        }
+        else if (angle >= 135 && angle <= 215)
+        {
+            VisualDirection.SetDirection(CharacterVisualDirectionEnum.Left);
+        }
+        else if (angle < 180)
+        {
+            if (angle < 90)
                 VisualDirection.SetDirection(CharacterVisualDirectionEnum.BackRight);
             else
                 VisualDirection.SetDirection(CharacterVisualDirectionEnum.BackLeft);
 
         }
         else {
-            if (angle < 90 || angle > 270)
+            if (angle > 270)
                 VisualDirection.SetDirection(CharacterVisualDirectionEnum.FrontRight);
             else
                 VisualDirection.SetDirection(CharacterVisualDirectionEnum.FrontLeft);
-        }
-    }
-
-    public CharacterTwoAxisDirection GetDirectionToMouse()
-    {
-        float angle = MathFunctions.GetAngleBetweenPoints(transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition));
-
-        if (angle > 315 || angle < 45)
-        {
-            return new CharacterTwoAxisDirection(CharacterTwoAxisDirectionEnum.Right);
-        }
-        else if (angle >= 45 && angle <= 135)
-        {
-            return new CharacterTwoAxisDirection(CharacterTwoAxisDirectionEnum.Back);
-        }
-        else if (angle > 135 && angle < 225)
-        {
-            return new CharacterTwoAxisDirection(CharacterTwoAxisDirectionEnum.Left);
-        }
-        else if (angle >= 225 && angle <= 315)
-        {
-            return new CharacterTwoAxisDirection(CharacterTwoAxisDirectionEnum.Front);
-        }
-        else
-        {
-            throw new System.Exception("Invalid angle");
         }
     }
 }

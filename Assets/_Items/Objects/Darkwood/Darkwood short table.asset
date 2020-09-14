@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf7cbe68299a02c4782bfd2d31180757, type: 3}
+  m_Name: Darkwood short table
+  m_EditorClassIdentifier: 
+  itemName: Darkwood short table
+  itemIcon: {fileID: 21300000, guid: 338464f8933ef6f44adf914f70ec015e, type: 3}
+  objectToPlace: {fileID: 11400000, guid: b9163cf643e93294280c8a4675719c7a, type: 2}
+  tag: 0
+  stackable: 1

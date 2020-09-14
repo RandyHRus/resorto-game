@@ -123,7 +123,7 @@ public class DefaultState : PlayerState
                         TileInformation mouseTileInfo = TileInformationManager.Instance.GetTileInformation(mouseTilePos);
                         if (mouseTileInfo != null)
                         {
-                            mouseTileInfo.BuildsOnTile.ClickInteract();
+                            mouseTileInfo.ClickInteract();
                         }
                     }
                 }

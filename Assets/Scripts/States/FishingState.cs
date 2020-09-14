@@ -6,6 +6,7 @@ using UnityEngine;
 public class FishingState : PlayerState
 {
     [SerializeField] private GameObject fishingLinePrefab = null;
+    [SerializeField] private GameObject caughtFish = null;
 
     private Canvas progressBarCanvas;
     private ProgressBar progressBar;
@@ -28,11 +29,11 @@ public class FishingState : PlayerState
     private int numPoints = 10;
     //**************************************
     private float castAngle = 150f;
-    private float maxCastLength = 2.5f;
+    private float maxCastLength = 5f;
     private float maxCastHoldTime = 1f;
     //**************************************
     private float castSpeed = 0.6f;
-    private float castDragSpeed = 0.7f;
+    private float castDragSpeed = 0.8f;
     //**************************************
     private float dragOffsetAngle = 15f;
     //**************************************
@@ -41,6 +42,8 @@ public class FishingState : PlayerState
     //**************************************
     private float fishScanRadius = FishInformation.FISH_SEEING_DISTANCE;
     #endregion
+
+    private float fishCaughtFlySpeed = 10f;
 
     public override void Initialize()
     {
@@ -69,13 +72,7 @@ public class FishingState : PlayerState
             playerTransform = player.transform;
 
             //Find fishing rod object in player
-            foreach (Transform t in playerTransform)
-            {
-                if (t.tag == "FishingRod")
-                {
-                    fishingRod = t;
-                }
-            }
+            fishingRod = FindChildWithTag(playerTransform, "FishingRod");
         }
         //Configure progress bar
         {
@@ -86,8 +83,25 @@ public class FishingState : PlayerState
         {
             wildlifeFilter = new ContactFilter2D();
             wildlifeFilter.useTriggers = false;
-            wildlifeFilter.SetLayerMask(1 << LayerMask.NameToLayer("Fish"));
+            wildlifeFilter.SetLayerMask(1 << LayerMask.NameToLayer("Wildlife"));
             wildlifeFilter.useLayerMask = true;
+        }
+
+        Transform FindChildWithTag(Transform t, string tag)
+        {
+            if (t.tag == tag)
+            {
+                return t;
+            }
+
+            foreach (Transform ct in t)
+            {
+                Transform found = FindChildWithTag(ct, tag);
+                if (found != null)
+                    return found;
+            }
+
+            return null;
         }
     }
 
@@ -148,8 +162,6 @@ public class FishingState : PlayerState
                 animator.SetBool("Hooked", false);
                 fishingLineInstance.SetActive(false);
 
-                fishingRod.gameObject.SetActive(false);
-
                 foreach (GameObject fish in fishInRange)
                 {
                     if (fish != null)
@@ -169,7 +181,6 @@ public class FishingState : PlayerState
                     animator.SetBool("LineOut", true);
                     animator.speed = 0;
                 }
-                fishingRod.gameObject.SetActive(true);
                 progressBar.ObjectTransform.position = (new Vector2(playerTransform.position.x, playerTransform.position.y + 1.5f));
                 progressBar.Show(true);
 
@@ -235,8 +246,6 @@ public class FishingState : PlayerState
         yield return 0; //Wait a frame to get proper fishing rod position (HeightToEndOfRod could return 0 if this isn't here) TODO: maybe there is better way?
         fishingLineInstance.SetActive(true); //Needs to go after yield
 
-        Vector2 playerDirectionVector = PlayerDirection.Instance.GetDirectionToMouse().DirectionVector;
-
         Vector2 lineEndPosition = new Vector2(0,0), lineMiddlePosition = new Vector2(0, 0);
 
         float heightToEndOfRod = fishingRod.position.y - playerTransform.position.y;
@@ -245,17 +254,19 @@ public class FishingState : PlayerState
         float minCastLength = heightToEndOfRod + minimumOffset;
         float maxLineLength = ((maxCastLength - minCastLength) * (chargeTimer / maxCastHoldTime)) + minCastLength;
 
+        float xDir = PlayerDirection.Instance.VisualDirection.DirectionVector.x;
+        float yDir = PlayerDirection.Instance.VisualDirection.DirectionVector.y;
+
         float beginLineAngle;
-        //Horizontal direction
-        if (playerDirectionVector.x != 0)
+
+        if (yDir != 0)
+        {
+            beginLineAngle = 90;
+        }
+        else
         {
             float endLineAngle = 270 + (Mathf.Rad2Deg * Mathf.Acos(heightToEndOfRod / maxLineLength)); //Degrees
             beginLineAngle = endLineAngle + castAngle; //Degrees
-        }
-        //Vertical direction
-        else
-        {
-            beginLineAngle = 90;
         }
 
         float timer = 0;
@@ -280,17 +291,17 @@ public class FishingState : PlayerState
             float lineDragAngle = beginLineAngle - ((dragTimer / castDragSpeed) * castAngle) - dragOffsetAngle;
             
             //Horizontal direction
-            if (playerDirectionVector.x != 0)
+            if (yDir == 0)
             {
                 //Get line end position
                 {
-                    float lineEndX = playerDirectionVector.x * currentLineLength * Mathf.Cos(Mathf.Deg2Rad*lineAngle);
+                    float lineEndX = xDir * currentLineLength * Mathf.Cos(Mathf.Deg2Rad*lineAngle);
                     float lineEndY = currentLineLength * Mathf.Sin(Mathf.Deg2Rad * lineAngle);
                     lineEndPosition = new Vector2(lineStartPosition.x + lineEndX, lineStartPosition.y + lineEndY);
                 }
                 //Get line drag (middle) position
                 {
-                    float dragLineEndX = playerDirectionVector.x * (currentLineLength / 2) * Mathf.Cos(Mathf.Deg2Rad * lineDragAngle);
+                    float dragLineEndX = xDir * (currentLineLength / 2) * Mathf.Cos(Mathf.Deg2Rad * lineDragAngle);
                     float dragLineEndY = (currentLineLength / 2) * Mathf.Sin(Mathf.Deg2Rad * lineDragAngle);
                     lineMiddlePosition = new Vector2(lineStartPosition.x + dragLineEndX, lineStartPosition.y + dragLineEndY);
                 }
@@ -302,13 +313,13 @@ public class FishingState : PlayerState
                 //Get line end position
                 {
                     float lineEndX = (1/4f)*currentLineLength * Mathf.Cos(Mathf.Deg2Rad * lineAngle);
-                    float lineEndY = currentLineLength * Mathf.Sin(Mathf.Deg2Rad * lineAngle);
+                    float lineEndY = -yDir * currentLineLength * Mathf.Sin(Mathf.Deg2Rad * lineAngle);
                     lineEndPosition = new Vector2(lineStartPosition.x + lineEndX, lineStartPosition.y + lineEndY);
                 }
                 //Get line drag (middle) position
                 {
                     float dragLineEndX = (1/4f)*(currentLineLength / 2) * Mathf.Cos(Mathf.Deg2Rad * lineDragAngle);
-                    float dragLineEndY = (currentLineLength / 2) * Mathf.Sin(Mathf.Deg2Rad * lineDragAngle);
+                    float dragLineEndY = -yDir * (currentLineLength / 2) * Mathf.Sin(Mathf.Deg2Rad * lineDragAngle);
                     lineMiddlePosition = new Vector2(lineStartPosition.x + dragLineEndX, lineStartPosition.y + dragLineEndY);
                 }
             }
@@ -356,6 +367,20 @@ public class FishingState : PlayerState
 
     IEnumerator FishHooked(Transform fish)
     {
+        Transform caughtFishInstance = null;
+        FishItemInstance randomFish = null;
+
+        void FishFlyingProgress(Vector2 position)
+        {
+            caughtFishInstance.position = new Vector3(position.x, position.y, DynamicZDepth.GetDynamicZDepth(position, DynamicZDepth.CAUGHT_FISH_OFFSET));
+        }
+
+        void FishFlyingEnd(Vector2 position)
+        {
+            Destroy(caughtFishInstance.gameObject);
+            InventoryManager.Instance.AddItem(randomFish, 1);
+        }
+
         int clickCount = 5; //Todo: Come up with something else other then clicks
 
         while (fishingState == FishingStates.FishHooked)
@@ -371,8 +396,15 @@ public class FishingState : PlayerState
 
             if (clickCount <= 0)
             {
+                //Finish here
                 Destroy(fish.gameObject);
                 SwitchFishingState(FishingStates.None, null);
+                caughtFishInstance = Instantiate(caughtFish, lineEndPosition, Quaternion.identity).transform;
+
+                randomFish = CaughtFishGenerator.Instance.GetRandomFish();
+                caughtFishInstance.GetComponent<SpriteRenderer>().sprite = randomFish.ItemInformation.ItemIcon;
+
+                Coroutines.Instance.StartCoroutine(LerpEffect.LerpVectorSpeed(lineEndPosition, playerTransform.position, fishCaughtFlySpeed, FishFlyingProgress, FishFlyingEnd));
             }
             yield return 0; 
         }

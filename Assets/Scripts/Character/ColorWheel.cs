@@ -11,22 +11,25 @@ public class ColorWheel : MonoBehaviour, IPointerClickHandler, IDragHandler
     private Transform pickedPointTransform;
 
     private float realRadius;
-    private Vector2 wheelPos;
+    private Transform wheelTransform;
 
     private float h;
     private float s;
     private float v;
 
+    public delegate void ColorChanged(Color32 color);
+    public event ColorChanged OnColorChanged;
+
     private void Awake()
     {
         pickedPointTransform = pickedPoint.transform;
-        wheelPos = gameObject.GetComponent<RectTransform>().position;
+        wheelTransform = gameObject.GetComponent<RectTransform>();
 
         Vector3[] v = new Vector3[4];
         gameObject.GetComponent<RectTransform>().GetWorldCorners(v);
-        Vector2 wheelEdge = new Vector2(v[0].x, wheelPos.y);
+        Vector2 wheelEdge = new Vector2(v[0].x, wheelTransform.position.y);
 
-        realRadius = Vector2.Distance(wheelEdge, wheelPos);
+        realRadius = Vector2.Distance(wheelEdge, wheelTransform.position);
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -45,21 +48,21 @@ public class ColorWheel : MonoBehaviour, IPointerClickHandler, IDragHandler
     {       
         Vector2 mouseToWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-        Vector2 offsetFromCenter = new Vector2(mouseToWorld.x - wheelPos.x, mouseToWorld.y - wheelPos.y);
+        Vector2 offsetFromCenter = new Vector2(mouseToWorld.x - wheelTransform.position.x, mouseToWorld.y - wheelTransform.position.y);
 
         if (offsetFromCenter.magnitude > realRadius)
         {
             offsetFromCenter = offsetFromCenter.normalized * realRadius;
         }
 
-        Vector3 pointPos = new Vector3(wheelPos.x + offsetFromCenter.x, wheelPos.y + offsetFromCenter.y, 1);
+        Vector3 pointPos = new Vector3(wheelTransform.position.x + offsetFromCenter.x, wheelTransform.position.y + offsetFromCenter.y, 1);
         pickedPointTransform.position =pointPos;
 
-        h = MathFunctions.Mod((MathFunctions.GetAngleBetweenPoints(wheelPos, pointPos) + wheelColorOffsetCorrectionAngle), 360) / 360f; //Need to mod again to account for offset
+        h = MathFunctions.Mod((MathFunctions.GetAngleBetweenPoints(wheelTransform.position, pointPos) + wheelColorOffsetCorrectionAngle), 360) / 360f; //Need to mod again to account for offset
         //h = mod(((Mathf.Atan2(pointPos.y - wheelPos.y, pointPos.x - wheelPos.x) * 180 / Mathf.PI + wheelColorOffsetCorrectionAngle) / 360f), 1);
         s = offsetFromCenter.magnitude / realRadius;
 
-        SetCharacterPartColor();
+        OnColorChanged?.Invoke(Color.HSVToRGB(h, s, v));
     }
 
     public void MovePointAndSliderToColor(Color32 color)
@@ -74,7 +77,7 @@ public class ColorWheel : MonoBehaviour, IPointerClickHandler, IDragHandler
             float xOffset = Mathf.Cos(angleRad) * distance;
             float yOffset = Mathf.Sin(angleRad) * distance;
 
-            pickedPointTransform.position = new Vector3(wheelPos.x + xOffset, wheelPos.y + yOffset, 1);
+            pickedPointTransform.position = new Vector3(wheelTransform.position.x + xOffset, wheelTransform.position.y + yOffset, 1);
         }
         //Move slider
         {
@@ -87,12 +90,6 @@ public class ColorWheel : MonoBehaviour, IPointerClickHandler, IDragHandler
     {
         v = brightnessSlider.value;
 
-        SetCharacterPartColor();
-    }
-
-    private void SetCharacterPartColor()
-    {
-        Color32 col = Color.HSVToRGB(h, s, v);
-        CharacterCustomizationMenu.Instance.SelectColorOption(col);
+        OnColorChanged?.Invoke(Color.HSVToRGB(h, s, v));
     }
 }

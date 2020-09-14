@@ -58,23 +58,6 @@ public class PlayerStateMachine : MonoBehaviour
         currentState.Execute();
     }
 
-    public void OnSelectedItemChanged(InventoryItemInformation newItem)
-    {
-        if (newItem == null)
-            TrySwitchState<DefaultState>();
-        else
-        {
-            if (newItem.GetType().Equals(typeof(ToolItemInformation))) {
-                PlayerState proposedState = ((ToolItemInformation)newItem).StateWhenHeld;
-                Type stateType = proposedState.GetType();
-                TrySwitchState(stateType);
-            }
-            else if (newItem.GetType().Equals(typeof(ObjectItemInformation))) {
-                TrySwitchState<CreateObjectsState>(new object[] { newItem });
-            }
-        }
-    }
-
     public PlayerState GetPlayerStateInstance<T>()
     {
         return typeToStateInstance[typeof(T)];

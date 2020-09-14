@@ -10,7 +10,7 @@ public class ChestStorage : MonoBehaviour, ITileObjectFunctions
     [SerializeField] private int numOfSlotsX = 5;
     [SerializeField] private int numOfSlotsY = 5;
 
-    private void Start()
+    private void Awake()
     {
         storage = new Storage(numOfSlotsX, numOfSlotsY);
     }
@@ -35,21 +35,32 @@ public class ChestStorage : MonoBehaviour, ITileObjectFunctions
        
     }
 
+    public void InsertItemInRandomEmptySlot(InventoryItemInstance item, int count)
+    {
+        List<StorageItemInventorySlot> emptySlots = new List<StorageItemInventorySlot>();
+
+        for (int i = 0; i < storage.SlotCount; i++)
+        {
+            StorageItemInventorySlot slot = storage.GetStorageSlotInformation(i);
+            if (slot.Item == null)
+                emptySlots.Add(slot);
+        }
+
+        if (emptySlots.Count <= 0)
+        {
+            throw new System.Exception("No empty slots!");
+        }
+
+        StorageItemInventorySlot randomSlot = emptySlots[Random.Range(0, emptySlots.Count)];
+        randomSlot.SetSlot(item, count);
+    }
+
     private void OpenUI()
     {
-        if (ui != null)
+        if (InventoryManager.Instance.IsInventoryOpen)
             return;
 
         ui = new StorageUI(storage);
-        ui.OnDestroy += OnUIDestroy;
-
-        UIPanelsManager.Instance.SetCurrentPanel(ui, true);
-        InventoryManager.Instance.ToggleInventory(true);
-    }
-
-    private void OnUIDestroy()
-    {
-        ui.OnDestroy -= OnUIDestroy;
-        ui = null;
+        PlayerStateMachine.Instance.TrySwitchState<InventoryState>(new object[] { ui });
     }
 }

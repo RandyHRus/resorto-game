@@ -6,7 +6,7 @@ public class DropItems
 {
     //private static readonly float dropNearbyItemsScanRadius = 1f;
 
-    public static DroppedItem DropItem(Vector2 positionOnGround, float dropHeight, InventoryItemInformation itemInfo, int count, float xSpeed)
+    public static DroppedItem DropItem(Vector2 positionOnGround, float dropHeight, InventoryItemInstance itemInstance, int count, float xSpeed)
     {
         /*
         //Try to group same items
@@ -29,7 +29,7 @@ public class DropItems
             GameObject droppedItemPrefab = ResourceManager.Instance.DroppedItem;
             GameObject obj = GameObject.Instantiate(droppedItemPrefab, posWithDepth, Quaternion.identity);
             DroppedItem droppedItem = obj.GetComponent<DroppedItem>();
-            droppedItem.Initialize(itemInfo, count, positionOnGround, dropHeight, xSpeed);
+            droppedItem.Initialize(itemInstance, count, positionOnGround, dropHeight, xSpeed);
             return droppedItem;
         }
 

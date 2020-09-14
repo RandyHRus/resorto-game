@@ -15,7 +15,7 @@ public class StairsManager: MonoBehaviour
         if (tileInfo == null)
             return false;
 
-        if (tileInfo.BuildsOnTile.TopMostBuild != null)
+        if (tileInfo.TopMostBuild != null)
             return false;
 
         TileLocation tileLocation = tileInfo.tileLocation;
@@ -109,9 +109,7 @@ public class StairsManager: MonoBehaviour
         renderer.sortingLayerName = "DynamicY";
         obj.transform.position = new Vector3(pos.x, pos.y, DynamicZDepth.GetDynamicZDepth(pos.y, DynamicZDepth.OBJECTS_STANDARD_OFFSET));
 
-        //Set tile
-        BuildOnTile stairsBuild = new BuildOnTile(obj, variant, new List<Vector3Int>() { pos }, rot, ObjectType.Ground);
-        tileInfo.BuildsOnTile.SetTileObject(stairsBuild);
+        BuildOnTile stairsBuild = new BuildOnTile(obj, variant, new HashSet<Vector3Int>() { pos }, rot, ObjectType.Ground, (Vector2Int)pos);
 
         //Refresh connected docks
         if (tileInfo.tileLocation == TileLocation.WaterEdge)

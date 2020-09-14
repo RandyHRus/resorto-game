@@ -12,8 +12,6 @@ public class InventoryState : PlayerState
     public override void Initialize()
     {
         base.Initialize();
-
-        PlayerMovement.PlayerMoved += (Vector2 pos, bool slow, Vector2 previousPos) => TryEndState();
     }
 
     public override void Execute()
@@ -33,13 +31,29 @@ public class InventoryState : PlayerState
 
     public override void StartState(object[] args)
     {
-        InventoryManager.Instance.ToggleInventory(true);
+        PlayerMovement.PlayerMoved += SwitchDefaultState;
+
+        if (args == null || args.Length == 0)
+            InventoryManager.Instance.ShowInventory(null);
+        else if (args[0] is BuildingStructureVariant v)
+            InventoryManager.Instance.ShowInventory(v.uiToShowOnSelect);
+        else if (args[0] is UIObject u)
+            InventoryManager.Instance.ShowInventory(u);
+        else
+            throw new System.NotImplementedException();
+
         firstExecute = true;
     }
 
     public override bool TryEndState()
     {
-        InventoryManager.Instance.ToggleInventory(false);
+        PlayerMovement.PlayerMoved -= SwitchDefaultState;
+        InventoryManager.Instance.HideInventory();
         return true;
+    }
+
+    private void SwitchDefaultState(Vector2 pos, bool slow, Vector2 directionVector)
+    {
+        PlayerStateMachine.Instance.TrySwitchState<DefaultState>();
     }
 }

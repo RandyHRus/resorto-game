@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DroppedItem : MonoBehaviour
 {
-    public InventoryItemInformation ItemInfo { get; private set; }
+    public InventoryItemInstance ItemInstance { get; private set; }
     public int Count { get; private set; }
 
     [SerializeField] private Transform innerTransform = null;
@@ -21,7 +21,9 @@ public class DroppedItem : MonoBehaviour
 
     private Coroutine bounceCoroutine;
 
-    public void Initialize(InventoryItemInformation itemInfo, int count, Vector2 positionOnGround, float dropHeight, float xSpeed)
+    private static ItemInformationDisplayWithCountUI itemInformationDisplayUI;
+
+    public void Initialize(InventoryItemInstance itemInstance, int count, Vector2 positionOnGround, float dropHeight, float xSpeed)
     {
         float zPosition = DynamicZDepth.GetDynamicZDepth(positionOnGround.y, 0);
 
@@ -42,14 +44,16 @@ public class DroppedItem : MonoBehaviour
             innerTransform.localPosition = new Vector2(0, h);
         }
 
-        this.ItemInfo = itemInfo;
+        this.ItemInstance = itemInstance;
         this.Count = count;
-        innerTransform.GetComponent<SpriteRenderer>().color = ResourceManager.Instance.ItemTagColors[(int)itemInfo.Tag];
+        innerTransform.GetComponent<SpriteRenderer>().color = ResourceManager.Instance.ItemTagColors[(int)itemInstance.ItemInformation.Tag];
 
         timer = 0;
 
         bounceCoroutine = StartCoroutine(BounceEffect.Bounce(dropHeight, xSpeed, OnBounceMove, OnBounceEnd));
         Moving = true;
+
+        itemInformationDisplayUI = new ItemInformationDisplayWithCountUI();
     }
 
     public void AddToStack(int count)
@@ -114,5 +118,33 @@ public class DroppedItem : MonoBehaviour
             distanceTravelled = 0;
             distanceToTravel = Vector2.Distance(startPos, goal);
         }
+    }
+
+    private void OnMouseEnter()
+    {
+        if (!CheckMouseOverUI.IsMouseOverUI())
+        {
+            itemInformationDisplayUI.Show(true);
+            itemInformationDisplayUI.SetItem(ItemInstance, Count);
+            MouseUIInformationDisplayManager.SetShownUI(itemInformationDisplayUI);
+        }
+    }
+
+    private void OnMouseOver()
+    {
+        if (!CheckMouseOverUI.IsMouseOverUI())
+        {
+            itemInformationDisplayUI.Show(true);
+            itemInformationDisplayUI.ObjectTransform.position = ((Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition)) + new Vector2(1.5f, -0.5f);
+        }
+        else
+        {
+            itemInformationDisplayUI.Show(false);
+        }
+    }
+
+    private void OnMouseExit()
+    {
+        itemInformationDisplayUI.Show(false);
     }
 }

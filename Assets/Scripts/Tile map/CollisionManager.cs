@@ -166,7 +166,7 @@ public class CollisionManager
         if (tileLayer != tile.layerNum)
             return false;
 
-        BuildOnTile build = tile.BuildsOnTile.TopMostBuild;
+        BuildOnTile build = tile.TopMostBuild;
 
         if (build == null)
             return false;

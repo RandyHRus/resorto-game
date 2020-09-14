@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class UIPanelsManager : MonoBehaviour
 {
-    [SerializeField] private GameObject houseCustomizationMenuInstance = null;
-    private UIObject houseCustomizationMenuObject;
-
     private UIObject currentOpenPanel;
     private bool currentPanelShouldBeDeleted = false;
 
@@ -22,8 +19,6 @@ public class UIPanelsManager : MonoBehaviour
         {
             _instance = this;
         }
-
-        houseCustomizationMenuObject = new UIObject(houseCustomizationMenuInstance);
     }
 
     private void Update()
@@ -31,19 +26,7 @@ public class UIPanelsManager : MonoBehaviour
         if (Input.GetButtonDown("Cancel"))
         {
             CloseCurrentPanel();
-        }
-        
-        if (Input.GetButtonDown("House menu"))
-        {
-            if (currentOpenPanel == houseCustomizationMenuObject)
-            {
-                CloseCurrentPanel();
-            }
-            else
-            {
-                SetCurrentPanel(houseCustomizationMenuObject, false);
-            }
-        }
+        }      
     }
 
     public void SetCurrentPanel(UIObject obj, bool shouldBeDeleted)

@@ -7,6 +7,7 @@ public class Storage
     public int SlotCountX { get; private set; }
     public int SlotCountY { get; private set; }
 
+    public int SlotCount { get; private set; }
     private StorageItemInventorySlot[] slots;
 
     public Storage(int slotCountX, int slotCountY)
@@ -14,10 +15,10 @@ public class Storage
         this.SlotCountX = slotCountX;
         this.SlotCountY = slotCountY;
 
-        int totalSlotCount = slotCountX * slotCountY;
+        SlotCount = slotCountX * slotCountY;
 
-        slots = new StorageItemInventorySlot[totalSlotCount];
-        for (int i = 0; i < totalSlotCount; i++)
+        slots = new StorageItemInventorySlot[SlotCount];
+        for (int i = 0; i < SlotCount; i++)
         {
             slots[i] = new StorageItemInventorySlot();
         }

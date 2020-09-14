@@ -33,6 +33,12 @@ public class CharacterVisualDirection
             case (CharacterVisualDirectionEnum.FrontRight):
                 DirectionVector = new Vector2(1, -1);
                 break;
+            case (CharacterVisualDirectionEnum.Left):
+                DirectionVector = new Vector2(-1, 0);
+                break;
+            case (CharacterVisualDirectionEnum.Right):
+                DirectionVector = new Vector2(1, 0);
+                break;
             default:
                 throw new System.Exception("Unknown direction!");
         }
@@ -50,10 +56,7 @@ public class CharacterVisualDirection
         else
             proposedVector.x = Mathf.Sign(moveVector.x);
 
-        if (moveVector.y == 0)
-            proposedVector.y = currentVector.y;
-        else
-            proposedVector.y = Mathf.Sign(moveVector.y);
+        proposedVector.y = moveVector.y == 0 ? 0 : Mathf.Sign(moveVector.y); //This can be 0, horizontal cannot be 0
 
         DirectionVector = proposedVector;
 
@@ -62,7 +65,7 @@ public class CharacterVisualDirection
 
     private void UpdateCharacter()
     {
-        characterTransform.localScale = new Vector3(-DirectionVector.x, 1, 1);
+        characterTransform.localScale = new Vector3(DirectionVector.x, 1, 1);
         characterAnimator.SetFloat("Vertical", DirectionVector.y);
     }
 }
@@ -72,5 +75,7 @@ public enum CharacterVisualDirectionEnum
     BackLeft,
     BackRight,
     FrontLeft,
-    FrontRight
+    FrontRight,
+    Left,
+    Right
 }

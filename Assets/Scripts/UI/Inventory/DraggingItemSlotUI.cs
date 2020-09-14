@@ -12,11 +12,11 @@ public class DraggingItemSlotUI : ItemSlotUI
 
     public override void StartEnlarge()
     {
-        throw new System.Exception("Can't enlarge!");
+        //throw new System.Exception("Can't enlarge!");
     }
 
     public override void StartShrink()
     {
-        throw new System.Exception("Can't shrink!");
+        //throw new System.Exception("Can't shrink!");
     }
 }

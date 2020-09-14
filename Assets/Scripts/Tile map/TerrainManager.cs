@@ -599,7 +599,7 @@ public class TerrainManager : MonoBehaviour
         bool checkForBuildAtPosition(Vector3Int pos, int layerNum)
         {
             TileInformation info = TileInformationManager.Instance.GetTileInformation(pos);
-            if (info.layerNum == layerNum && info.BuildsOnTile.TopMostBuild != null)
+            if (info.layerNum == layerNum && info.TopMostBuild != null)
             {
                 return true;
             }
@@ -685,7 +685,7 @@ public class TerrainManager : MonoBehaviour
                     placeableAbove = false;
 
                 //Check for objects
-                if (tile.BuildsOnTile.TopMostBuild != null || tile.GetTopFlooringGroup() != null)
+                if (tile.TopMostBuild != null || tile.GetTopFlooringGroup() != null)
                     placeableAbove = false;
             }
             //Placeable above
@@ -706,7 +706,7 @@ public class TerrainManager : MonoBehaviour
                     placeableBelow = false;
 
                 //Check for objects (but only if they are on below)
-                if (tile.BuildsOnTile.TopMostBuild != null || tile.GetTopFlooringGroup() != null)
+                if (tile.TopMostBuild != null || tile.GetTopFlooringGroup() != null)
                 {
                     if (aboveTileInformation.layerNum == tile.layerNum)
                         placeableBelow = false;
@@ -780,5 +780,28 @@ public class TerrainManager : MonoBehaviour
 
         tilemap.SetTile(position, tilemapInfo.codeToTile[code]);
         return true;
+    }
+
+    public void ClearAllTerrain()
+    {
+        sandTilemap.ClearAllTiles();
+        waterBGTilemap.ClearAllTiles();
+
+        foreach (Tilemap t in tilemapLayers_)
+        {
+            Destroy(t.gameObject);
+        }
+        tilemapLayers_.Clear();
+
+        int mapSize = TileInformationManager.mapSize;
+
+        for (int i = 0; i < mapSize; i++)
+        {
+            for (int j = 0; j < mapSize; j++)
+            {
+                TileInformation t = TileInformationManager.Instance.GetTileInformation(new Vector3Int(i, j, 0));
+                t.ResetTerrainInformation();
+            }
+        }
     }
 }

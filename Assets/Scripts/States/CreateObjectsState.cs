@@ -18,18 +18,11 @@ public class CreateObjectsState : CreateBuildState
         get { return true; }
     }
 
-
-    //args[0] = InventoryItem
     public override void StartState(object[] args)
     {
         objectRotation = BuildRotation.Front;
 
-        ObjectItemInformation selectedItem = (ObjectItemInformation)args[0];
-
-        if (selectedItem == null)
-            Debug.LogError("No item selected! This should not happen!");
-
-        selectedObject = selectedItem.ObjectToPlace;
+        selectedObject = (ObjectInformation)args[0];
 
         indicatorManager = new TilesIndicatorManager();
     }

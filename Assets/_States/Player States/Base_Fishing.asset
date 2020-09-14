@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fishingLinePrefab: {fileID: 3240492623828674677, guid: eaea8d1d13ff98045be5ceeb32c18f77,
     type: 3}
+  caughtFish: {fileID: 2574886549642566117, guid: 4cd6fc16a9bea064cbf5718c0621e013,
+    type: 3}

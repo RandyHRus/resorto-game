@@ -7,12 +7,6 @@ public abstract class MessageBox : UIObject
     private float boxShowTime = 3;
     private CanvasGroup group;
 
-    private float overshootFrequency = 10f;
-    private float overshootDecay = 0.03f;
-    private float overshootHeight = 0.05f;
-
-    private Coroutine overshootCoroutine;
-
     public float alpha
     {
         get
@@ -28,11 +22,11 @@ public abstract class MessageBox : UIObject
 
     public MessageBox(GameObject prefab) : base(prefab, MessageManager.Instance.Canvas.transform)
     {
-        void OvershootMove(float value)
+        void ExpandValueChanged(float value)
         {
             //MessageBox could have been destroyed
             if (RectTransform != null)
-                RectTransform.localScale = new Vector2(1 + value, 1 + value);
+                RectTransform.localScale = new Vector2(value, value);
         }
 
         group = ObjectInScene.GetComponent<CanvasGroup>();
@@ -40,6 +34,7 @@ public abstract class MessageBox : UIObject
 
         MessageManager.Instance.ShowMessage(this);
 
-        overshootCoroutine = Coroutines.Instance.StartCoroutine(OvershootEffect.Overshoot(overshootHeight, overshootDecay, overshootFrequency, OvershootMove, OvershootMove));
+        Coroutines.Instance.StartCoroutine(LerpEffect.LerpTime(0.5f, 1f, 0.3f, ExpandValueChanged, ExpandValueChanged));
+        //overshootCoroutine = Coroutines.Instance.StartCoroutine(OvershootEffect.Overshoot(overshootHeight, overshootDecay, overshootFrequency, OvershootMove, OvershootMove));
     }
 }

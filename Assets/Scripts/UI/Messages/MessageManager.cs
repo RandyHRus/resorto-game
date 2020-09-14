@@ -11,6 +11,12 @@ public class MessageManager : MonoBehaviour
     [SerializeField] private GameObject warningMessageBox = null;
     public GameObject WarningMessageBox => warningMessageBox;
 
+    [SerializeField] private GameObject fishGainMessageBox = null;
+    public GameObject FishGainMessageBox => fishGainMessageBox;
+
+    [SerializeField] private GameObject cosmeticGainMessageBox = null;
+    public GameObject CosmeticGainMessageBox => cosmeticGainMessageBox;
+
     [SerializeField] private Canvas canvas = null;
     public Canvas Canvas => canvas;
 
@@ -38,7 +44,7 @@ public class MessageManager : MonoBehaviour
         }
         messageBoxes = new Queue<MessageBox>();
 
-        InventoryManager.OnItemGained += (InventoryItemInformation item, int count) => { new ItemGainMessage(item, count); };
+        InventoryManager.OnItemGained += (InventoryItemInstance item, int count) => { item.ShowMessage(count); };
     }
 
     public void ShowMessage(MessageBox newMessageBox)

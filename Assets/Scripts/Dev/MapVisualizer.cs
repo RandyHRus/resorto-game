@@ -55,7 +55,6 @@ public class MapVisualizer : MonoBehaviour
             {
                 ShowVisualization(GetObjectsAndFlooringsMap());
             }
-
         }
     }
 
@@ -90,8 +89,7 @@ public class MapVisualizer : MonoBehaviour
 
                 Color32 proposedColor;
 
-                BuildGroupOnTile buildsOnTile = info.BuildsOnTile;
-                BuildOnTile topMostBuild = buildsOnTile.TopMostBuild;
+                BuildOnTile topMostBuild = info.TopMostBuild;
                 if (topMostBuild != null)
                 {
                     switch (topMostBuild.ModifiedType)

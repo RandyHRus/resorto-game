@@ -56,6 +56,9 @@ public class ObjectInformation : ScriptableObject, IBuildable
 
     [SerializeField] private InventoryItemInformation dropItem = null;
 
+    [SerializeField] private int transparencyCapableYSize = 0;
+    public int TransparencyCapableYSize => transparencyCapableYSize;
+
     private float dropHeight = 0.5f;
     private float minDropXSpeed = -0.4f;
     private float maxDropXSpeed = 0.4f;
@@ -77,12 +80,12 @@ public class ObjectInformation : ScriptableObject, IBuildable
         }
     }
 
-    public void OnRemove(BuildOnTile build)
+    public void OnRemoveThroughState(BuildOnTile build)
     {
         if (dropItem != null)
         {
-            Vector3Int pos = build.OccupiedTiles[0];
-            DropItems.DropItem(new Vector2(pos.x, pos.y), dropHeight, dropItem, 1, UnityEngine.Random.Range(minDropXSpeed, maxDropXSpeed));
+            Vector2Int pos = build.BottomLeft;
+            DropItems.DropItem(pos, dropHeight, new InventoryItemInstance(dropItem), 1, UnityEngine.Random.Range(minDropXSpeed, maxDropXSpeed));
         }
     }
 
@@ -90,6 +93,8 @@ public class ObjectInformation : ScriptableObject, IBuildable
     {
         return GetSpriteInformation(rotation).Size;
     }
+
+
 }
 
 [System.Serializable]

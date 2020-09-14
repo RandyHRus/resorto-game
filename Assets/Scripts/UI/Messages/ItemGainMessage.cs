@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class ItemGainMessage : MessageBox
 {
-    public ItemGainMessage(InventoryItemInformation item, int count) : base(MessageManager.Instance.ItemGainMessageBox)
+    public ItemGainMessage(InventoryItemInstance item, int count, GameObject overrideObject = null) : base(overrideObject != null ? overrideObject : MessageManager.Instance.ItemGainMessageBox)
     {
         //Find child components
         Transform t = ObjectInScene.transform;
@@ -19,12 +19,12 @@ public class ItemGainMessage : MessageBox
             else if (tr.tag == "Name Field")
             {
                 OutlinedText text = new OutlinedText(tr.gameObject);
-                text.SetText(item.ItemName);
-                text.SetColor(ResourceManager.Instance.ItemTagColors[(int)item.Tag]);
+                text.SetText(item.ItemInformation.ItemName);
+                text.SetColor(ResourceManager.Instance.ItemTagColors[(int)item.ItemInformation.Tag]);
             }
             else if (tr.tag == "Icon Field")
             {
-                tr.GetComponent<Image>().sprite = item.ItemIcon;
+                tr.GetComponent<Image>().sprite = item.ItemInformation.ItemIcon;
             }
         }
     }

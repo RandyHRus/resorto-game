@@ -8,7 +8,7 @@ public class PickupItems : MonoBehaviour
 
     private void Awake()
     {
-        PlayerMovement.PlayerMoved += (Vector2 pos, bool slow, Vector2 previousPos) => PickUpNearby(pos);
+        PlayerMovement.PlayerMoved += (Vector2 pos, bool slow, Vector2 directionVector) => PickUpNearby(pos);
     }
 
     public void PickUpNearby(Vector2 pos)
@@ -26,7 +26,7 @@ public class PickupItems : MonoBehaviour
         void OnFlyEnd(DroppedItem item)
         {
             //Gain item here
-            InventoryManager.Instance.AddItem(item.ItemInfo, item.Count);
+            InventoryManager.Instance.AddItem(item.ItemInstance, item.Count);
             Destroy(item.gameObject);
         }
     }

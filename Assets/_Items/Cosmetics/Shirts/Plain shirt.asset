@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64533840c1ae4244eb1c358a05fa140b, type: 3}
+  m_Name: Plain shirt
+  m_EditorClassIdentifier: 
+  itemName: Plain shirt
+  itemIcon: {fileID: 21300000, guid: 1a3344ad99f80fc44a94e0e6809f7c4f, type: 3}
+  baseSpritePair:
+    spriteFront: {fileID: 21300000, guid: 1a3344ad99f80fc44a94e0e6809f7c4f, type: 3}
+    spriteBack: {fileID: 21300000, guid: 1a3344ad99f80fc44a94e0e6809f7c4f, type: 3}
+  baseColorable: 1
+  colorableSpritePair:
+    spriteFront: {fileID: 0}
+    spriteBack: {fileID: 0}

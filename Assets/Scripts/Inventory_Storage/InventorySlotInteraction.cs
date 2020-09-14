@@ -27,12 +27,19 @@ public class InventorySlotInteraction : MonoBehaviour, IPointerClickHandler, IPo
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (InventoryManager.Instance.IsInventoryOpen)
+        {
             slotUI.StartEnlarge();
+            InventoryManager.Instance.DisplaySlotInformation(slotUI);
+        }
+
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         if (InventoryManager.Instance.IsInventoryOpen)
+        {
             slotUI.StartShrink();
+            InventoryManager.Instance.HideSlotInformation(slotUI);
+        }
     }
 }

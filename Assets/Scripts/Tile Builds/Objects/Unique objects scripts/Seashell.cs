@@ -15,7 +15,7 @@ public class Seashell : MonoBehaviour, ITileObjectFunctions
     {
         if (RemoveManager.TryRemoveBuild(buildData))
         {
-            buildData.BuildInfo.OnRemove(buildData);
+            buildData.BuildInfo.OnRemoveThroughState(buildData);
         }
     }
 

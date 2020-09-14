@@ -28,7 +28,7 @@ public class UIObject
         ObjectTransform = ObjectInScene.transform;
     }
 
-    public void Show(bool show)
+    public virtual void Show(bool show)
     {
         ObjectInScene.SetActive(show);
     }

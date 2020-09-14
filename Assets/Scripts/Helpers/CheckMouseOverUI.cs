@@ -7,7 +7,12 @@ public class CheckMouseOverUI
 {
     public static bool GetButtonDownAndNotOnUI(string input)
     {
-        return (Input.GetButtonDown(input) && !IsPointerOverUIElement(GetEventSystemRaycastResults()));
+        return (Input.GetButtonDown(input) && !IsMouseOverUI());
+    }
+
+    public static bool IsMouseOverUI()
+    {
+        return IsPointerOverUIElement(GetEventSystemRaycastResults());
     }
 
     ///Returns 'true' if we touched or hovering on Unity UI element.
@@ -21,8 +26,8 @@ public class CheckMouseOverUI
         }
         return false;
     }
-    ///Gets all event systen raycast results of current mouse or touch position.
-    private static List<RaycastResult> GetEventSystemRaycastResults()
+    ///Gets all event system raycast results of current mouse or touch position.
+    public static List<RaycastResult> GetEventSystemRaycastResults()
     {
         PointerEventData eventData = new PointerEventData(EventSystem.current);
         eventData.position = Input.mousePosition;

@@ -18,7 +18,7 @@ public class PlayerMovement : MonoBehaviour
 
     private int currentTileLayer; //Starts at 0 which means the player is on the sand layer, which means we need to check collision at land layer 0
 
-    public delegate void OnPlayerMove(Vector2 position, bool slow, Vector2 previousPosition);
+    public delegate void OnPlayerMove(Vector2 position, bool slow, Vector2 directionVector);
     public static event OnPlayerMove PlayerMoved;
 
     private static PlayerMovement _instance;
@@ -61,11 +61,13 @@ public class PlayerMovement : MonoBehaviour
         Vector3 previousPos = playerTransform.position;
 
         //Animation
+        Vector2 directionVector;
         {
             int moveH = (int)Input.GetAxisRaw("Horizontal");
             int MoveV = (int)Input.GetAxisRaw("Vertical");
             animator.SetBool("Walking", moveH != 0 || MoveV != 0);
             animator.speed = Input.GetButton("Slow move") ? 0.5f : 1f;
+            directionVector = new Vector2(moveH, MoveV);
         }
         //Movement
         {
@@ -75,8 +77,8 @@ public class PlayerMovement : MonoBehaviour
                 StairsMovement();
         }
 
-        if (playerTransform.position != previousPos)
-            PlayerMoved?.Invoke(playerTransform.position, Input.GetButton("Slow move"), previousPos);
+        if (directionVector.x != 0 || directionVector.y != 0)
+            PlayerMoved?.Invoke(playerTransform.position, Input.GetButton("Slow move"), directionVector);
 
     }
 
@@ -152,7 +154,7 @@ public class PlayerMovement : MonoBehaviour
                 if (!foundTile)
                 {
                     TileInformation t = TileInformationManager.Instance.GetTileInformation(beforeTile);
-                    t.BuildsOnTile.StepOff();
+                    t.StepOff();
                 }
                 else
                     afterTiles.Remove(beforeTile);
@@ -161,7 +163,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 //We removed all duplicates in last loop so we can directly call step on function
                 TileInformation t = TileInformationManager.Instance.GetTileInformation(afterTile);
-                t.BuildsOnTile.StepOn();
+                t.StepOn();
             }
         }
     }

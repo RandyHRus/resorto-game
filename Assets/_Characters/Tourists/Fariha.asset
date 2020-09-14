@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d8ebe6e1146b6947aba627a5ffdef21, type: 3}
+  m_Name: Fariha
+  m_EditorClassIdentifier: 
+  characterCustomization:
+    characterName: Fariha
+    eyebrows: {fileID: 11400000, guid: f6eac92c1700813408ff6bc5292e347b, type: 2}
+    eyebrowsColor:
+      serializedVersion: 2
+      rgba: 4280334140
+    hair: {fileID: 11400000, guid: 25a9d129adf191e4e9847b69da36e6e7, type: 2}
+    hairColor:
+      serializedVersion: 2
+      rgba: 4287500087
+    skinColor:
+      serializedVersion: 2
+      rgba: 4282170895
+    eyesColor:
+      serializedVersion: 2
+      rgba: 4280787105
+    sex: 1
+    pantsColor:
+      serializedVersion: 2
+      rgba: 4285953680
+  dialogueFile: {fileID: 4900000, guid: 669423f90e9c89c48b5ed2b100f3619b, type: 3}

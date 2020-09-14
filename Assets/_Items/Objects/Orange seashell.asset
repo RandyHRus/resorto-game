@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf7cbe68299a02c4782bfd2d31180757, type: 3}
+  m_Name: Orange seashell
+  m_EditorClassIdentifier: 
+  itemName: Orange seashell
+  itemIcon: {fileID: 21300000, guid: bc2aa280a96aa4942a328c811bb1ed72, type: 3}
+  objectToPlace: {fileID: 11400000, guid: 874fc4c155d0c3740afec52c5366f92a, type: 2}
+  tag: 3
+  stackable: 1

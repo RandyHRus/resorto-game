@@ -6,6 +6,7 @@ public class DynamicZDepth : MonoBehaviour
 {
     public static float OBJECTS_STANDARD_OFFSET = 0f;
     public static float PLAYER_OFFSET = 0f;
+    public static float CAUGHT_FISH_OFFSET = 0.1f;
     public static float NPC_OFFSET = 0.1f;
     public static float OBJECTS_ONTOP_OFFSET = 0.2f;
     public static float PLAYER_ON_STAIRS = 0.8f;

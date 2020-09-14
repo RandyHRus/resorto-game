@@ -23,6 +23,12 @@ public class ResourceManager : MonoBehaviour
     [SerializeField] private GameObject itemSlot = null;
     public GameObject ItemSlot => itemSlot;
 
+    [SerializeField] private GameObject itemInformationDisplay = null;
+    public GameObject ItemInformationDisplay => itemInformationDisplay;
+
+    [SerializeField] private GameObject itemInformationDisplayWithCount = null;
+    public GameObject ItemInformationDisplayWithCount => itemInformationDisplayWithCount;
+
     [SerializeField] private GameObject dropItemInventorySlot = null;
     public GameObject DropItemInventorySlot => dropItemInventorySlot;
 
@@ -31,6 +37,13 @@ public class ResourceManager : MonoBehaviour
 
     [SerializeField] private Canvas inventoryCanvas = null;
     public Canvas InventoryCanvas => inventoryCanvas;
+
+    [SerializeField] private Canvas indicatorsCanvas = null;
+    public Canvas IndicatorsCanvas => indicatorsCanvas;
+
+    [SerializeField] private GameObject houseCustomizationMenu = null;
+    public GameObject HouseCustomizationMenu => houseCustomizationMenu;
+
 
     [Header("Colors")]
 

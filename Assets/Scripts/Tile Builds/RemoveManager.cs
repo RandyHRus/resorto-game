@@ -12,16 +12,16 @@ public class RemoveManager
         if (tileInfo == null)
             return false;
 
-        BuildOnTile topMostObject = tileInfo.BuildsOnTile.TopMostBuild;
+        BuildOnTile topMostObject = tileInfo.TopMostBuild;
         if (topMostObject == null)
             return false;
 
         //Check if there is any objects on above, if there is, it cannot be destroyed
         foreach (Vector3Int checkPos in topMostObject.OccupiedTiles)
         {
-            BuildGroupOnTile thisGroup = TileInformationManager.Instance.GetTileInformation(checkPos).BuildsOnTile;
+            TileInformation thisInfo = TileInformationManager.Instance.GetTileInformation(checkPos);
 
-            if (thisGroup.TopMostBuild != topMostObject)
+            if (thisInfo.TopMostBuild != topMostObject)
                 return false;
         }
 
@@ -37,14 +37,15 @@ public class RemoveManager
             return false;
         }
 
-        RemoveBuild(pos, buildOnTile, out removedBuildInfo);
+        removedBuildInfo = buildOnTile.BuildInfo;
+        buildOnTile.RemoveBuild();
 
         return true;
     }
 
     public static bool BuildRemovable(BuildOnTile build)
     {
-        return BuildRemovable(build.OccupiedTiles[0], out BuildOnTile outBuild) ? outBuild == build : false;
+        return BuildRemovable((Vector3Int)build.BottomLeft, out BuildOnTile outBuild) ? outBuild == build : false;
     }
 
     public static bool TryRemoveBuild(BuildOnTile build)
@@ -52,20 +53,8 @@ public class RemoveManager
         if (!BuildRemovable(build))
             return false;
 
-        RemoveBuild(build.OccupiedTiles[0], build, out IBuildable removedBuildInfo);
+        build.RemoveBuild();
 
         return true;
-    }
-
-    //Removes top most object
-    private static void RemoveBuild(Vector3Int pos, BuildOnTile buildOnTile, out IBuildable removedBuildInfo)
-    {
-        TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(pos);
-        removedBuildInfo = buildOnTile.BuildInfo;
-
-        buildOnTile.IndicateBuildRemoved();
-
-        if (tileInfo.BuildsOnTile.RemoveTopMostTileObject() != buildOnTile.ModifiedType)
-            throw new System.Exception("Removed wrong type!");
     }
 }

@@ -36,3 +36,4 @@ MonoBehaviour:
     size: {x: 0, y: 0}
   sizeWhenNoSprite: {x: 0, y: 0}
   dropItem: {fileID: 11400000, guid: 15291d69076786e499c7f6a033d6f313, type: 2}
+  transparencyCapableYSize: 1

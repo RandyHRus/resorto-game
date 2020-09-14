@@ -34,7 +34,7 @@ public class RemoveState : PlayerState
             TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(mouseTilePosition);
             if (buildRemovable) {
                 Vector2Int sizeOnTile = build.BuildInfo.GetSizeOnTile(build.Rotation);
-                Vector2Int bottomLeft = (Vector2Int)build.OccupiedTiles[0];
+                Vector2Int bottomLeft = build.BottomLeft;
                 Vector2Int topRight = new Vector2Int(bottomLeft.x + sizeOnTile.x - 1, bottomLeft.y + sizeOnTile.y - 1);
                 indicatorManager.SetSizeAndPosition(bottomLeft, topRight);
             }
@@ -57,7 +57,7 @@ public class RemoveState : PlayerState
             {
                 if (RemoveManager.TryRemoveBuild(mouseTilePosition, out IBuildable buildInfo))
                 {
-                    buildInfo.OnRemove(build);
+                    buildInfo.OnRemoveThroughState(build);
                 }
             }
             else if (flooringRemovable)

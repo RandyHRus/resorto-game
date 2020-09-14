@@ -32,7 +32,7 @@ public class FlooringManager
         if (info == null || belowInfo == null)
             return false;
 
-        if (info.BuildsOnTile.TopMostBuild != null|| belowInfo.BuildsOnTile.TopMostBuild != null)
+        if (info.TopMostBuild != null|| belowInfo.TopMostBuild != null)
             return false;
 
         if (info.NormalFlooringGroup != null)
@@ -58,7 +58,7 @@ public class FlooringManager
         if (info == null)
             return false;
 
-        if (info.BuildsOnTile.TopMostBuild != null)
+        if (info.TopMostBuild != null)
             return false;
 
         if (info.GetTopFlooringGroup() == null)
@@ -289,7 +289,7 @@ public class FlooringManager
         foreach (Tuple<Vector3Int, int> t in codeToAddFromStairs)
         {
             TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(t.Item1);
-            if (tileInfo?.BuildsOnTile.TopMostBuild?.BuildInfo is StairsVariant stairs)
+            if (tileInfo?.TopMostBuild?.BuildInfo is StairsVariant stairs)
             {
                 resultCode = resultCode | t.Item2;
             }

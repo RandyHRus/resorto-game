@@ -5,7 +5,7 @@ using UnityEngine;
 public class StorageUI : UIObject
 {
     private static int edgesPadding = 10;
-    private static int slotPadding = 36;
+    private static int slotPadding = 44;
 
     private ItemSlotUI[] slots;
 
@@ -43,12 +43,20 @@ public class StorageUI : UIObject
         }
     }
 
-    public override void Destroy() {;
-        foreach (ItemSlotUI slot in slots)
+    public override void Show(bool show)
+    {
+        if (!show)
         {
-            slot.Destroy();
+            foreach (ItemSlotUI slot in slots)
+            {
+                //To make sure event unsubscribed
+                slot.Destroy();
+            }
+            Object.Destroy(ObjectInScene);
         }
-
-        base.Destroy();
+        else
+        {
+            base.Show(show);
+        }
     }
 }
