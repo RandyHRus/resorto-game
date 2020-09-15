@@ -18,6 +18,7 @@ MonoBehaviour:
     spriteFront: {fileID: 21300000, guid: fa10e4ba7ff11dc4a91815db33b6d9e8, type: 3}
     spriteBack: {fileID: 21300000, guid: fa10e4ba7ff11dc4a91815db33b6d9e8, type: 3}
   baseColorable: 1
+  hasColorable: 1
   colorableSpritePair:
     spriteFront: {fileID: 21300000, guid: 43a84970b5a5e9544b91a1c0235c1ac2, type: 3}
     spriteBack: {fileID: 21300000, guid: 43a84970b5a5e9544b91a1c0235c1ac2, type: 3}

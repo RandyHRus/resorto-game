@@ -29,7 +29,25 @@ MonoBehaviour:
       serializedVersion: 2
       rgba: 4280787105
     sex: 1
-    pantsColor:
-      serializedVersion: 2
-      rgba: 4285953680
+    hat:
+      hatItemInformation: {fileID: 0}
+      primaryColor:
+        serializedVersion: 2
+        rgba: 0
+      secondaryColor:
+        serializedVersion: 2
+        rgba: 0
+    shirt:
+      shirtItemInformation: {fileID: 0}
+      primaryColor:
+        serializedVersion: 2
+        rgba: 0
+      secondaryColor:
+        serializedVersion: 2
+        rgba: 0
+    pants:
+      pantsItemInformation: {fileID: 0}
+      color:
+        serializedVersion: 2
+        rgba: 0
   dialogueFile: {fileID: 4900000, guid: 669423f90e9c89c48b5ed2b100f3619b, type: 3}

@@ -305,8 +305,11 @@ public class CharacterCustomizationMenu : MonoBehaviour
 
         if (customization.Shirt != null)
         {
-            SetPartColor(ColorCustomizationPart.ShirtBase, customization.Shirt.BaseColor);
-            SetPartColor(ColorCustomizationPart.ShirtColorable, customization.Shirt.ColorableColor);
+            if (customization.Shirt.BaseColor != null)
+                SetPartColor(ColorCustomizationPart.ShirtBase, (Color32)customization.Shirt.BaseColor);
+
+            if (customization.Shirt.ColorableColor != null)
+                SetPartColor(ColorCustomizationPart.ShirtColorable, (Color32)customization.Shirt.ColorableColor);
         }
 
         SetPartColor(ColorCustomizationPart.Skin,     customization.SkinColor);

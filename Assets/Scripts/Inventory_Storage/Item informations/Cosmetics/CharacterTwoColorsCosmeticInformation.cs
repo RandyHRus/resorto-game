@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Items/Shirt")]
-public class CharacterShirtItemInformation : CharacterCosmeticItemInformation
+public class CharacterTwoColorsCosmeticInformation : CharacterCosmeticItemInformation
 {
     [SerializeField] private CosmeticSpritePair baseSpritePair = null;
     public CosmeticSpritePair BaseSpritePair => baseSpritePair;
@@ -16,4 +15,20 @@ public class CharacterShirtItemInformation : CharacterCosmeticItemInformation
 
     [ConditionalHide("hasColorable", false, false), SerializeField] private CosmeticSpritePair colorableSpritePair = null;
     public CosmeticSpritePair ColorableSpritePair => colorableSpritePair;
+
+    public override bool HasPrimaryColor
+    {
+        get
+        {
+            return (baseColorable || hasColorable);
+        }
+    }
+
+    public override bool HasSecondaryColor
+    {
+        get
+        {
+            return (baseColorable && hasColorable);
+        }
+    }
 }

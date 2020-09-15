@@ -3,65 +3,63 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class ShirtItemInstance : CosmeticItemInstance
+public class ShirtItemInstance : TwoColorsCosmeticInstance
 {
     [SerializeField] private CharacterShirtItemInformation shirtItemInformation = null;
     public override InventoryItemInformation ItemInformation => shirtItemInformation;
 
-    [SerializeField] private Color32 baseColor = Color.white;
-    public Color32 BaseColor
+    [TwoColorsCosmeticColorHide(true, "shirtItemInformation"), SerializeField] private Color32 primaryColor = Color.white;
+    public override Color32? PrimaryColor
     {
         get
         {
-            return baseColor;
-        }
-        set
-        {
-            baseColor = value;
+            if (shirtItemInformation.HasPrimaryColor)
+                return primaryColor;
+            else
+                return null;
         }
     }
 
-    [SerializeField] private Color32 colorableColor = Color.white;
-    public Color32 ColorableColor
+    [TwoColorsCosmeticColorHide(false, "shirtItemInformation"), SerializeField] private Color32 secondaryColor = Color.white;
+    public override Color32? SecondaryColor
     {
         get
         {
-            return colorableColor;
-        }
-        set
-        {
-            colorableColor = value;
+            if (shirtItemInformation.HasSecondaryColor)
+                return secondaryColor;
+            else
+                return null;
         }
     }
 
-    public ShirtItemInstance(CharacterShirtItemInformation itemInfo, Color32 baseColor, Color32 colorableColor) : base(itemInfo)
+    public ShirtItemInstance(CharacterShirtItemInformation itemInfo, Color32? primaryColor, Color32? secondaryColor) : base(itemInfo, primaryColor, secondaryColor)
     {
         shirtItemInformation = itemInfo;
-        this.BaseColor = baseColor;
-        this.ColorableColor = colorableColor;
-    }
 
-    public override bool Equals(object obj)
-    {
-        //Check for null and compare run-time types.
-        if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+        if (primaryColor != null)
         {
-            return false;
+            if (shirtItemInformation.HasPrimaryColor)
+                this.primaryColor = (Color32)primaryColor;
+            else
+                throw new System.Exception("Too many colors!");
         }
         else
         {
-            return (((ShirtItemInstance)obj).ItemInformation == this.ItemInformation &&
-                this.BaseColor.Equals(((ShirtItemInstance)obj).BaseColor) &&
-                this.ColorableColor.Equals(((ShirtItemInstance)obj).ColorableColor));
+            if (shirtItemInformation.HasPrimaryColor)
+                throw new System.Exception("Missing color!");
         }
 
-    }
-
-    public override int GetHashCode()
-    {
-        /*Since I cant use mutable fields in hash code, this should be fine
-         * as long as I dont use it in a hash table
-        */
-        return ItemInformation.GetHashCode();
+        if (secondaryColor != null)
+        {
+            if (shirtItemInformation.HasSecondaryColor)
+                this.secondaryColor = (Color32)secondaryColor;
+            else
+                throw new System.Exception("Too many colors!");
+        }
+        else
+        {
+            if (shirtItemInformation.HasSecondaryColor)
+                throw new System.Exception("Missing color!");
+        }
     }
 }

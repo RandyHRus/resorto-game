@@ -30,20 +30,21 @@ MonoBehaviour:
       rgba: 4286259736
     sex: 1
     hat:
-      hatItemInformation: {fileID: 0}
-      baseColor:
+      hatItemInformation: {fileID: 11400000, guid: d7cef26125bd23f4db327d2802931efd,
+        type: 2}
+      primaryColor:
         serializedVersion: 2
-        rgba: 0
-      colorableColor:
+        rgba: 4280799202
+      secondaryColor:
         serializedVersion: 2
-        rgba: 0
+        rgba: 4278255459
     shirt:
       shirtItemInformation: {fileID: 11400000, guid: 3ff12e44f92ea704e8e83f3f966501fc,
         type: 2}
-      baseColor:
+      primaryColor:
         serializedVersion: 2
-        rgba: 4280247254
-      colorableColor:
+        rgba: 4281377214
+      secondaryColor:
         serializedVersion: 2
         rgba: 0
     pants:

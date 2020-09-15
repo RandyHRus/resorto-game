@@ -5,11 +5,16 @@ using UnityEngine;
 
 public abstract class CosmeticItemInstance : InventoryItemInstance
 {
-    public abstract Color32? ColorPrimary { get; }
-    public abstract Color32? ColorSecondary { get; }
+    public abstract Color32? PrimaryColor { get; }
+    public abstract Color32? SecondaryColor { get; }
 
     public CosmeticItemInstance(CharacterCosmeticItemInformation item): base(item)
     {
 
+    }
+
+    public override void ShowMessage(int count)
+    {
+        new CosmeticGainMessage(this, count);
     }
 }

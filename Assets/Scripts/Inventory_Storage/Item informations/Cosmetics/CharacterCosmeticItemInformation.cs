@@ -13,6 +13,17 @@ public abstract class CharacterCosmeticItemInformation : InventoryItemInformatio
     {
         PlayerStateMachine.Instance.TrySwitchState<DefaultState>();
     }
+
+    public abstract bool HasPrimaryColor { get; }
+
+    public abstract bool HasSecondaryColor { get; }
+    
+    public enum NumberOfColors
+    {
+        None,
+        One,
+        Two
+    }
 }
 
 [System.Serializable]

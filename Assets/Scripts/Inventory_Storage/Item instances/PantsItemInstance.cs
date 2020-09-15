@@ -9,22 +9,15 @@ public class PantsItemInstance : CosmeticItemInstance
     public override InventoryItemInformation ItemInformation => pantsItemInformation;
 
     [SerializeField] private Color32 color = Color.white;
-    public Color32 Color_
-    {
-        get
-        {
-            return color;
-        }
-        set
-        {
-            color = value;
-        }
-    }
+    public Color32 Color_ => color;
+
+    public override Color32? PrimaryColor => color;
+    public override Color32? SecondaryColor => null;
 
     public PantsItemInstance(CharacterPantsItemInformation itemInfo, Color32 color) : base(itemInfo)
     {
         pantsItemInformation = itemInfo;
-        this.Color_ = color;
+        this.color = color;
     }
 
     public override bool Equals(object obj)
@@ -37,7 +30,7 @@ public class PantsItemInstance : CosmeticItemInstance
         else
         {
             return (((PantsItemInstance)obj).ItemInformation == this.ItemInformation &&
-                this.Color_.Equals(((PantsItemInstance)obj).Color_));
+                this.color.Equals(((PantsItemInstance)obj).color));
         }
 
     }

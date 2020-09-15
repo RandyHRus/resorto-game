@@ -75,8 +75,12 @@ public class CharacterCustomizationLoader : MonoBehaviour
         if (hat != null)
         {
             SetHat((CharacterHatItemInformation)hat.ItemInformation);
-            SetHatBaseColor(hat.BaseColor);
-            SetHatColorableColor(hat.ColorableColor);
+
+            if (hat.PrimaryColor != null)
+                SetHatBaseColor((Color32)hat.PrimaryColor);
+
+            if (hat.SecondaryColor != null)
+                SetHatColorableColor((Color32)hat.SecondaryColor);
         }
         else
         {
@@ -109,8 +113,12 @@ public class CharacterCustomizationLoader : MonoBehaviour
         if (shirt != null)
         {
             SetShirt((CharacterShirtItemInformation)shirt.ItemInformation);
-            SetShirtBaseColor(shirt.BaseColor);
-            SetShirtColorableColor(shirt.ColorableColor);
+
+            if (shirt.BaseColor != null)
+                SetShirtBaseColor((Color32)shirt.BaseColor);
+
+            if (shirt.ColorableColor != null) 
+                SetShirtColorableColor((Color32)shirt.ColorableColor);
         }
         else
         {

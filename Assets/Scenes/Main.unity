@@ -1823,8 +1823,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ca3a8141575a2ef428b9b16bef620440, type: 2}
   - {fileID: 11400000, guid: 04492999d5a6acc448ef696446fb4732, type: 2}
   - {fileID: 11400000, guid: 8b597fd854049524eab263e62198969a, type: 2}
-  - {fileID: 11400000, guid: 6d553b378ba315d41a90c4a70b06b036, type: 2}
-  - {fileID: 11400000, guid: 8da08706c077c3241a5b0e9e4103eb8d, type: 2}
   inventoryCanvas: {fileID: 36465749}
   inventoryAboveCanvas: {fileID: 1322810376}
   playerTransform: {fileID: 1699220020}
