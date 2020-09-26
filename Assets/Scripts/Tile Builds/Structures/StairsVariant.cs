@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Structure Variants/Stairs")]
-public class StairsVariant : StructureVariantInformation, IBuildable
+public class StairsVariant : StructureInformation, IBuildable
 {
     [EnumNamedArray(typeof(BuildRotation)), SerializeField]
     private Sprite[] stairsSprites = null;

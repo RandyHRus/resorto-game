@@ -123,7 +123,7 @@ public class HouseCustomizationMenu : MonoBehaviour
 
     public void CreateButtonPressed()
     {
-        UIPanelsManager.Instance.CloseCurrentPanel();
+        //UIPanelsManager.Instance.CloseCurrentPanel();
         PlayerStateMachine.Instance.TrySwitchState<CreateBuildingsState>(new object[] { houseStructure, houseCustomization });
     }
 }

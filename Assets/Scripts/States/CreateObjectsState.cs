@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 using System;
 
 [CreateAssetMenu(menuName = "States/Create Objects")]
-public class CreateObjectsState : CreateBuildState
+public class CreateObjectsState : PlayerState
 {
     [SerializeField] private Sprite defaultIndicatorSprite = null;
     private BuildRotation objectRotation;

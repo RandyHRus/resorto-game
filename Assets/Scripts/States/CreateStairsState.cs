@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "States/Create Stairs")]
-public class CreateStairsState : CreateBuildState
+public class CreateStairsState : PlayerState
 {
     private TilesIndicatorManager indicatorManager;
 
     private StairsVariant stairsVariant;
+
+    public override bool AllowMovement
+    {
+        get { return true; }
+    }
+
 
     public override void Execute()
     {

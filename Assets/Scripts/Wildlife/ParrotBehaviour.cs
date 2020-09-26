@@ -77,7 +77,7 @@ public class ParrotBehaviour : WildlifeBehaviour, INonTileClickable
             Transform.position = new Vector3(position.x, position.y, DynamicZDepth.GetDynamicZDepth(position.y, DynamicZDepth.ParrotFlying));
         }
 
-        void End(Vector2 position)
+        void End()
         {
             callback();
         }

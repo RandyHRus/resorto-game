@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Structure Variants/Buildings")]
-public class BuildingStructureVariant : StructureVariantInformation, IBuildable
+public class BuildingStructureVariant : StructureInformation, IBuildable
 {
     [SerializeField] private Vector2Int size = new Vector2Int();
 

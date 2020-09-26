@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RegionSelection : Selection
+public class RegionSelection : ListComponentUI
 {
     private readonly RegionInformation info;
 
-    public RegionSelection(RegionInformation info, SelectionPanel parentPanel): base(ResourceManager.Instance.RegionSelection, parentPanel)
+    public RegionSelection(RegionInformation info, SelectionPanel<RegionSelection> parentPanel): base(ResourceManager.Instance.RegionComponent, parentPanel.ObjectTransform)
     {
         foreach (Transform t in ObjectTransform)
         {
@@ -24,6 +24,7 @@ public class RegionSelection : Selection
 
         this.info = info;
     }
+
 
     public override void OnClick()
     {

@@ -4,11 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu]
-public class ObjectInformation : ScriptableObject, IBuildable
+public class ObjectInformation : StructureInformation, IBuildable
 {
-    [SerializeField] private string _name = null;
-    public string Name => _name;
-
     [SerializeField] private bool useDefaultPrefab = true;
     public bool UseDefaultPrefab => useDefaultPrefab;
 

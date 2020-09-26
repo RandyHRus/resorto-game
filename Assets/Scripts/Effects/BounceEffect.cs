@@ -10,8 +10,9 @@ public class BounceEffect
     static readonly float hStop = 0.05f;   // stop when bounce is less than
 
     public delegate void Progress(float h, float xChange);
+    public delegate void End();
 
-    public static IEnumerator Bounce(float startHeight, float xSpeed, Progress moveCallback, Progress endCallback)
+    public static IEnumerator Bounce(float startHeight, float xSpeed, Progress moveCallback, End endCallback)
     {
         float maxYSpeed = Mathf.Sqrt(Mathf.Abs(2 * startHeight * g));
 
@@ -53,6 +54,6 @@ public class BounceEffect
             yield return 0;
         }
 
-        endCallback(0, xSpeed * Time.deltaTime);
+        endCallback?.Invoke();
     }
 }

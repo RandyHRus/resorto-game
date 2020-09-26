@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FlooringVariantBase : StructureVariantInformation
+public class FlooringVariantBase : StructureInformation
 {
     [EnumNamedArray(typeof(FlooringVariantCodes)), SerializeField]
     private Sprite[] flooringSprites = null;

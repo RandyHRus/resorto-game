@@ -25,7 +25,7 @@ public class PlayerTalkingState : PlayerState
     {
         base.Initialize();
 
-        dialogueBox = GameObject.FindGameObjectWithTag("DialogueBox");
+        dialogueBox = ResourceManager.Instance.DialogueBoxInstance;
         foreach (Transform t in dialogueBox.transform)
         {
             if (t.tag == "Name Field")

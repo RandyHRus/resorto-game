@@ -259,7 +259,10 @@ public class InventoryManager : MonoBehaviour
 
     public void OnSelectedItemChanged()
     {
-        SelectedSlot.Item.ItemInformation.ItemSelected();
+        if (SelectedSlot.Item == null)
+            PlayerStateMachine.Instance.TrySwitchState<DefaultState>();
+        else
+            SelectedSlot.Item.ItemInformation.ItemSelected();
     }
 
     public void AddItem(InventoryItemInstance item, int count) {

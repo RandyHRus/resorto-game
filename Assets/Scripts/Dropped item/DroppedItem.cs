@@ -32,9 +32,8 @@ public class DroppedItem : MonoBehaviour
             Move(h, xChange);
         }
 
-        void OnBounceEnd(float h, float xChange)
+        void OnBounceEnd()
         {
-            Move(h, xChange);
             Moving = false;
         }
 

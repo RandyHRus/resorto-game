@@ -8,14 +8,8 @@ public class ResourceManager : MonoBehaviour
 {
     [Header("UI")]
 
-    [SerializeField] private GameObject selectionPanel = null;
-    public GameObject SelectionPanel => selectionPanel;
-
-    [SerializeField] private GameObject regionSelection = null;
-    public GameObject RegionSelection => regionSelection;
-
-    [SerializeField] private GameObject structureSelection = null;
-    public GameObject StructureSelection => structureSelection;
+    [SerializeField] private GameObject componentsListPanel = null;
+    public GameObject ComponentsListPanel => componentsListPanel;
 
     [SerializeField] private GameObject progressbar = null;
     public GameObject Progressbar => progressbar;
@@ -44,6 +38,32 @@ public class ResourceManager : MonoBehaviour
     [SerializeField] private GameObject houseCustomizationMenu = null;
     public GameObject HouseCustomizationMenu => houseCustomizationMenu;
 
+    [SerializeField] private GameObject taskInstanceUI = null;
+    public GameObject TaskInstanceUI => taskInstanceUI;
+
+    [SerializeField] private GameObject statisticComponentUI = null;
+    public GameObject StatisticComponentUI => statisticComponentUI;
+
+    [SerializeField] private GameObject structureTypeComponentUI = null;
+    public GameObject StructureTypeComponentUI => structureTypeComponentUI;
+
+    [SerializeField] private GameObject structureVariantComponentUI = null;
+    public GameObject StructureVariantComponentUI => structureVariantComponentUI;
+
+    [SerializeField] private GameObject regionComponent = null;
+    public GameObject RegionComponent => regionComponent;
+
+    [SerializeField] private GameObject subtaskInstanceUI = null;
+    public GameObject SubtaskInstanceUI => subtaskInstanceUI;
+
+    [SerializeField] private Sprite subtaskActiveSprite = null;
+    public Sprite SubtaskActiveSprite => subtaskActiveSprite;
+
+    [SerializeField] private Sprite subtaskCompleteSprite = null;
+    public Sprite SubtaskCompleteSprite => subtaskCompleteSprite;
+
+    [SerializeField] private GameObject dialogueBoxInstance = null;
+    public GameObject DialogueBoxInstance => dialogueBoxInstance;
 
     [Header("Colors")]
 
@@ -59,6 +79,9 @@ public class ResourceManager : MonoBehaviour
     [EnumNamedArray(typeof(ItemTag)), SerializeField]
     private Color32[] itemTagColors = new Color32[Enum.GetNames(typeof(ItemTag)).Length];
     public Color32[] ItemTagColors => itemTagColors;
+
+    [SerializeField] private Color32 uiHighlightColor = Color.white;
+    public Color32 UIHighlightColor => uiHighlightColor;
 
     [Header("Others")]
 

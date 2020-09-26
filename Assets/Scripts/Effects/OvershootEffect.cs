@@ -7,8 +7,9 @@ public class OvershootEffect
     static readonly float hStop = 0.01f;
 
     public delegate void Progress(float value);
+    public delegate void End();
 
-    public static IEnumerator Overshoot(float startHeight, float hDecaySpeed, float frequency, Progress moveCallback, Progress endCallback)
+    public static IEnumerator Overshoot(float startHeight, float hDecaySpeed, float frequency, Progress moveCallback, End endCallback)
     {
         float timer = 0;
         float h = startHeight;
@@ -25,6 +26,6 @@ public class OvershootEffect
             yield return 0;
         }
        
-        endCallback(0);
+        endCallback?.Invoke();
     }
 }

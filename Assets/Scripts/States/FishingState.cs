@@ -375,7 +375,7 @@ public class FishingState : PlayerState
             caughtFishInstance.position = new Vector3(position.x, position.y, DynamicZDepth.GetDynamicZDepth(position, DynamicZDepth.CAUGHT_FISH_OFFSET));
         }
 
-        void FishFlyingEnd(Vector2 position)
+        void FishFlyingEnd()
         {
             Destroy(caughtFishInstance.gameObject);
             InventoryManager.Instance.AddItem(randomFish, 1);

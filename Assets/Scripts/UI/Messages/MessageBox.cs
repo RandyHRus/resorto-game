@@ -29,12 +29,17 @@ public abstract class MessageBox : UIObject
                 RectTransform.localScale = new Vector2(value, value);
         }
 
+        void End()
+        {
+
+        }
+
         group = ObjectInScene.GetComponent<CanvasGroup>();
         timeRemaining = boxShowTime;
 
         MessageManager.Instance.ShowMessage(this);
 
-        Coroutines.Instance.StartCoroutine(LerpEffect.LerpTime(0.5f, 1f, 0.3f, ExpandValueChanged, ExpandValueChanged));
+        Coroutines.Instance.StartCoroutine(LerpEffect.LerpTime(0.5f, 1f, 0.3f, ExpandValueChanged, End));
         //overshootCoroutine = Coroutines.Instance.StartCoroutine(OvershootEffect.Overshoot(overshootHeight, overshootDecay, overshootFrequency, OvershootMove, OvershootMove));
     }
 }

@@ -8,9 +8,6 @@ public class UIObject
     public RectTransform RectTransform { get; }
     public Transform ObjectTransform { get; }
 
-    public delegate void Destroyed();
-    public event Destroyed OnDestroy;
-
     //Instantiates a object
     public UIObject(GameObject prefab, Transform parent)
     {
@@ -35,7 +32,6 @@ public class UIObject
 
     public virtual void Destroy()
     {
-        OnDestroy?.Invoke();
         GameObject.Destroy(ObjectInScene);
     }
 }
