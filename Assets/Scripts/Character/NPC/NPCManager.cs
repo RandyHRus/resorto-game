@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class NPCManager : MonoBehaviour
 {
-    [SerializeField] private List<TouristScriptableObject> tourists = null;
+    [SerializeField] private TouristScriptableObject[] touristsTemp = null;
+
+    private List<TouristInstance> tourists = new List<TouristInstance>();
+
+    public delegate void TouristAdded(TouristInstance instance);
+    public static event TouristAdded OnTouristAdded;
 
     private static NPCManager _instance;
     public static NPCManager Instance { get { return _instance; } }
@@ -22,16 +27,23 @@ public class NPCManager : MonoBehaviour
             }
         }
 
-        IslandGenerationPipeline.IslandCompleted += CreateNPCs;
+        IslandGenerationPipeline.IslandCompleted += CreateStarterNPCs;
     }
 
-    private void CreateNPCs(IslandStartingPosition startingPosition)
+    private void CreateStarterNPCs(IslandStartingPosition startingPosition)
     {
         //TODO remove
-        foreach(TouristScriptableObject tourist in tourists)
+        foreach(TouristScriptableObject tourist in touristsTemp)
         {
-            tourist.CreateInScene(new Vector2Int(startingPosition.ActualStartingPosition.x, startingPosition.ActualStartingPosition.y));
+            CreateNPC(tourist, new Vector2Int(startingPosition.ActualStartingPosition.x, startingPosition.ActualStartingPosition.y));
         }
+    }
+
+    public void CreateNPC(TouristScriptableObject tourist, Vector2 position)
+    {
+        TouristInstance t = new TouristInstance(tourist, position);
+        tourists.Add(t);
+        OnTouristAdded?.Invoke(t);
     }
 }
 

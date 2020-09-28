@@ -56,6 +56,12 @@ public class ResourceManager : MonoBehaviour
     [SerializeField] private GameObject subtaskInstanceUI = null;
     public GameObject SubtaskInstanceUI => subtaskInstanceUI;
 
+    [SerializeField] private GameObject terrainOptionComponentUI = null;
+    public GameObject TerrainOptionComponentUI => terrainOptionComponentUI;
+
+    [SerializeField] private GameObject touristInformationComponentUI = null;
+    public GameObject TouristInformationComponentUI => touristInformationComponentUI;
+
     [SerializeField] private Sprite subtaskActiveSprite = null;
     public Sprite SubtaskActiveSprite => subtaskActiveSprite;
 

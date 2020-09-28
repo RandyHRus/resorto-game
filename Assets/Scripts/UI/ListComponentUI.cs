@@ -8,11 +8,6 @@ public abstract class ListComponentUI : UIObject
     public delegate void Selected(ListComponentUI selection);
     public event Selected OnSelect;
 
-    /* This is required because we can't get the content height of the object in script, without a 1 frame delay
-     * It will become messy if we have to wait 1 frame to get the height of the object, so we will just manually set it here
-     */
-    public virtual int ObjectHeight => 40;
-
     private Image buttonImage;
 
     private void AddListener(Button button)
@@ -27,7 +22,7 @@ public abstract class ListComponentUI : UIObject
 
     public ListComponentUI(GameObject prefab, Transform parent) : base(prefab, parent)
     {
-        foreach (Transform t in ObjectTransform)
+        foreach (Transform t in ObjectTransform.GetComponentsInChildren<Transform>())
         {
             if (t.tag == "Background Field")
             {

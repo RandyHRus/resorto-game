@@ -4,21 +4,73 @@ using UnityEngine;
 
 public class MoveCamera : MonoBehaviour
 {
-    private GameObject player;
+    [SerializeField] private Transform player = null;
 
-    void Start()
+    public Transform Following { get; private set; }
+
+    private bool changingTarget;
+    private float targetShiftTime = 0.3f;
+    Coroutine targetShiftingCoroutine = null;
+
+    private static MoveCamera _instance;
+    public static MoveCamera Instance { get { return _instance; } }
+    private void Awake()
     {
-        try {
-            player = GameObject.FindGameObjectWithTag("Player");
-        }
-        catch (System.Exception)
+        //Singleton
         {
-            Debug.Log("object with tag \"Player\" was not found");
+            if (_instance != null && _instance != this)
+            {
+                Destroy(this.gameObject);
+            }
+            else
+            {
+                _instance = this;
+            }
         }
+
+        ChangeFollowTarget(player);
     }
 
-    void LateUpdate()
+    private void LateUpdate()
     {
-        transform.position = new Vector3(player.transform.position.x, player.transform.position.y, -100);
+        if (!changingTarget)
+            transform.position = new Vector3(Following.position.x, Following.position.y, -100);
+    }
+
+    public void ChangeFollowTarget(Transform t)
+    {
+        Vector2 previousTargetPosition;
+
+        void OnProgress(Vector2 pos)
+        {
+            transform.position = new Vector3(pos.x, pos.y, -100);
+
+            if (previousTargetPosition != (Vector2)t.position)
+            {
+                RestartCoroutine();
+            }
+        }
+
+        void OnEnd()
+        {
+            changingTarget = false;
+        }
+
+        void RestartCoroutine() {
+            previousTargetPosition = t.position;
+
+            if (targetShiftingCoroutine != null)
+                StopCoroutine(targetShiftingCoroutine);
+
+            targetShiftingCoroutine = StartCoroutine(LerpEffect.LerpVectorTime(transform.position, t.position, targetShiftTime, OnProgress, OnEnd));
+        }
+
+        if (targetShiftingCoroutine != null)
+            StopCoroutine(targetShiftingCoroutine);
+
+        changingTarget = true;
+
+        Following = t;
+        RestartCoroutine();
     }
 }

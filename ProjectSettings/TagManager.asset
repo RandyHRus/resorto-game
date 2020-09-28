@@ -30,6 +30,7 @@ TagManager:
   - List Field
   - Background Field
   - Content Field
+  - Character Field
   layers:
   - Default
   - TransparentFX

@@ -27,10 +27,9 @@ public class CreateObjectsState : PlayerState
         indicatorManager = new TilesIndicatorManager();
     }
 
-    public override bool TryEndState()
+    public override void EndState()
     {
         indicatorManager.ClearCurrentTiles();
-        return true;
     }
 
     public override void Execute()

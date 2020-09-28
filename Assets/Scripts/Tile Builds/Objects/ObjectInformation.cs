@@ -90,8 +90,6 @@ public class ObjectInformation : StructureInformation, IBuildable
     {
         return GetSpriteInformation(rotation).Size;
     }
-
-
 }
 
 [System.Serializable]

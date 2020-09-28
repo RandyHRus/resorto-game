@@ -8,8 +8,6 @@ public class TaskInstanceUI : ListComponentUI
     private int distanceBetweenSubtasks = 30;
     private Dictionary<Subtask, SubtaskInstanceUI> subtaskUIs = new Dictionary<Subtask, SubtaskInstanceUI>();
 
-    public override int ObjectHeight => 56 + (subtaskUIs.Count * distanceBetweenSubtasks);
-
     public TaskInstanceUI(TaskInstance task, ComponentsListPanel<TaskInstanceUI> parent): base(ResourceManager.Instance.TaskInstanceUI, parent.ObjectTransform)
     {
         foreach (Transform t in ObjectTransform)

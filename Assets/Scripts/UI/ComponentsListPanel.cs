@@ -42,7 +42,7 @@ public class ComponentsListPanel<T> : UIObject where T: ListComponentUI
     {
         components.Add(comp);
 
-        float objectHeight = comp.ObjectHeight;
+        float objectHeight = comp.RectTransform.sizeDelta.y;
 
         panelContentHeight += objectHeight + PADDING;
         contentTransform.sizeDelta = new Vector2(RectTransform.sizeDelta.x, panelContentHeight);

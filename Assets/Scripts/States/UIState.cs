@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "States/Inventory")]
-public class InventoryState : PlayerState
+[CreateAssetMenu(menuName = "States/UI")]
+public class UIState : PlayerState
 {
     public override bool AllowMovement { get { return true; } }
 
@@ -25,7 +25,7 @@ public class InventoryState : PlayerState
 
         if (Input.GetButtonDown("Inventory"))
         {
-            PlayerStateMachine.Instance.TrySwitchState<DefaultState>();
+            PlayerStateMachine.Instance.SwitchState<DefaultState>();
         }
     }
 
@@ -45,15 +45,14 @@ public class InventoryState : PlayerState
         firstExecute = true;
     }
 
-    public override bool TryEndState()
+    public override void EndState()
     {
         PlayerMovement.PlayerMoved -= SwitchDefaultState;
         InventoryManager.Instance.HideInventory();
-        return true;
     }
 
     private void SwitchDefaultState(Vector2 pos, bool slow, Vector2 directionVector)
     {
-        PlayerStateMachine.Instance.TrySwitchState<DefaultState>();
+        PlayerStateMachine.Instance.SwitchState<DefaultState>();
     }
 }

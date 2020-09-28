@@ -25,6 +25,8 @@ public class IslandStatisticsManager: MonoBehaviour
         {
             statistics[(StatisticInstance)i] = new Statistic(statisticsToCreateToName[i]);
         }
+
+        NPCManager.OnTouristAdded += (TouristInstance instance) => GetStatistic(StatisticInstance.NumberOfTourists).Add(1);
     }
 
     public Statistic GetStatistic(StatisticInstance type)

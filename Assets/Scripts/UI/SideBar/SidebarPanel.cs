@@ -8,6 +8,11 @@ public abstract class SidebarPanel : MonoBehaviour
     public event PanelDelegate OnPanelOpen;
     public event PanelDelegate OnPanelClosed;
 
+    protected virtual void Awake()
+    {
+        StartCoroutine(DisableOnStart());
+    }
+
     public void OnOpen()
     {
         gameObject.SetActive(true);
@@ -18,5 +23,12 @@ public abstract class SidebarPanel : MonoBehaviour
     {
         gameObject.SetActive(false);
         OnPanelClosed?.Invoke();
+    }
+
+    IEnumerator DisableOnStart()
+    {
+        yield return 0; //Wait for initialization
+
+        gameObject.SetActive(false);
     }
 }

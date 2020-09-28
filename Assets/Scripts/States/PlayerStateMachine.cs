@@ -6,6 +6,7 @@ using UnityEngine;
 public class PlayerStateMachine : MonoBehaviour
 {
     private PlayerState currentState;
+    private PlayerState comebackState;
 
     private static PlayerStateMachine _instance;
     public static PlayerStateMachine Instance { get { return _instance; } }
@@ -34,18 +35,18 @@ public class PlayerStateMachine : MonoBehaviour
             typeToStateInstance.Add(stateType, stateInstance);
         }
 
-        TrySwitchState<DefaultState>();
+        SwitchState<DefaultState>();
     }
 
     private void Update()
     {
         if (Input.GetButtonDown("Cancel"))
         {
-            TrySwitchState<DefaultState>();
+            SwitchState<DefaultState>();
         }
-        else if (Input.GetButtonDown("Inventory") && currentState != typeToStateInstance[typeof(InventoryState)])
+        else if (Input.GetButtonDown("Inventory") && currentState != typeToStateInstance[typeof(UIState)])
         {
-            TrySwitchState<InventoryState>();
+            SwitchState<UIState>();
         }
 
         //Movement should go before current state execution
@@ -58,17 +59,33 @@ public class PlayerStateMachine : MonoBehaviour
         currentState.Execute();
     }
 
+    private void LateUpdate()
+    {
+        currentState.LateExecute();
+    }
+
     public PlayerState GetPlayerStateInstance<T>()
     {
         return typeToStateInstance[typeof(T)];
     }
 
-    public void TrySwitchState<T>(object[] args = null) where T: PlayerState
+    public void SwitchStateTemporary<T>(object[] args = null) where T: PlayerState
     {
-        TrySwitchState(typeof(T), args);    
+        comebackState = currentState;
+        SwitchState<T>();
     }
 
-    public void TrySwitchState(Type type, object[] args = null)
+    public void EndCurrentState()
+    {
+
+    }
+
+    public void SwitchState<T>(object[] args = null) where T: PlayerState
+    {
+        SwitchState(typeof(T), args);    
+    }
+
+    public void SwitchState(Type type, object[] args = null)
     {
         PlayerState proposedState;
         try
@@ -77,15 +94,13 @@ public class PlayerStateMachine : MonoBehaviour
         }
         catch (Exception)
         {
-            Debug.LogError("Unknown state!");
-            return;
+            throw new System.Exception("Unknown state!");
         }
 
         //Current state will be null when first started
         if (currentState != null)
         {
-            if (!currentState.TryEndState())
-                return;
+            currentState.EndState();
 
             if (currentState.AllowMovement && !proposedState.AllowMovement)
             {

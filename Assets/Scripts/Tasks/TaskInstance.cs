@@ -33,7 +33,7 @@ public class TaskInstance
 
         currentSubtaskIndex++;
 
-        if (currentSubtaskIndex <= TaskInformation.SubTasks.Count)
+        if (currentSubtaskIndex < TaskInformation.SubTasks.Count)
         {
             TaskInformation.SubTasks[currentSubtaskIndex].OnSubtaskCompleted += NextSubTask;
             CurrentSubtask.Initialize();

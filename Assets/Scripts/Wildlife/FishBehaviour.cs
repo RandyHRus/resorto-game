@@ -54,7 +54,7 @@ public class FishBehaviour : WildlifeBehaviour
         targetFishingState = stateInstance;
     }
 
-    public void StartFlee()
+    public void TryStartFlee()
     {
         TrySwitchState(FishState.Fleeing, null);
     }
@@ -71,7 +71,7 @@ public class FishBehaviour : WildlifeBehaviour
 
     private bool TrySwitchState(FishState proposedState, object[] args)
     {
-        if (state == FishState.Fleeing)
+        if (state == FishState.Fleeing || state == FishState.Hooked)
         {
             return false;
         }

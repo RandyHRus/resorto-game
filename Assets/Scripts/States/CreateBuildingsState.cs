@@ -46,9 +46,8 @@ public class CreateBuildingsState : PlayerState
         buildingCustomization = (IBuildingCustomization)args[1];
     }
 
-    public override bool TryEndState()
+    public override void EndState()
     {
         indicatorManager.ClearCurrentTiles();
-        return true;
     }
 }

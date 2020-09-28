@@ -15,6 +15,6 @@ public class ToolItemInformation : InventoryItemInformation
 
     public override void ItemSelected()
     {
-        PlayerStateMachine.Instance.TrySwitchState(StateWhenHeld.GetType());
+        PlayerStateMachine.Instance.SwitchState(StateWhenHeld.GetType());
     }
 }

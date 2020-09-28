@@ -75,7 +75,7 @@ public class DefaultState : PlayerState
                             if (dialogueComponent.GetStandardDialogue(out Dialogue dialogue))
                             {
                                 object[] args = new object[] { dialogueComponent.Name, dialogue };
-                                PlayerStateMachine.Instance.TrySwitchState<PlayerTalkingState>(args);
+                                PlayerStateMachine.Instance.SwitchState<PlayerTalkingState>(args);
                             }
                         }
                         break;
@@ -140,9 +140,8 @@ public class DefaultState : PlayerState
         //Nothing needed yet
     }
 
-    public override bool TryEndState()
+    public override void EndState()
     {
         interactIndicatorInstance.SetActive(false);
-        return true;
     }
 }

@@ -97,16 +97,22 @@ public class PlayerTalkingState : PlayerState
         }
     }
 
-    private void EndDialogueAndState()
+    private void EndCurrentDialogue()
     {
         dialogueBox.SetActive(false);
         dialoguePlaying = false;
-        PlayerStateMachine.Instance.TrySwitchState<DefaultState>();
     }
 
-    public override bool TryEndState()
+    private void EndDialogueAndState()
     {
-        return !dialoguePlaying;
+        EndCurrentDialogue();
+        PlayerStateMachine.Instance.SwitchState<DefaultState>();
+    }
+
+    public override void EndState()
+    {
+        if (dialoguePlaying)
+            EndCurrentDialogue();
     }
 
     IEnumerator TypeDialogueNode(DialogueElement element)

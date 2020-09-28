@@ -240,27 +240,31 @@ public class InventoryManager : MonoBehaviour
             ((StorageItemInventorySlot)inventorySlotToUI[SelectedSlot].Slot).ItemChanged -= OnSelectedItemChanged;
         }
 
+        selectedSlotIndex = i;
+        OnSelectedItemChanged();
+
         if (i == -1)
         {
             return;
         }
 
-        if (i >= totalSlotCount || i < 0) {
-            Debug.LogError("Invalid item slot");
-            return;
+        if (i >= totalSlotCount || i < 0)
+        {
+            throw new System.Exception("Invalid item slot");
         }
 
         StorageItemInventorySlot slotInfo = inventory.GetStorageSlotInformation(i);
         inventorySlotToUI[slotInfo].StartEnlarge();
-        selectedSlotIndex = i;
         slotInfo.ItemChanged += OnSelectedItemChanged;
-        OnSelectedItemChanged();
     }
 
     public void OnSelectedItemChanged()
     {
+        if (SelectedSlot == null)
+            return;
+
         if (SelectedSlot.Item == null)
-            PlayerStateMachine.Instance.TrySwitchState<DefaultState>();
+            PlayerStateMachine.Instance.SwitchState<DefaultState>();
         else
             SelectedSlot.Item.ItemInformation.ItemSelected();
     }

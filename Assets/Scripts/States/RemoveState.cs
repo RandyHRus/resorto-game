@@ -70,9 +70,8 @@ public class RemoveState : PlayerState
         }
     }
 
-    public override bool TryEndState()
+    public override void EndState()
     {
         indicatorManager.Toggle(false);
-        return true;
     }
 }

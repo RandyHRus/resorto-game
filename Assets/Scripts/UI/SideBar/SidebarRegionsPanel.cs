@@ -11,11 +11,12 @@ public class SidebarRegionsPanel : SidebarPanel
 
     void Start()
     {
-        regionsPanel = new SelectionPanel<RegionSelection>(transform.Find("RegionSelection").gameObject);
-    }
+        foreach (Transform t in transform.GetComponentsInChildren<Transform>())
+        {
+            if (t.tag == "List Field")
+                regionsPanel = new SelectionPanel<RegionSelection>(t.gameObject);
+        }
 
-    void Update()
-    {
         foreach (RegionInformation i in regions)
         {
             regionsPanel.InsertListComponent(new RegionSelection(i, regionsPanel));

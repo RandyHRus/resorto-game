@@ -8,6 +8,7 @@ public class TerrainState : PlayerState
     [SerializeField] private Sprite landIndicatorSprite = null;
     [SerializeField] private Sprite sandIndicatorSprite = null;
     private bool coroutineRunning = false;
+    private Coroutine currentCoroutine;
 
     private TilesIndicatorManager indicatorManager;
 
@@ -22,10 +23,12 @@ public class TerrainState : PlayerState
         indicatorManager = new TilesIndicatorManager();
     }
 
-    public override bool TryEndState()
+    public override void EndState()
     {
+        if (coroutineRunning)
+            Coroutines.Instance.StopCoroutine(currentCoroutine);
+
         indicatorManager.ClearCurrentTiles();
-        return !coroutineRunning;
     }
 
     public override void Execute()
@@ -50,12 +53,12 @@ public class TerrainState : PlayerState
                 {
                     if (layerNumber == 0)
                     {
-                        Coroutines.Instance.StartCoroutine(RemoveSand());
+                        currentCoroutine = Coroutines.Instance.StartCoroutine(RemoveSand());
                         return;
                     }
                     else if (layerNumber >= 1)
                     {
-                        Coroutines.Instance.StartCoroutine(RemoveLand(layerNumber));
+                        currentCoroutine = Coroutines.Instance.StartCoroutine(RemoveLand(layerNumber));
                         return;
                     }
                 }
@@ -73,12 +76,12 @@ public class TerrainState : PlayerState
                 {
                     if (layerNumber == 0)
                     {
-                        Coroutines.Instance.StartCoroutine(PlaceSand());
+                        currentCoroutine = Coroutines.Instance.StartCoroutine(PlaceSand());
                         return;
                     }
                     else if (layerNumber >= 1)
                     {
-                        Coroutines.Instance.StartCoroutine(PlaceLand(layerNumber));
+                        currentCoroutine = Coroutines.Instance.StartCoroutine(PlaceLand(layerNumber));
                         return;
                     }
                 }

@@ -61,6 +61,6 @@ public class ChestStorage : MonoBehaviour, ITileObjectFunctions
             return;
 
         ui = new StorageUI(storage);
-        PlayerStateMachine.Instance.TrySwitchState<InventoryState>(new object[] { ui });
+        PlayerStateMachine.Instance.SwitchState<UIState>(new object[] { ui });
     }
 }

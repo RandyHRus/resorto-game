@@ -9,6 +9,7 @@ public class CreateFlooringState : PlayerState
     private FlooringVariantBase flooringVariant;
     private FlooringRotation rotation;
     private bool coroutineRunning = false;
+    private Coroutine floorCoroutine;
 
     private TilesIndicatorManager indicatorManager;
 
@@ -42,7 +43,7 @@ public class CreateFlooringState : PlayerState
         if (floorPlaceable && CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
         {
             indicatorManager.ClearCurrentTiles();
-            Coroutines.Instance.StartCoroutine(PlaceFloor());
+            floorCoroutine = Coroutines.Instance.StartCoroutine(PlaceFloor());
         }
     }
 
@@ -138,9 +139,14 @@ public class CreateFlooringState : PlayerState
         indicatorManager = new TilesIndicatorManager();
     }
 
-    public override bool TryEndState()
+    public override void EndState()
     {
         indicatorManager.ClearCurrentTiles();
-        return !coroutineRunning;
+
+        if (coroutineRunning)
+        {
+            Coroutines.Instance.StopCoroutine(floorCoroutine);
+            coroutineRunning = false;
+        }
     }
 }

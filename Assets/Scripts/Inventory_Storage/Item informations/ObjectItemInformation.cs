@@ -16,6 +16,6 @@ public class ObjectItemInformation : InventoryItemInformation
 
     public override void ItemSelected()
     {
-        PlayerStateMachine.Instance.TrySwitchState<CreateObjectsState>(new object[] { objectToPlace });
+        PlayerStateMachine.Instance.SwitchState<CreateObjectsState>(new object[] { objectToPlace });
     }
 }

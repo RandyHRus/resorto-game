@@ -7,8 +7,6 @@ public class StatisticComponentUI : ListComponentUI
     private OutlinedText valueText;
     Statistic statistic;
 
-    public override int ObjectHeight => 30;
-
     public StatisticComponentUI(Statistic statistic, Transform parent): base(ResourceManager.Instance.StatisticComponentUI, parent)
     {
         this.statistic = statistic;

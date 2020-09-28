@@ -13,7 +13,9 @@ public abstract class PlayerState : ScriptableObject
 
     public abstract void StartState(object[] args);
 
-    public abstract bool TryEndState();
+    public abstract void EndState();
 
     public abstract void Execute();
+
+    public virtual void LateExecute() { }
 }

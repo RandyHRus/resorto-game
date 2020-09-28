@@ -16,7 +16,7 @@ public class EatState : PlayerState
         throw new System.NotImplementedException();
     }
 
-    public override bool TryEndState()
+    public override void EndState()
     {
         throw new System.NotImplementedException();
     }

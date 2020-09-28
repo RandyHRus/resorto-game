@@ -12,6 +12,7 @@ public class CreateRegionState : PlayerState
 
     private RegionInformation selectedRegion;
     private bool coroutineRunning = false;
+    private Coroutine currentCoroutine;
 
     private TilesIndicatorManager indicatorManager;
 
@@ -33,18 +34,18 @@ public class CreateRegionState : PlayerState
         indicatorManager = new TilesIndicatorManager();
     }
 
-    public override bool TryEndState()
+    public override void EndState()
     {
         if (coroutineRunning)
         {
-            return false;
+            Coroutines.Instance.StopCoroutine(currentCoroutine);
+            coroutineRunning = false;
         }
-        else
-        {
-            indicatorManager.ClearCurrentTiles();
-            ShowRegions(false);
-            return true;
-        }
+
+
+
+        indicatorManager.ClearCurrentTiles();
+        ShowRegions(false);
     }
 
     public override void Execute()
@@ -80,7 +81,7 @@ public class CreateRegionState : PlayerState
         if (regionPlaceable && CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
         {
             indicatorManager.ClearCurrentTiles();
-            Coroutines.Instance.StartCoroutine(PlaceRegion(selectedRegion));
+            currentCoroutine = Coroutines.Instance.StartCoroutine(PlaceRegion(selectedRegion));
         }
     }
 

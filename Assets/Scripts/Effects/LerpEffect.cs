@@ -63,4 +63,22 @@ public class LerpEffect
 
         endCallback?.Invoke();
     }
+
+    public static IEnumerator LerpVectorTime(Vector2 startPos, Vector2 targetPos, float time, ProgressVector valueChangedCallback, EndDelegate endCallback)
+    {
+        float timer = 0;
+
+        while (timer < time)
+        {
+            timer += Time.deltaTime;
+            if (timer > time)
+                timer = time;
+
+            valueChangedCallback(Vector2.Lerp(startPos, targetPos, timer / time));
+
+            yield return 0;
+        }
+
+        endCallback?.Invoke();
+    }
 }

@@ -14,6 +14,6 @@ public class FoodItemInformation : InventoryItemInformation
 
     public override void ItemSelected()
     {
-        PlayerStateMachine.Instance.TrySwitchState<EatState>(new object[] { this });
+        PlayerStateMachine.Instance.SwitchState<EatState>(new object[] { this });
     }
 }

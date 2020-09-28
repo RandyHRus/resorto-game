@@ -45,9 +45,8 @@ public class CreateStairsState : PlayerState
         indicatorManager = new TilesIndicatorManager();
     }
 
-    public override bool TryEndState()
+    public override void EndState()
     {
         indicatorManager.ClearCurrentTiles();
-        return true;
     }
 }

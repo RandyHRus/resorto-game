@@ -29,6 +29,6 @@ public class RegionSelection : ListComponentUI
     public override void OnClick()
     {
         base.OnClick();
-        PlayerStateMachine.Instance.TrySwitchState<CreateRegionState>(new object[] { info });
+        PlayerStateMachine.Instance.SwitchState<CreateRegionState>(new object[] { info });
     }
 }
