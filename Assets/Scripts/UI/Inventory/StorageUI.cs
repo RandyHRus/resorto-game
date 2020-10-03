@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StorageUI : UIObject
+public class StorageUI : InventoryExternalUI
 {
     private static int edgesPadding = 10;
     private static int slotPadding = 44;
@@ -52,7 +52,7 @@ public class StorageUI : UIObject
                 //To make sure event unsubscribed
                 slot.Destroy();
             }
-            Object.Destroy(ObjectInScene);
+            Destroy();
         }
         else
         {

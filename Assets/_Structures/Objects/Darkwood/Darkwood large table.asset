@@ -25,11 +25,11 @@ MonoBehaviour:
   frontSprite:
     sprite: {fileID: 4855592963271061882, guid: 3061e288efac0f444bcef049fce37b89,
       type: 3}
-    size: {x: 2, y: 4}
+    size: {x: 4, y: 2}
   rightSprite:
     sprite: {fileID: 8650862501231152914, guid: 3061e288efac0f444bcef049fce37b89,
       type: 3}
-    size: {x: 4, y: 2}
+    size: {x: 2, y: 4}
   backSprite:
     sprite: {fileID: 0}
     size: {x: 0, y: 0}

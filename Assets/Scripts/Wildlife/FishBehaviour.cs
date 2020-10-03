@@ -6,8 +6,6 @@ public class FishBehaviour : WildlifeBehaviour
 {
     private FishState state = FishState.Idle;
 
-    private FishingState targetFishingState; 
-
     public override float TargetAlpha { get { return 0.6f; } }
 
     private float fleeingDistance = 0.7f; //Fish will flee if target (bobber) lands this close (or closer) to it
@@ -29,7 +27,10 @@ public class FishBehaviour : WildlifeBehaviour
     private float hookedTuggingSize = 0.07f;
     private float hookedTuggingSpeed = 8f;
 
-    public void SetTarget(FishingState stateInstance, Vector2 target) //Ex. bobber location changed
+    public delegate void Hooked(FishBehaviour fish);
+    public event Hooked OnHooked;
+
+    public void SetTarget(Vector2 target) //Ex. bobber location changed
     {
         if (state != FishState.Targeting)
         {
@@ -50,18 +51,11 @@ public class FishBehaviour : WildlifeBehaviour
                 }
             }
         }
-
-        targetFishingState = stateInstance;
     }
 
     public void TryStartFlee()
     {
         TrySwitchState(FishState.Fleeing, null);
-    }
-
-    public void OnHooked()
-    {
-        TrySwitchState(FishState.Hooked, null);
     }
 
     public override void Initialize()
@@ -71,7 +65,7 @@ public class FishBehaviour : WildlifeBehaviour
 
     private bool TrySwitchState(FishState proposedState, object[] args)
     {
-        if (state == FishState.Fleeing || state == FishState.Hooked)
+        if (state == FishState.Fleeing)
         {
             return false;
         }
@@ -99,9 +93,9 @@ public class FishBehaviour : WildlifeBehaviour
                 }
             case (FishState.Hooked):
                 {
-                    targetFishingState.OnFishBite(gameObject);
+                    OnHooked?.Invoke(this);
                     Animator.speed = 1.3f;
-                    StartCoroutine(Hooked());
+                    StartCoroutine(HookedEnum());
                     break;
                 }
             default:
@@ -275,7 +269,7 @@ public class FishBehaviour : WildlifeBehaviour
         }
     }
 
-    IEnumerator Hooked()
+    IEnumerator HookedEnum()
     {
         Vector2 forward = (-Transform.right);
         Vector2 defaultPosition = Transform.position;

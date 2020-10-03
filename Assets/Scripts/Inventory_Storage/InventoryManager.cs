@@ -39,8 +39,6 @@ public class InventoryManager : MonoBehaviour
 
     private List<Tuple<InventorySlotUI, bool>> uiToClose = new List<Tuple<InventorySlotUI, bool>>();
 
-    private UIObject externalUI;
-
     private ItemInformationDisplayUI itemInformationDisplayUI;
 
     private readonly int slotStartY = -40;
@@ -66,6 +64,9 @@ public class InventoryManager : MonoBehaviour
     public delegate void ItemGained(InventoryItemInstance item, int count);
     public static event ItemGained OnItemGained;
 
+    public delegate void InventoryClosed();
+    public static event InventoryClosed OnInventoryClosed;
+
     private static InventoryManager _instance;
     public static InventoryManager Instance { get { return _instance; } }
     private void Awake()
@@ -81,6 +82,8 @@ public class InventoryManager : MonoBehaviour
                 _instance = this;
             }
         }
+
+        Sidebar.OnSidebarOpened += ShowInventory;
     }
 
     private void Start()
@@ -165,7 +168,7 @@ public class InventoryManager : MonoBehaviour
             }
         }
 
-        HideInventory();
+        TryHideInventory();
         GainStartItems();
     }
 
@@ -292,12 +295,9 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    public void ShowInventory(UIObject externalUI = null)
+    public void ShowInventory()
     {
-        this.externalUI = externalUI;
-        externalUI?.Show(true);
-
-        IsInventoryOpen = true; ;
+        IsInventoryOpen = true;
 
         if (SelectedSlot != null)
             inventorySlotToUI[SelectedSlot].StartShrink();
@@ -311,8 +311,11 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    public void HideInventory()
+    public void TryHideInventory()
     {
+        if (Sidebar.Instance.CurrentPanel != null)
+            return;
+
         IsInventoryOpen = false;
 
         foreach (Tuple<InventorySlotUI, bool> pair in uiToClose)
@@ -327,7 +330,8 @@ public class InventoryManager : MonoBehaviour
         }
 
         itemInformationDisplayUI.Show(false);
-        externalUI?.Show(false);
+
+        OnInventoryClosed?.Invoke();
     }
 
     public void DropDraggingItem()
@@ -343,11 +347,6 @@ public class InventoryManager : MonoBehaviour
     {
         float xSpeed = PlayerDirection.Instance.VisualDirection.DirectionVector.x * UnityEngine.Random.Range(minDropXSpeed, maxDropXSpeed);
         DropItems.DropItem(playerTransform.position, itemDropHeight, item, count, xSpeed);
-    }
-
-    public void SetExternalUI(StorageUI externalUI)
-    {
-        this.externalUI = externalUI;
     }
 
     public void DisplaySlotInformation(InventorySlotUI slotUI)

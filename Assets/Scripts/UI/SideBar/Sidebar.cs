@@ -12,6 +12,12 @@ public class Sidebar : MonoBehaviour
 
     public SidebarPanel CurrentPanel { get; private set; }
 
+    [EnumNamedArray(typeof(SidebarTab)), SerializeField] private SidebarPanel[] sidebarPanels = null;
+    private Dictionary<SidebarTab, SidebarPanel> sidebarPanelDict = new Dictionary<SidebarTab, SidebarPanel>();
+
+    public delegate void SidebarOpenedDelegate();
+    public static event SidebarOpenedDelegate OnSidebarOpened; //Only should run when sidebar first opens, not when switched
+
     private static Sidebar _instance;
     public static Sidebar Instance { get { return _instance; } }
     private void Awake()
@@ -28,9 +34,24 @@ public class Sidebar : MonoBehaviour
         rectTransform = GetComponent<RectTransform>();
         defaultPosition = rectTransform.anchoredPosition;
         openPosition = defaultPosition - new Vector2(rectTransform.sizeDelta.x, 0);
+
+        for (int i = 0; i < sidebarPanels.Length; i++)
+        {
+            sidebarPanelDict.Add((SidebarTab)i, sidebarPanels[i]);
+        }
     }
 
-    public void OpenSideBar(SidebarPanel panel)
+    public SidebarPanel GetPanel(SidebarTab tab)
+    {
+        return sidebarPanelDict[tab];
+    }
+
+    public void OpenSidebar(SidebarTab tab)
+    {
+        OpenSidebar(sidebarPanelDict[tab]);
+    }
+
+    public void OpenSidebar(SidebarPanel panel)
     {
         void Open()
         {
@@ -81,6 +102,7 @@ public class Sidebar : MonoBehaviour
             else
             {
                 CurrentPanel = panel;
+                OnSidebarOpened?.Invoke();
                 Open();
             }
         }
@@ -92,6 +114,9 @@ public class Sidebar : MonoBehaviour
         {
             rectTransform.anchoredPosition = new Vector2(position, defaultPosition.y);
         }
+
+        if (CurrentPanel == null)
+            return;
 
         SidebarPanel oldPanel = CurrentPanel;
         CurrentPanel = null;
@@ -106,7 +131,9 @@ public class Sidebar : MonoBehaviour
 
 public enum SidebarTab
 {
-    Create,
+    Build,
+    Terrain,
+    Region,
     Tasks,
     Statistics,
     Tourists,

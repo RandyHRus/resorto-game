@@ -5,6 +5,7 @@ using UnityEngine;
 public class SidebarTouristsPanel : SidebarPanel
 {
     private SelectionPanel<TouristInformationComponentUI> touristsComponentsPanel;
+    private Dictionary<TouristInstance, TouristInformationComponentUI> touristToComponent = new Dictionary<TouristInstance, TouristInformationComponentUI>();
 
     public class TouristInformationComponentUI: ListComponentUI
     {
@@ -48,10 +49,17 @@ public class SidebarTouristsPanel : SidebarPanel
 
         NPCManager.OnTouristAdded += AddTouristComponent;
     }
+
+    public void SelectTourist(TouristInstance instance)
+    {
+        TouristInformationComponentUI component = touristToComponent[instance];
+        component.OnClick();
+    }
     
     private void AddTouristComponent(TouristInstance instance)
     {
         TouristInformationComponentUI component = new TouristInformationComponentUI(instance, touristsComponentsPanel.ObjectTransform);
         touristsComponentsPanel.InsertListComponent(component);
+        touristToComponent.Add(instance, component);
     }
 }

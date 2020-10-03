@@ -6,7 +6,8 @@ using UnityEngine.EventSystems;
 
 public class SidebarTabSelectionUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [SerializeField] private SidebarPanel targetPanel = null;
+    [SerializeField] private SidebarTab targetPanelTab = 0;
+    private SidebarPanel targetPanel;
 
     private RectTransform rectTransform;
     private Vector2 defaultPosition;
@@ -21,14 +22,18 @@ public class SidebarTabSelectionUI : MonoBehaviour, IPointerEnterHandler, IPoint
         slideOutTargetPosition = defaultPosition - new Vector2(80, 0);
 
         GetComponent<Button>().onClick.AddListener(OnButtonClick);
+    }
 
+    private void Start()
+    {
+        targetPanel = Sidebar.Instance.GetPanel(targetPanelTab);
         targetPanel.OnPanelClosed += SlideIn;
         targetPanel.OnPanelOpen += SlideOut;
     }
 
     private void OnButtonClick()
     {
-        Sidebar.Instance.OpenSideBar(targetPanel);
+        Sidebar.Instance.OpenSidebar(targetPanelTab);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

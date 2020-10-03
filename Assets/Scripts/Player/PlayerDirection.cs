@@ -33,7 +33,7 @@ public class PlayerDirection : MonoBehaviour
         PlayerMovement.PlayerMoved += (Vector2 pos, bool slow, Vector2 directionVector) => VisualDirection.SetDirectionOnMove(directionVector);
     }
 
-    private void Update()
+    public void Execute()
     {
         //Point to direction of mouse on mouseclick
         if (CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))

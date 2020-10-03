@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Fishing rod
   itemIcon: {fileID: 21300000, guid: 7894471929a754b43aee18bfa8ef1992, type: 3}
-  tag: 1
-  stateWhenHeld: {fileID: 11400000, guid: d1faf40f516258d4fb27a0067d638bac, type: 2}
+  stateWhenHeld: {fileID: 11400000, guid: 88e8498a097ce2349a2c41a79040a417, type: 2}
+  stackable: 0

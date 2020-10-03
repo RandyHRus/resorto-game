@@ -71,6 +71,9 @@ public class ResourceManager : MonoBehaviour
     [SerializeField] private GameObject dialogueBoxInstance = null;
     public GameObject DialogueBoxInstance => dialogueBoxInstance;
 
+    [SerializeField] private Transform player = null;
+    public Transform Player => player;
+
     [Header("Colors")]
 
     [SerializeField] private Color32 red = Color.white;
@@ -102,6 +105,12 @@ public class ResourceManager : MonoBehaviour
 
     [SerializeField] private Sprite boxOutline = null;
     public Sprite BoxOutline => boxOutline;
+
+    [SerializeField] private GameObject fishingLinePrefab = null;
+    public GameObject FishingLinePrefab => fishingLinePrefab;
+
+    [SerializeField] private GameObject caughtFishPrefab = null;
+    public GameObject CaughtFishPrefab => caughtFishPrefab;
 
     private static ResourceManager _instance;
     public static ResourceManager Instance { get { return _instance; } }

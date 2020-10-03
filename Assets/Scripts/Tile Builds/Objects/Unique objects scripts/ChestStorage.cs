@@ -57,10 +57,16 @@ public class ChestStorage : MonoBehaviour, ITileObjectFunctions
 
     private void OpenUI()
     {
-        if (InventoryManager.Instance.IsInventoryOpen)
-            return;
+        if (ui == null)
+        {
+            ui = new StorageUI(storage);
+            ui.OnDestroy += UIDestroyed;
+        }
+    }
 
-        ui = new StorageUI(storage);
-        PlayerStateMachine.Instance.SwitchState<UIState>(new object[] { ui });
+    private void UIDestroyed()
+    {
+        ui.OnDestroy -= UIDestroyed;
+        ui = null;
     }
 }
