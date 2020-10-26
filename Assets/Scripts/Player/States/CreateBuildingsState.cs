@@ -17,13 +17,13 @@ public class CreateBuildingsState : PlayerState
 
     public override void Execute()
     {
-        Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
-        bool buildingPlaceable = BuildingsManager.BuildingPlaceable(mouseTilePosition, buildingVariant, out HashSet<Vector3Int> tilesToOccupy);
+        Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
+        bool buildingPlaceable = BuildingsManager.BuildingPlaceable(mouseTilePosition, buildingVariant, out HashSet<Vector2Int> tilesToOccupy);
 
         //Indicator things TODO: CHANGE
         {
             indicatorManager.SwapCurrentTiles(tilesToOccupy);
-            foreach (Vector3Int pos in tilesToOccupy)
+            foreach (Vector2Int pos in tilesToOccupy)
             {
                 indicatorManager.SetColor(pos, buildingPlaceable ? ResourceManager.Instance.Green : ResourceManager.Instance.Red);
                 indicatorManager.SetSprite(pos, indicatorSprite);

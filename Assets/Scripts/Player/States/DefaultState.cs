@@ -6,7 +6,6 @@ using UnityEngine.UI;
 [CreateAssetMenu(menuName = "States/Default")]
 public class DefaultState : PlayerState
 {
-    private GameObject player = null;
     private Transform playerTransform;
 
     [SerializeField] private Sprite talkIndicatorSprite = null, entryIndicatorSprite = null;
@@ -30,8 +29,7 @@ public class DefaultState : PlayerState
         interactIndicatorImage = interactIndicatorInstance.GetComponent<Image>();
         interactIndicatorInstance.SetActive(false);
 
-        player = GameObject.FindGameObjectWithTag("Player");
-        playerTransform = player.transform;
+        playerTransform = ResourceManager.Instance.Player;
     }
 
     public override void Execute()
@@ -70,13 +68,11 @@ public class DefaultState : PlayerState
 
                         if (Input.GetButtonDown("Interact"))
                         {
-                            INPCDialogue dialogueComponent = tMin.GetComponent<INPCDialogue>();
+                            NPCMonoBehaviour npc = tMin.GetComponent<NPCMonoBehaviour>();
 
-                            if (dialogueComponent.GetStandardDialogue(out Dialogue dialogue))
-                            {
-                                object[] args = new object[] { dialogueComponent.Name, dialogue };
-                                PlayerStateMachine.Instance.SwitchState<PlayerTalkingState>(args);
-                            }
+                            Dialogue dialogue = npc.GetDialogue();
+                            object[] args = new object[] { npc.NpcInformation.NpcName, dialogue };
+                            PlayerStateMachineManager.Instance.SwitchState<PlayerTalkingState>(args);
                         }
                         break;
 
@@ -119,7 +115,7 @@ public class DefaultState : PlayerState
                     //Interact with tile objects
                     if (nonTileClickableFound == false)
                     {
-                        Vector3Int mouseTilePos = TileInformationManager.Instance.GetMouseTile();
+                        Vector2Int mouseTilePos = TileInformationManager.Instance.GetMouseTile();
                         TileInformation mouseTileInfo = TileInformationManager.Instance.GetTileInformation(mouseTilePos);
                         if (mouseTileInfo != null)
                         {

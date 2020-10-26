@@ -6,7 +6,6 @@ using UnityEngine;
 public class ToolItemInformation : InventoryItemInformation
 {
     [SerializeField] private PlayerState stateWhenHeld = null;
-    public PlayerState StateWhenHeld => stateWhenHeld;
 
     public override ItemTag Tag { get { return ItemTag.Tool; } }
 
@@ -15,6 +14,6 @@ public class ToolItemInformation : InventoryItemInformation
 
     public override void ItemSelected()
     {
-        PlayerStateMachine.Instance.SwitchState(StateWhenHeld.GetType());
+        PlayerStateMachineManager.Instance.SwitchState(stateWhenHeld.GetType());
     }
 }

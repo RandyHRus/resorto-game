@@ -39,7 +39,7 @@ public class ParrotBehaviour : WildlifeBehaviour, INonTileClickable
             { typeof(FleeingState),      new FleeingState(this) }
         };
 
-        playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+        playerTransform = ResourceManager.Instance.Player;
 
         TrySwitchState<IdleOnGroundState>(null);
     }

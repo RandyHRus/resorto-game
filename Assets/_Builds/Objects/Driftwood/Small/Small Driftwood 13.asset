@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fdb4b6060ef40e4aab2f277e4627212, type: 3}
+  m_Name: Small Driftwood 13
+  m_EditorClassIdentifier: 
+  _name: Small driftwood
+  icon: {fileID: -408062360876767006, guid: bfb246e146d725245ae6fd638495a07f, type: 3}
+  useDefaultPrefab: 1
+  prefab: {fileID: 0}
+  collision: 0
+  objectsCanBePlacedOnTop: 0
+  onTopOffsetInPixels: 0
+  type: 1
+  placeableLocations: 14
+  hasSprite: 1
+  frontSprite:
+    sprite: {fileID: -408062360876767006, guid: bfb246e146d725245ae6fd638495a07f,
+      type: 3}
+    size: {x: 1, y: 1}
+  rightSprite:
+    sprite: {fileID: 0}
+    size: {x: 0, y: 0}
+  backSprite:
+    sprite: {fileID: 0}
+    size: {x: 0, y: 0}
+  leftSprite:
+    sprite: {fileID: 0}
+    size: {x: 0, y: 0}
+  sizeWhenNoSprite: {x: 0, y: 0}
+  dropItem: {fileID: 11400000, guid: 380714a5678dedb4da0c1adaa9e9fa19, type: 2}
+  transparencyCapableYSize: 0

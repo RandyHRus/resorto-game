@@ -1,73 +1,244 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CharacterCustomizationLoader : MonoBehaviour
 {
-    [SerializeField] private SpriteRenderer eyebrowRenderer = null;
+    [SerializeField] private bool useImages = false;
+    [ConditionalHide("useImages", false, true), SerializeField] private CharacterSpriteRenderers spriteRenderers = null;
+    [ConditionalHide("useImages", false, false), SerializeField] private CharacterImageRenderers images = null;
 
-    [SerializeField] private SpriteRenderer hairFrontRenderer = null;
-    [SerializeField] private SpriteRenderer hairBackRenderer = null;
+    private SpriteRendererOrImage renderers;
+    private Animator animator;
 
-    [SerializeField] private SpriteRenderer[] skinColorRenderers = null;
+    public abstract class SpriteRendererOrImage
+    {
+        public abstract Spritable EyebrowRenderer { get; }
+        public abstract Spritable HairFrontRenderer { get; }
+        public abstract Spritable HairBackRenderer { get; }
+        public abstract Spritable[] SkinColorRenderers { get; }
+        public abstract Spritable BraRenderer { get; }
+        public abstract Spritable ShirtFrontRenderer1 { get; }
+        public abstract Spritable ShirtFrontRenderer2 { get; }
+        public abstract Spritable ShirtBackRenderer1 { get; }
+        public abstract Spritable ShirtBackRenderer2 { get; }
+        public abstract Spritable HatFrontRenderer1 { get; }
+        public abstract Spritable HatFrontRenderer2 { get; }
+        public abstract Spritable HatBackRenderer1 { get; }
+        public abstract Spritable HatBackRenderer2 { get; }
+        public abstract Spritable[] PantsRenderers { get; }
+        public abstract Spritable[] EyeRenderers { get; }
+    }
 
-    [SerializeField] private SpriteRenderer braRenderer = null;
+    [System.Serializable]
+    public class CharacterSpriteRenderers : SpriteRendererOrImage
+    {
+        [SerializeField] private SpritableSpriteRenderer eyebrowRenderer = null;
+        public override Spritable EyebrowRenderer => eyebrowRenderer;
 
-    [SerializeField] private SpriteRenderer shirtFrontRenderer1 = null;
-    [SerializeField] private SpriteRenderer shirtFrontRenderer2 = null;
-    [SerializeField] private SpriteRenderer shirtBackRenderer1 = null;
-    [SerializeField] private SpriteRenderer shirtBackRenderer2 = null;
+        [SerializeField] private SpritableSpriteRenderer hairFrontRenderer = null;
+        public override Spritable HairFrontRenderer => hairFrontRenderer;
 
-    [SerializeField] private SpriteRenderer hatFrontRenderer1 = null;
-    [SerializeField] private SpriteRenderer hatFrontRenderer2 = null;
-    [SerializeField] private SpriteRenderer hatBackRenderer1 = null;
-    [SerializeField] private SpriteRenderer hatBackRenderer2 = null;
+        [SerializeField] private SpritableSpriteRenderer hairBackRenderer = null;
+        public override Spritable HairBackRenderer => hairBackRenderer;
 
-    [SerializeField] private SpriteRenderer[] pantsRenderers = null;
+        [SerializeField] private SpritableSpriteRenderer[] skinColorRenderers = null;
+        public override Spritable[] SkinColorRenderers => skinColorRenderers;
 
-    [SerializeField] private SpriteRenderer[] eyeRenderers = null;
+        [SerializeField] private SpritableSpriteRenderer braRenderer = null;
+        public override Spritable BraRenderer => braRenderer;
+
+        [SerializeField] private SpritableSpriteRenderer shirtFrontRenderer1 = null;
+        public override Spritable ShirtFrontRenderer1 => shirtFrontRenderer1;
+
+        [SerializeField] private SpritableSpriteRenderer shirtFrontRenderer2 = null;
+        public override Spritable ShirtFrontRenderer2 => shirtFrontRenderer2;
+
+        [SerializeField] private SpritableSpriteRenderer shirtBackRenderer1 = null;
+        public override Spritable ShirtBackRenderer1 => shirtBackRenderer1;
+
+        [SerializeField] private SpritableSpriteRenderer shirtBackRenderer2 = null;
+        public override Spritable ShirtBackRenderer2 => shirtBackRenderer2;
+
+        [SerializeField] private SpritableSpriteRenderer hatFrontRenderer1 = null;
+        public override Spritable HatFrontRenderer1 => hatFrontRenderer1;
+        [SerializeField] private SpritableSpriteRenderer hatFrontRenderer2 = null;
+        public override Spritable HatFrontRenderer2 => hatFrontRenderer2;
+        [SerializeField] private SpritableSpriteRenderer hatBackRenderer1 = null;
+        public override Spritable HatBackRenderer1 => hatBackRenderer1;
+        [SerializeField] private SpritableSpriteRenderer hatBackRenderer2 = null;
+        public override Spritable HatBackRenderer2 => hatBackRenderer2;
+
+        [SerializeField] private SpritableSpriteRenderer[] pantsRenderers = null;
+        public override Spritable[] PantsRenderers => pantsRenderers;
+
+        [SerializeField] private SpritableSpriteRenderer[] eyeRenderers = null;
+        public override Spritable[] EyeRenderers => eyeRenderers;
+    }
+
+
+    [System.Serializable]
+    public class CharacterImageRenderers: SpriteRendererOrImage
+    {
+        [SerializeField] private SpritableImage eyebrowRenderer = null;
+        public override Spritable EyebrowRenderer => eyebrowRenderer;
+
+        [SerializeField] private SpritableImage hairFrontRenderer = null;
+        public override Spritable HairFrontRenderer => hairFrontRenderer;
+
+        [SerializeField] private SpritableImage hairBackRenderer = null;
+        public override Spritable HairBackRenderer => hairBackRenderer;
+
+        [SerializeField] private SpritableImage[] skinColorRenderers = null;
+        public override Spritable[] SkinColorRenderers => skinColorRenderers;
+
+        [SerializeField] private SpritableImage braRenderer = null;
+        public override Spritable BraRenderer => braRenderer;
+
+        [SerializeField] private SpritableImage shirtFrontRenderer1 = null;
+        public override Spritable ShirtFrontRenderer1 => shirtFrontRenderer1;
+
+        [SerializeField] private SpritableImage shirtFrontRenderer2 = null;
+        public override Spritable ShirtFrontRenderer2 => shirtFrontRenderer2;
+
+        [SerializeField] private SpritableImage shirtBackRenderer1 = null;
+        public override Spritable ShirtBackRenderer1 => shirtBackRenderer1;
+
+        [SerializeField] private SpritableImage shirtBackRenderer2 = null;
+        public override Spritable ShirtBackRenderer2 => shirtBackRenderer2;
+
+        [SerializeField] private SpritableImage hatFrontRenderer1 = null;
+        public override Spritable HatFrontRenderer1 => hatFrontRenderer1;
+        [SerializeField] private SpritableImage hatFrontRenderer2 = null;
+        public override Spritable HatFrontRenderer2 => hatFrontRenderer2;
+        [SerializeField] private SpritableImage hatBackRenderer1 = null;
+        public override Spritable HatBackRenderer1 => hatBackRenderer1;
+        [SerializeField] private SpritableImage hatBackRenderer2 = null;
+        public override Spritable HatBackRenderer2 => hatBackRenderer2;
+
+        [SerializeField] private SpritableImage[] pantsRenderers = null;
+        public override Spritable[] PantsRenderers => pantsRenderers;
+
+        [SerializeField] private SpritableImage[] eyeRenderers = null;
+        public override Spritable[] EyeRenderers => eyeRenderers;
+    }
+
+    public abstract class Spritable
+    {
+        public abstract void SetColor(Color32 color);
+        public abstract void SetSprite(Sprite sprite);
+        public abstract void Enable(bool enable);
+    }
+
+    [System.Serializable]
+    public class Spritable<T1> : Spritable
+    {
+        [SerializeField] private T1 spritable = default;
+
+        public override void SetColor(Color32 color)
+        {
+            if (spritable is SpriteRenderer renderer)
+            {
+                renderer.color = color;
+            }
+            else if (spritable is Image image)
+            {
+                image.color = color;
+            }
+            else
+            {
+                throw new System.Exception("Not a spriteRenderer or image");
+            }
+        }
+
+        public override void SetSprite(Sprite sprite)
+        {
+            if (spritable is SpriteRenderer renderer)
+            {
+                renderer.sprite = sprite;
+            }
+            else if (spritable is Image image)
+            {
+                image.sprite = sprite;
+            }
+            else
+            {
+                throw new System.Exception("Not a spriteRenderer or image");
+            }
+        }
+
+        public override void Enable(bool enable)
+        {
+            if (spritable is SpriteRenderer renderer)
+            {
+                renderer.enabled = enable;
+            }
+            else if (spritable is Image image)
+            {
+                image.enabled = enable;
+            }
+            else
+            {
+                throw new System.Exception("Not a spriteRenderer or image");
+            }
+        }
+    }
+
+    [System.Serializable] public class SpritableImage : Spritable<Image> { }
+    [System.Serializable] public class SpritableSpriteRenderer : Spritable<SpriteRenderer> { }
+
+
+    private void Awake()
+    {
+        renderers = useImages ? (SpriteRendererOrImage)images: (SpriteRendererOrImage)spriteRenderers;
+        animator = GetComponent<Animator>();
+    }
 
     public void SetEyes(Color32 color)
     {
-        for (int i = 0; i < eyeRenderers.Length; i++)
+        for (int i = 0; i < renderers.EyeRenderers.Length; i++)
         {
-            eyeRenderers[i].color = color;
+            renderers.EyeRenderers[i].SetColor(color);
         }
     }
 
     public void SetSkin(Color32 color)
     {
-        for (int i = 0; i < skinColorRenderers.Length; i++)
+        for (int i = 0; i < renderers.SkinColorRenderers.Length; i++)
         {
-            skinColorRenderers[i].color = color;
+            renderers.SkinColorRenderers[i].SetColor(color);
         }
     }
 
     public void SetEyebrowsColor(Color32 color)
     {
-        eyebrowRenderer.color = color;
+        renderers.EyebrowRenderer.SetColor(color);
     }
 
     public void SetEyebrows(CharacterEyebrows eyebrows)
     {
-        eyebrowRenderer.sprite = eyebrows.Sprite;
+        renderers.EyebrowRenderer.SetSprite(eyebrows.Sprite);
     }
 
     public void SetHair(CharacterHair hair)
     {
-        hairFrontRenderer.sprite = hair?.FrontHair;
-        hairBackRenderer.sprite = hair?.BackHair;
+        renderers.HairFrontRenderer.Enable(hair != null && hair.FrontHair != null && animator.GetFloat("Vertical") < 0);
+        renderers.HairBackRenderer.Enable(hair != null && hair.BackHair != null && animator.GetFloat("Vertical") > 0);
+
+        renderers.HairFrontRenderer.SetSprite(hair?.FrontHair);
+        renderers.HairBackRenderer.SetSprite(hair?.BackHair);
     }
 
     public void SetHairColor(Color32 color)
     {
-        hairFrontRenderer.color = color;
-        hairBackRenderer.color = color;
+        renderers.HairFrontRenderer.SetColor(color);
+        renderers.HairBackRenderer.SetColor(color);
     }
 
     public void SetSex(CharacterSex sex)
     {
-        braRenderer.enabled = (sex == CharacterSex.Female);
+        renderers.BraRenderer.Enable(sex == CharacterSex.Female);
     }
     
     public void LoadHatInstance(HatItemInstance hat)
@@ -90,22 +261,29 @@ public class CharacterCustomizationLoader : MonoBehaviour
 
     public void SetHat(CharacterHatItemInformation hat)
     {
-        hatFrontRenderer1.sprite = hat?.BaseSpritePair.SpriteFront;
-        hatFrontRenderer2.sprite = hat?.ColorableSpritePair.SpriteFront;
-        hatBackRenderer1.sprite = hat?.BaseSpritePair.SpriteBack;
-        hatBackRenderer2.sprite = hat?.ColorableSpritePair.SpriteBack;
+        renderers.HatFrontRenderer1.SetSprite(hat?.BaseSpritePair.SpriteFront);
+        renderers.HatFrontRenderer1.Enable(hat != null && hat.BaseSpritePair.SpriteFront != null && animator.GetFloat("Vertical") < 0);
+
+        renderers.HatFrontRenderer2.SetSprite(hat?.ColorableSpritePair.SpriteFront);
+        renderers.HatFrontRenderer2.Enable(hat != null  && hat.ColorableSpritePair.SpriteFront != null && animator.GetFloat("Vertical") < 0);
+
+        renderers.HatBackRenderer1.SetSprite(hat?.BaseSpritePair.SpriteBack);
+        renderers.HatBackRenderer1.Enable(hat != null && hat.BaseSpritePair.SpriteBack != null && animator.GetFloat("Vertical") > 0);
+
+        renderers.HatBackRenderer2.SetSprite(hat?.ColorableSpritePair.SpriteBack);
+        renderers.HatBackRenderer2.Enable(hat != null && hat.ColorableSpritePair.SpriteBack != null && animator.GetFloat("Vertical") > 0);
     }
 
     public void SetHatBaseColor(Color32 color)
     {
-        hatFrontRenderer1.color = color;
-        hatBackRenderer1.color = color;
+        renderers.HatFrontRenderer1.SetColor(color);
+        renderers.HatBackRenderer1.SetColor(color);
     }
 
     public void SetHatColorableColor(Color32 color)
     {
-        hatFrontRenderer2.color = color;
-        hatBackRenderer2.color = color;
+        renderers.HatFrontRenderer2.SetColor(color);
+        renderers.HatBackRenderer2.SetColor(color);
     }
 
     public void LoadShirtInstance(ShirtItemInstance shirt)
@@ -128,22 +306,29 @@ public class CharacterCustomizationLoader : MonoBehaviour
 
     public void SetShirt(CharacterShirtItemInformation shirt)
     {
-        shirtFrontRenderer1.sprite = shirt?.BaseSpritePair.SpriteFront;
-        shirtBackRenderer1.sprite = shirt?.BaseSpritePair.SpriteBack;
-        shirtFrontRenderer2.sprite = shirt?.ColorableSpritePair.SpriteFront;
-        shirtBackRenderer2.sprite = shirt?.ColorableSpritePair.SpriteBack;
+        renderers.ShirtFrontRenderer1.SetSprite(shirt?.BaseSpritePair.SpriteFront);
+        renderers.ShirtFrontRenderer1.Enable(shirt != null && shirt.BaseSpritePair.SpriteFront != null && animator.GetFloat("Vertical") < 0);
+
+        renderers.ShirtBackRenderer1.SetSprite(shirt?.BaseSpritePair.SpriteBack);
+        renderers.ShirtBackRenderer1.Enable(shirt != null && shirt.BaseSpritePair.SpriteBack != null && animator.GetFloat("Vertical") > 0);
+
+        renderers.ShirtFrontRenderer2.SetSprite(shirt?.ColorableSpritePair.SpriteFront);
+        renderers.ShirtFrontRenderer2.Enable(shirt != null && shirt.ColorableSpritePair.SpriteFront != null && animator.GetFloat("Vertical") < 0);
+
+        renderers.ShirtBackRenderer2.SetSprite(shirt?.ColorableSpritePair.SpriteBack);
+        renderers.ShirtBackRenderer2.Enable(shirt != null && shirt.ColorableSpritePair.SpriteBack != null && animator.GetFloat("Vertical") > 0);
     }
 
     public void SetShirtBaseColor(Color32 color)
     {
-        shirtFrontRenderer1.color = color;
-        shirtBackRenderer1.color = color;
+        renderers.ShirtFrontRenderer1.SetColor(color);
+        renderers.ShirtBackRenderer1.SetColor(color);
     }
 
     public void SetShirtColorableColor(Color32 color)
     {
-        shirtFrontRenderer2.color = color;
-        shirtBackRenderer2.color = color;
+        renderers.ShirtFrontRenderer2.SetColor(color);
+        renderers.ShirtBackRenderer2.SetColor(color);
     }
 
     public void LoadPantsInstance(PantsItemInstance pants)
@@ -163,17 +348,17 @@ public class CharacterCustomizationLoader : MonoBehaviour
     {
         // Little weird with pants because we only have 1 type,
         // Enable/Disable pants renderers depending on if pants is null or not
-        for (int i = 0; i < pantsRenderers.Length; i++)
+        for (int i = 0; i < renderers.PantsRenderers.Length; i++)
         {
-            pantsRenderers[i].enabled = (pants != null);
+            renderers.PantsRenderers[i].Enable(pants != null);
         }
     }
 
     public void SetPantsColor(Color32 color)
     {
-        for (int i = 0; i < pantsRenderers.Length; i++)
+        for (int i = 0; i < renderers.PantsRenderers.Length; i++)
         {
-            pantsRenderers[i].color = color;
+            renderers.PantsRenderers[i].SetColor(color);
         }
     } 
 

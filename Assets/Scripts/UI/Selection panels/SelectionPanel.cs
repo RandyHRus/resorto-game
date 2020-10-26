@@ -6,10 +6,10 @@ public class SelectionPanel<T> : ComponentsListPanel<T> where T : ListComponentU
 {
     private ListComponentUI currentSelected;
 
-    public SelectionPanel(Transform parent, Vector2 position) : base(parent, position)
-    {
-
-    }
+    //public SelectionPanel(Transform parent, Vector2 position) : base(parent, position)
+    //{
+    //
+    //}
 
     public SelectionPanel(GameObject instance) : base(instance) {
 

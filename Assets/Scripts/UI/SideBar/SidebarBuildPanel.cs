@@ -168,7 +168,7 @@ public class SidebarBuildPanel : SidebarPanel
         public override void OnClick()
         {
             base.OnClick();
-            PlayerStateMachine.Instance.SwitchState(type.OnSelectState.GetType(), new object[] { structureInfo });
+            PlayerStateMachineManager.Instance.SwitchState(type.OnSelectState.GetType(), new object[] { structureInfo });
         }
     }
 
@@ -185,6 +185,6 @@ public class SidebarBuildPanel : SidebarPanel
 
     public void OnStructureTypeCollapseStart(StructureTypeComponentUI component, float change, float speed)
     {
-        structuresTypeList.SignalContentSizeChange(component, change, speed);
+        structuresTypeList.OnContentSizeChange(component, change, speed);
     }
 }

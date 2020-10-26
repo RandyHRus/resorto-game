@@ -44,9 +44,9 @@ public class IslandTerrainGenerator : MonoBehaviour
             {
                 for (int y = 0; y < mapSize; y++)
                 {
-                    Vector3Int pos = new Vector3Int(x, y, 0);
-                    waterTilemap.SetTile(pos, waterTile);
-                    waterBGTilemap.SetTile(pos, waterBGFullDarkTile);
+                    Vector2Int pos = new Vector2Int(x, y);
+                    waterTilemap.SetTile((Vector3Int)pos, waterTile);
+                    waterBGTilemap.SetTile((Vector3Int)pos, waterBGFullDarkTile);
                     TileInformationManager.Instance.GetTileInformation(pos).tileLocation = TileLocation.DeepWater;
                 }
             }
@@ -84,11 +84,11 @@ public class IslandTerrainGenerator : MonoBehaviour
                     if (toCreate) {
                         if (i == 0)
                         {
-                            TerrainManager.Instance.TryCreateSand(new Vector3Int(x, y, 0));
+                            TerrainManager.Instance.TryCreateSand(new Vector2Int(x, y));
                         }
                         else
                         {
-                            TerrainManager.Instance.TryCreateLand(new Vector3Int(x, y, 0), i);
+                            TerrainManager.Instance.TryCreateLand(new Vector2Int(x, y), i);
                         }
                     }
                 }

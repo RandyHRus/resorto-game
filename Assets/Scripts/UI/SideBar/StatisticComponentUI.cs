@@ -26,6 +26,8 @@ public class StatisticComponentUI : ListComponentUI
         }
 
         statistic.OnValueChanged += RefreshDisplayValue;
+
+        OnDestroy += UnSub;
     }
 
     private void RefreshDisplayValue(int value)
@@ -33,9 +35,9 @@ public class StatisticComponentUI : ListComponentUI
         valueText.SetText(value.ToString());
     }
 
-    public override void Destroy()
+    public void UnSub()
     {
         statistic.OnValueChanged -= RefreshDisplayValue;
-        base.Destroy();
+        OnDestroy -= UnSub;
     }
 }

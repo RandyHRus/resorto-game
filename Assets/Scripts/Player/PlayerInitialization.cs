@@ -26,13 +26,13 @@ public class PlayerInitialization : MonoBehaviour
     private void Start()
     {
         //Load character
-        GetComponent<CharacterCustomizationLoader>().LoadCustomization(PlayerCharacterCustomization.Customization);
+        GetComponent<CharacterCustomizationLoader>().LoadCustomization(PlayerCustomization.Character);
     }
 
     //Moves player onto starting position
     private void SetInitialLocation(IslandStartingPosition startingPosition)
     {
-        transform.position = startingPosition.ActualStartingPosition;
+        transform.position = (Vector3Int)startingPosition.ActualStartingPosition;
         GetComponent<PlayerMovement>().InitializeLayerAndDepth();
     }
 

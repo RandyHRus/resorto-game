@@ -20,7 +20,7 @@ public class ParticlesManager : MonoBehaviour
         }
     }
 
-    public void PlaySmokeEffect(Vector3 position)
+    public void PlaySmokeEffect(Vector2 position)
     {
         ParticleSystem ps = Instantiate(smoke1, position, Quaternion.identity) as ParticleSystem;
         ps.Play();

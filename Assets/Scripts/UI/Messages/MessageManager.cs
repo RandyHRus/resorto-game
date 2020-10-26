@@ -20,12 +20,15 @@ public class MessageManager : MonoBehaviour
     [SerializeField] private Canvas canvas = null;
     public Canvas Canvas => canvas;
 
-    private float boxFadeSpeed = 1f;
-    private int paddingBetween = 50;
-    private int maxMessages = 6;
+    private static readonly float boxFadeSpeed = 1f;
+    private static readonly int paddingBetween = 50;
+    private static readonly int maxMessages = 6;
+
+    private static readonly int messagesXPosWhenSidebarOpen   = -250;
+    private static readonly int messagesXPosWhenSidebarClosed = -80;
+    private int currentSideBarXPos;
 
     private Queue<MessageBox> messageBoxes;
-
 
     private static MessageManager _instance;
     public static MessageManager Instance { get { return _instance; } }
@@ -45,11 +48,16 @@ public class MessageManager : MonoBehaviour
         messageBoxes = new Queue<MessageBox>();
 
         InventoryManager.OnItemGained += (InventoryItemInstance item, int count) => { item.ShowMessage(count); };
+
+        currentSideBarXPos = messagesXPosWhenSidebarClosed;
+
+        Sidebar.OnSidebarOpened += MoveOutMessages;
+        Sidebar.OnSidebarClosed += MoveInMessages;
     }
 
     public void ShowMessage(MessageBox newMessageBox)
     {
-        newMessageBox.RectTransform.anchoredPosition = new Vector2(-80, 40);
+        newMessageBox.RectTransform.anchoredPosition = new Vector2(currentSideBarXPos, 40);
         foreach (MessageBox messageBox in messageBoxes)
         {
             Vector2 pos = messageBox.RectTransform.anchoredPosition;
@@ -81,5 +89,26 @@ public class MessageManager : MonoBehaviour
             messageBoxes.Dequeue();
         }
     } 
+
+    private void MoveOutMessages()
+    {
+        currentSideBarXPos = messagesXPosWhenSidebarOpen;
+
+        foreach (MessageBox m in messageBoxes)
+        {
+            m.RectTransform.anchoredPosition = new Vector2(currentSideBarXPos, m.RectTransform.anchoredPosition.y);
+        }
+    }
+
+    private void MoveInMessages()
+    {
+        currentSideBarXPos = messagesXPosWhenSidebarClosed;
+
+        foreach (MessageBox m in messageBoxes)
+        {
+            m.RectTransform.anchoredPosition = new Vector2(currentSideBarXPos, m.RectTransform.anchoredPosition.y);
+        }
+    }
+
 
 }

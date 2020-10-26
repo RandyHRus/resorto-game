@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SidebarTouristsPanel : SidebarPanel
 {
@@ -9,31 +10,126 @@ public class SidebarTouristsPanel : SidebarPanel
 
     public class TouristInformationComponentUI: ListComponentUI
     {
-        TouristInstance instance;
+        TouristMonoBehaviour touristMono;
+        private OutlinedText stateText;
 
-        public TouristInformationComponentUI(TouristInstance instance, Transform parent): base(ResourceManager.Instance.TouristInformationComponentUI, parent)
+        private Image happinessIcon;
+        private ProgressBar happinessBar;
+
+        public TouristInformationComponentUI(TouristMonoBehaviour touristMono, Transform parent): base(ResourceManager.Instance.TouristInformationComponentUI, parent)
         {
-            this.instance = instance;
+            this.touristMono = touristMono;
+            TouristInstance instance = touristMono.TouristInstance;
 
             foreach (Transform t in ObjectTransform.GetComponentsInChildren<Transform>())
             {
-                if (t.tag == "Character Field")
-                {
-                    CharacterCustomizationLoader loader = t.GetComponent<CharacterCustomizationLoader>();
-                    loader.LoadCustomization(instance.CharacterInformation.CharacterCustomization);
-                }
-                else if (t.tag == "Name Field")
-                {
-                    OutlinedText text = new OutlinedText(t.gameObject);
-                    text.SetText(instance.CharacterInformation.CharacterCustomization.CharacterName);
+                switch (t.tag) {
+                    case ("Character Field"):
+                        {
+                            CharacterCustomizationLoader loader = t.GetComponent<CharacterCustomizationLoader>();
+                            loader.LoadCustomization(instance.TouristInformation.CharacterCustomization);
+                            break;
+                        }
+
+                    case ("Name Field"):
+                        {
+                            OutlinedText text = new OutlinedText(t.gameObject);
+                            text.SetText(instance.TouristInformation.NpcName);
+                            break;
+                        }
+                    case ("State Field"):
+                        {
+                            stateText = new OutlinedText(t.gameObject);
+                            stateText.SetText(touristMono.CurrentState.DisplayMessage);
+                            touristMono.OnStateChanged += OnStateChangedHandler;//Remember to unsubscribe if I ever implement destroying  
+                            break;
+                        }
+                    case ("Icon Field"):
+                        {
+                            Image img = t.GetComponent<Image>();
+                            if (instance.interests.Length > 0)
+                                img.sprite = instance.interests[0].Icon;
+                            else
+                                img.enabled = false;
+
+                            break;
+                        }
+                    case ("Icon Field 2"):
+                        {
+                            Image img = t.GetComponent<Image>();
+                            if (instance.interests.Length > 1)
+                                img.sprite = instance.interests[1].Icon;
+                            else
+                                img.enabled = false;
+
+                            break;
+                        }
+                    case ("Icon Field 3"):
+                        {
+                            Image img = t.GetComponent<Image>();
+                            if (instance.interests.Length > 2)
+                                img.sprite = instance.interests[2].Icon;
+                            else
+                                img.enabled = false;
+
+                            break;
+                        }
+                    case ("Icon Field 4"):
+                        {
+                            Image img = t.GetComponent<Image>();
+                            if (instance.interests.Length > 3)
+                                img.sprite = instance.interests[3].Icon;
+                            else
+                                img.enabled = false;
+
+                            break;
+                        }
+                    case ("Icon Field 5"):
+                        {
+                            happinessIcon = t.GetComponent<Image>();
+                            ChangeHappinessIcon(touristMono.TouristInstance.happiness.GetTouristHappinessEnum());
+
+                            break;
+                        }
+                    case ("Progress Field"):
+                        {
+                            happinessBar = new ProgressBar(ObjectInScene);
+                            ChangeHappinessBarFill(touristMono.TouristInstance.happiness.Value);
+                            break;
+                        }
                 }
             }
+
+            //TODO: remember to unsubscribe on tourist deletion;
+            touristMono.TouristInstance.happiness.OnHappinessChanged += OnHappinessChangedHandler;
         }
 
         public override void OnClick()
         {
             base.OnClick();
-            PlayerStateMachine.Instance.SwitchState<FollowNPCState>(new object[] { instance });
+            PlayerStateMachineManager.Instance.SwitchState<FollowNPCState>(new object[] { touristMono.TouristInstance });
+        }
+
+        private void OnStateChangedHandler(NPCState previousState, NPCState newState)
+        {
+            //Change state display message
+            stateText.SetText(newState.DisplayMessage);
+        }
+
+        private void OnHappinessChangedHandler(int value, TouristHappinessEnum happinessEnum)
+        {
+            ChangeHappinessIcon(happinessEnum);
+            ChangeHappinessBarFill(value);
+        }
+
+        private void ChangeHappinessIcon(TouristHappinessEnum happinessEnum)
+        {
+            happinessIcon.sprite = ResourceManager.Instance.GetTouristHappinessIcon(happinessEnum);
+        }
+
+        private void ChangeHappinessBarFill(int happinessValue)
+        {
+            happinessBar.SetFill(happinessValue / 100f);
         }
     }
 
@@ -53,13 +149,15 @@ public class SidebarTouristsPanel : SidebarPanel
     public void SelectTourist(TouristInstance instance)
     {
         TouristInformationComponentUI component = touristToComponent[instance];
+        touristsComponentsPanel.SetScrollToComponent(component);
+
         component.OnClick();
     }
     
-    private void AddTouristComponent(TouristInstance instance)
+    private void AddTouristComponent(TouristMonoBehaviour touristMono)
     {
-        TouristInformationComponentUI component = new TouristInformationComponentUI(instance, touristsComponentsPanel.ObjectTransform);
+        TouristInformationComponentUI component = new TouristInformationComponentUI(touristMono, touristsComponentsPanel.ObjectTransform);
         touristsComponentsPanel.InsertListComponent(component);
-        touristToComponent.Add(instance, component);
+        touristToComponent.Add(touristMono.TouristInstance, component);
     }
 }

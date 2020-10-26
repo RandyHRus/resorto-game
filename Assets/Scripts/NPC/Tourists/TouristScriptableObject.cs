@@ -6,8 +6,8 @@ using Newtonsoft.Json.Linq;
 using System.IO;
 
 [CreateAssetMenu(menuName = "Character/Tourist")]
-public class TouristScriptableObject : CharacterScriptableObject
+public class TouristScriptableObject: ScriptableObject
 {
-    [SerializeField] private TextAsset dialogueFile = null;
-    public TextAsset DialogueFile => dialogueFile;
+    [SerializeField] private TouristInformation touristInformation = null;
+    public TouristInformation TouristInformation => touristInformation;
 }

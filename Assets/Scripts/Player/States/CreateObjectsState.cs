@@ -54,7 +54,7 @@ public class CreateObjectsState : PlayerState
             indicatorManager.ClearCurrentTiles();
         }
 
-        Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
+        Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
         bool objectIsPlaceable = TileObjectsManager.ObjectPlaceable(mouseTilePosition, selectedObject, out ObjectType modifiedType, out float yOffset, objectRotation);
 
         //Indicator things
@@ -74,7 +74,7 @@ public class CreateObjectsState : PlayerState
         {
             if (TileObjectsManager.TryCreateObject(selectedObject, mouseTilePosition, out BuildOnTile buildOnTile, objectRotation))
             {
-                InventoryManager.Instance.SelectedSlot.RemoveItem(1);
+                InventoryManager.Instance.SelectedSlot.RemoveItem(1);  //TODO make listener of an event (Event can be OnObjectCreated or something)
                 indicatorManager.ClearCurrentTiles();
             }
         }

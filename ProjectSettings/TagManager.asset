@@ -31,6 +31,12 @@ TagManager:
   - Background Field
   - Content Field
   - Character Field
+  - Icon Field 2
+  - Icon Field 3
+  - Icon Field 4
+  - State Field
+  - Progress Field
+  - Icon Field 5
   layers:
   - Default
   - TransparentFX

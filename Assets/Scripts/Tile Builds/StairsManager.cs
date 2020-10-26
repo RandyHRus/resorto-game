@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class StairsManager: MonoBehaviour
 {
-    public static bool StairsPlaceable(Vector3Int pos, out BuildRotation rot)
+    public static bool StairsPlaceable(Vector2Int pos, out BuildRotation rot)
     {       
         rot = 0;
 
         TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(pos);
-        TileInformation aboveTileInfo = TileInformationManager.Instance.GetTileInformation(new Vector3Int(pos.x, pos.y + 1, 0));
+        TileInformation aboveTileInfo = TileInformationManager.Instance.GetTileInformation(new Vector2Int(pos.x, pos.y + 1));
 
         if (tileInfo == null)
             return false;
@@ -68,15 +68,15 @@ public class StairsManager: MonoBehaviour
         }
         else if (tileInfo.tileLocation == TileLocation.WaterEdge)
         {
-            List<Tuple<Vector3Int, BuildRotation>> positionToBuildRotation = new List<Tuple<Vector3Int, BuildRotation>>
+            List<Tuple<Vector2Int, BuildRotation>> positionToBuildRotation = new List<Tuple<Vector2Int, BuildRotation>>
             {
-                Tuple.Create(new Vector3Int(pos.x, pos.y - 1, 0), BuildRotation.Front),
-                Tuple.Create(new Vector3Int(pos.x, pos.y + 1, 0), BuildRotation.Back),
-                Tuple.Create(new Vector3Int(pos.x - 1, pos.y, 0), BuildRotation.Left),
-                Tuple.Create(new Vector3Int(pos.x + 1, pos.y, 0), BuildRotation.Right),
+                Tuple.Create(new Vector2Int(pos.x, pos.y - 1), BuildRotation.Front),
+                Tuple.Create(new Vector2Int(pos.x, pos.y + 1), BuildRotation.Back),
+                Tuple.Create(new Vector2Int(pos.x - 1, pos.y), BuildRotation.Left),
+                Tuple.Create(new Vector2Int(pos.x + 1, pos.y), BuildRotation.Right),
             };
 
-            foreach (Tuple<Vector3Int, BuildRotation> t in positionToBuildRotation)
+            foreach (Tuple<Vector2Int, BuildRotation> t in positionToBuildRotation)
             {
                 TileInformation checkForDockInfo = TileInformationManager.Instance.GetTileInformation(GetStairsConnectedDockPosition(pos, t.Item2));
                 TileInformation checkForSandInfo = TileInformationManager.Instance.GetTileInformation(t.Item1);
@@ -96,7 +96,7 @@ public class StairsManager: MonoBehaviour
         }
     }
 
-    public static bool TryCreateStairs(StairsVariant variant, Vector3Int pos)
+    public static bool TryCreateStairs(StairsVariant variant, Vector2Int pos)
     {
         if (!StairsPlaceable(pos, out BuildRotation rot))
             return false;
@@ -109,38 +109,26 @@ public class StairsManager: MonoBehaviour
         renderer.sortingLayerName = "DynamicY";
         obj.transform.position = new Vector3(pos.x, pos.y, DynamicZDepth.GetDynamicZDepth(pos.y, DynamicZDepth.OBJECTS_STANDARD_OFFSET));
 
-        BuildOnTile stairsBuild = new BuildOnTile(obj, variant, new HashSet<Vector3Int>() { pos }, rot, ObjectType.Ground, (Vector2Int)pos);
-
-        //Refresh connected docks
-        if (tileInfo.tileLocation == TileLocation.WaterEdge)
-        {
-            Vector3Int dockTilePosition = GetStairsConnectedDockPosition(pos, rot);
-            TileInformation dockTileInformation = TileInformationManager.Instance.GetTileInformation(dockTilePosition);
-
-            dockTileInformation.NormalFlooringGroup.NormalFloorings[dockTilePosition].Renderer.sprite = 
-                FlooringManager.GetSprite(dockTileInformation.NormalFlooringGroup.FlooringVariant, null, false, dockTilePosition, dockTileInformation.NormalFlooringGroup.Rotation);
-
-            dockTileInformation.NormalFlooringGroup.AddConnectedBuild(stairsBuild);
-        }
+        tileInfo.CreateBuild(obj, variant, new HashSet<Vector2Int>() { pos }, rot, ObjectType.Ground);
 
         return true;
     }
 
-    public static Vector3Int GetStairsConnectedDockPosition(Vector3Int StairsPosition, BuildRotation stairsRotation)
+    public static Vector2Int GetStairsConnectedDockPosition(Vector2Int StairsPosition, BuildRotation stairsRotation)
     {
         switch (stairsRotation)
         {
             case (BuildRotation.Front):
-                return new Vector3Int(StairsPosition.x, StairsPosition.y + 2, 0);
+                return new Vector2Int(StairsPosition.x, StairsPosition.y + 2);
 
             case (BuildRotation.Left):
-                return new Vector3Int(StairsPosition.x + 1, StairsPosition.y + 1, 0);
+                return new Vector2Int(StairsPosition.x + 1, StairsPosition.y + 1);
 
             case (BuildRotation.Back):
-                return new Vector3Int(StairsPosition.x, StairsPosition.y - 1, 0);
+                return new Vector2Int(StairsPosition.x, StairsPosition.y - 1);
 
             case (BuildRotation.Right):
-                return new Vector3Int(StairsPosition.x - 1, StairsPosition.y + 1, 0);
+                return new Vector2Int(StairsPosition.x - 1, StairsPosition.y + 1);
 
             default:
                 throw new System.Exception("Unknown rotation");

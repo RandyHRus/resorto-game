@@ -8,13 +8,12 @@ public class CreateRegionState : PlayerState
 {
     private Tilemap showRegionTilemap;
     [SerializeField] private Tile showRegionTile = null;
-    [SerializeField] private Sprite showRegionSprite = null;
 
     private RegionInformation selectedRegion;
     private bool coroutineRunning = false;
     private Coroutine currentCoroutine;
 
-    private TilesIndicatorManager indicatorManager;
+    private OutlineIndicatorManager indicatorManager;
 
     public override bool AllowMovement => true;
     public override bool AllowMouseDirectionChange => true;
@@ -32,7 +31,8 @@ public class CreateRegionState : PlayerState
         selectedRegion = (RegionInformation)args[0];
         ShowRegions(true);
 
-        indicatorManager = new TilesIndicatorManager();
+        indicatorManager = new OutlineIndicatorManager();
+        indicatorManager.Toggle(true);
     }
 
     public override void EndState()
@@ -43,9 +43,7 @@ public class CreateRegionState : PlayerState
             coroutineRunning = false;
         }
 
-
-
-        indicatorManager.ClearCurrentTiles();
+        indicatorManager.Toggle(false);
         ShowRegions(false);
     }
 
@@ -60,7 +58,7 @@ public class CreateRegionState : PlayerState
             return;
         }
 
-        Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
+        Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
         TileInformation mouseTile = TileInformationManager.Instance.GetTileInformation(mouseTilePosition);
 
         bool regionPlaceable = RegionManager.RegionPlaceable(selectedRegion, mouseTilePosition);
@@ -68,20 +66,18 @@ public class CreateRegionState : PlayerState
 
         //Indicator things
         {
-            indicatorManager.SwapCurrentTiles(mouseTilePosition);
-            indicatorManager.SetSprite(mouseTilePosition, showRegionSprite);
+            indicatorManager.SetSizeAndPosition((Vector2Int)mouseTilePosition, (Vector2Int)mouseTilePosition);
 
             if (regionPlaceable)
-                indicatorManager.SetColor(mouseTilePosition, selectedRegion.ShowColor);
+                indicatorManager.SetColor(selectedRegion.ShowColor);
             else if (regionRemoveable) //Region is removeable
-                indicatorManager.SetColor(mouseTilePosition, ResourceManager.Instance.Yellow);
+                indicatorManager.SetColor(ResourceManager.Instance.Yellow);
             else
-                indicatorManager.SetColor(mouseTilePosition, ResourceManager.Instance.Red);
+                indicatorManager.SetColor(ResourceManager.Instance.Red);
         }
 
         if (regionPlaceable && CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
         {
-            indicatorManager.ClearCurrentTiles();
             currentCoroutine = Coroutines.Instance.StartCoroutine(PlaceRegion(selectedRegion));
         }
     }
@@ -96,16 +92,16 @@ public class CreateRegionState : PlayerState
             {
                 for (int j = 0; j < TileInformationManager.mapSize; j++)
                 {
-                    Vector3Int pos = (new Vector3Int(i, j, 0));
+                    Vector2Int pos = (new Vector2Int(i, j));
                     if (TileInformationManager.Instance.GetTileInformation(pos).region != null)
                     {
-                        showRegionTilemap.SetTile(pos, showRegionTile);
-                        showRegionTilemap.SetTileFlags(pos, TileFlags.None);
-                        showRegionTilemap.SetColor(pos, TileInformationManager.Instance.GetTileInformation(pos).region.ShowColor);
+                        showRegionTilemap.SetTile((Vector3Int)pos, showRegionTile);
+                        showRegionTilemap.SetTileFlags((Vector3Int)pos, TileFlags.None);
+                        showRegionTilemap.SetColor((Vector3Int)pos, TileInformationManager.Instance.GetTileInformation(pos).region.regionInformation.ShowColor);
                     }
                     else
                     {
-                        showRegionTilemap.SetTile(pos, null);
+                        showRegionTilemap.SetTile((Vector3Int)  pos, null);
                     }
                 }
             }
@@ -115,23 +111,22 @@ public class CreateRegionState : PlayerState
     IEnumerator PlaceRegion(RegionInformation info)
     {
         coroutineRunning = true;
-        Vector3Int previousTilePosition = new Vector3Int(-1, -1, -1);
-        indicatorManager = new TilesIndicatorManager(); //We need to refresh the previous tiles
+        Vector2Int previousTilePosition = new Vector2Int(-1, -1);
 
-        Vector3Int startPos = TileInformationManager.Instance.GetMouseTile();
+        Vector2Int startPos = TileInformationManager.Instance.GetMouseTile();
         int[,] regionPlaceableCache = new int[TileInformationManager.mapSize, TileInformationManager.mapSize]; // 0 not visited, -1 not placeable, 1 placeable
 
         int minX = -1, maxX = -1, minY = -1, maxY = -1;
 
         bool placeable = false;
 
-        HashSet<Vector3Int> currentPositions = new HashSet<Vector3Int>();
+        HashSet<Vector2Int> currentPositions = new HashSet<Vector2Int>();
 
         while (Input.GetButton("Primary"))
         {
             currentPositions.Clear();
 
-            Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
+            Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
 
             if (mouseTilePosition != previousTilePosition)
                 previousTilePosition = mouseTilePosition;
@@ -149,7 +144,7 @@ public class CreateRegionState : PlayerState
             {
                 for (int j = minY; j <= maxY; j++)
                 {
-                    Vector3Int pos = new Vector3Int(i, j, 0);
+                    Vector2Int pos = new Vector2Int(i, j);
                     if (!TileInformationManager.Instance.PositionInMap(pos))
                         continue;
 
@@ -169,19 +164,13 @@ public class CreateRegionState : PlayerState
                 }
             }
 
-            //Show new indicators
-            List<Vector3Int> newlyShownTiles = indicatorManager.SwapCurrentTiles(currentPositions);
-            foreach (Vector3Int pos in newlyShownTiles)
-            {
-                indicatorManager.SetSprite(pos, showRegionSprite);
-                indicatorManager.SetColor(pos, selectedRegion.ShowColor);
-            }
+            indicatorManager.SetSizeAndPosition(new Vector2Int(minX, minY), new Vector2Int(maxX, maxY));
+            indicatorManager.SetColor(selectedRegion.ShowColor);
 
             yield return 0;
         }
 
         coroutineRunning = false;
-        indicatorManager.ClearCurrentTiles();
 
         if (placeable)
         {

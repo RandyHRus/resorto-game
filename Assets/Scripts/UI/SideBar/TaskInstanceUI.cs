@@ -73,6 +73,7 @@ public class TaskInstanceUI : ListComponentUI
             RectTransform.anchoredPosition = new Vector2(0, -(taskInstanceUI.subtaskUIs.Count * taskInstanceUI.distanceBetweenSubtasks) - 67);
 
             subTask.OnSubtaskCompleted += MarkSubtaskComplete;
+            OnDestroy += UnSub;
         }
 
         public void MarkSubtaskComplete()
@@ -80,10 +81,10 @@ public class TaskInstanceUI : ListComponentUI
             subtaskStatusImage.sprite = ResourceManager.Instance.SubtaskCompleteSprite;
         }
 
-        public override void Destroy()
+        public void UnSub()
         {
-            base.Destroy();
             subtask.OnSubtaskCompleted -= MarkSubtaskComplete;
+            OnDestroy -= UnSub;
         }
     }
 }

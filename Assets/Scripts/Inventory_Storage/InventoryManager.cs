@@ -126,7 +126,7 @@ public class InventoryManager : MonoBehaviour
             uiToClose.Add(Tuple.Create((InventorySlotUI)hatSlotUI, true));
             hatSlot.ItemChanged += () => customizationLoader.LoadHatInstance((HatItemInstance)hatSlot.Item);
 
-            hatSlot.SetSlot(PlayerCharacterCustomization.Customization.Hat);
+            hatSlot.SetSlot(PlayerCustomization.Character.Hat);
 
             shirtSlot = new CosmeticInventorySlot<CharacterShirtItemInformation>();
             ItemSlotUI shirtSlotUI = new ItemSlotUI(shirtSlot, inventoryCanvas, greenSlot);
@@ -134,7 +134,7 @@ public class InventoryManager : MonoBehaviour
             uiToClose.Add(Tuple.Create((InventorySlotUI)shirtSlotUI, true));
             shirtSlot.ItemChanged += () => customizationLoader.LoadShirtInstance((ShirtItemInstance)shirtSlot.Item);
 
-            shirtSlot.SetSlot(PlayerCharacterCustomization.Customization.Shirt);
+            shirtSlot.SetSlot(PlayerCustomization.Character.Shirt);
 
             pantsSlot = new CosmeticInventorySlot<CharacterPantsItemInformation>();
             ItemSlotUI pantsSlotUI = new ItemSlotUI(pantsSlot, inventoryCanvas, greenSlot);
@@ -142,7 +142,7 @@ public class InventoryManager : MonoBehaviour
             uiToClose.Add(Tuple.Create((InventorySlotUI)pantsSlotUI, true));
             pantsSlot.ItemChanged += () => customizationLoader.LoadPantsInstance((PantsItemInstance)pantsSlot.Item); ;
 
-            pantsSlot.SetSlot(PlayerCharacterCustomization.Customization.Pants);
+            pantsSlot.SetSlot(PlayerCustomization.Character.Pants);
 
             //Create trashcan
             {
@@ -267,7 +267,7 @@ public class InventoryManager : MonoBehaviour
             return;
 
         if (SelectedSlot.Item == null)
-            PlayerStateMachine.Instance.SwitchState<DefaultState>();
+            PlayerStateMachineManager.Instance.SwitchState<DefaultState>();
         else
             SelectedSlot.Item.ItemInformation.ItemSelected();
     }

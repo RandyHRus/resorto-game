@@ -1,17 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-public abstract class Activity : ScriptableObject { }
-
-public abstract class Activity<T>: Activity where T: ActivityState
+public abstract class Activity: ScriptableObject
 {
     [SerializeField] private string activityName = "";
     public string ActivityName => activityName;
 
     [SerializeField] private Sprite icon = null;
     public Sprite Icon => icon;
-}
 
-[CreateAssetMenu(menuName = "Activity/Fishing")]
-public class FishingActivity : Activity<FishingActivityState> { }
+    public abstract bool CanStartActivity(out Type switchToState, out object[] switchToStateArgs);
+}

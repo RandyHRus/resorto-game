@@ -18,6 +18,9 @@ public class Sidebar : MonoBehaviour
     public delegate void SidebarOpenedDelegate();
     public static event SidebarOpenedDelegate OnSidebarOpened; //Only should run when sidebar first opens, not when switched
 
+    public delegate void SidebarClosedDelegate();
+    public static event SidebarClosedDelegate OnSidebarClosed;
+
     private static Sidebar _instance;
     public static Sidebar Instance { get { return _instance; } }
     private void Awake()
@@ -126,6 +129,8 @@ public class Sidebar : MonoBehaviour
             StopCoroutine(currentCoroutine);
 
         currentCoroutine = StartCoroutine(LerpEffect.LerpSpeed(rectTransform.anchoredPosition.x, defaultPosition.x, slideSpeed, OnProgress, null));
+
+        OnSidebarClosed?.Invoke();
     }
 }
 

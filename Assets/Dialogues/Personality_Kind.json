@@ -1,0 +1,184 @@
+{
+    "Greeting": [
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "Sup dude",
+				}
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "I really like your island",
+				},
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "I'm really tired. I could use some rest.",
+				},
+			]
+		}
+	],
+	 "VeryHappy": [
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "Sup dude",
+				}
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "I really like your island",
+				},
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "I'm really tired. I could use some rest.",
+				},
+			]
+		}
+	],
+	 "Happy": [
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "Sup dude",
+				}
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "I really like your island",
+				},
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "I'm really tired. I could use some rest.",
+				},
+			]
+		}
+	],
+	 "NeutralHappy": [
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "Sup dude",
+				}
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "I really like your island",
+				},
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "I'm really tired. I could use some rest.",
+				},
+			]
+		}
+	],
+	 "Unhappy": [
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "Sup dude",
+				}
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "I really like your island",
+				},
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "I'm really tired. I could use some rest.",
+				},
+			]
+		}
+	],
+	 "VeryUnhappy": [
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "Sup dude",
+				}
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "I really like your island",
+				},
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "I'm really tired. I could use some rest.",
+				},
+			]
+		}
+	],
+	 "Fishing": [
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "Sup dude",
+				}
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "I really like your island",
+				},
+			]
+		},
+		{
+			"DialogueElements": [
+				{
+					"Node": 1,
+					"Text": "I'm really tired. I could use some rest.",
+				},
+			]
+		}
+	]
+}

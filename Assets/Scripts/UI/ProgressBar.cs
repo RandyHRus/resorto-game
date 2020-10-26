@@ -6,9 +6,19 @@ public class ProgressBar: UIObject
 {
     private Transform fillBarTransform;
 
-    public ProgressBar(Canvas canvas): base(ResourceManager.Instance.Progressbar, canvas.transform)
+    public ProgressBar(Transform parent): base(ResourceManager.Instance.Progressbar, parent)
     {
-        foreach (Transform t in ObjectTransform)
+        Initialize();
+    }
+
+    public ProgressBar(GameObject instance): base(instance)
+    {
+        Initialize();
+    }
+
+    private void Initialize()
+    {
+        foreach (Transform t in ObjectTransform.GetComponentsInChildren<Transform>())
         {
             if (t.tag == "Image component")
             {

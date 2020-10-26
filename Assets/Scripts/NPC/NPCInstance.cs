@@ -2,25 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NPCInstance
+public abstract class NPCInstance
 {
-    public CharacterScriptableObject CharacterInformation { get; }
-    public GameObject ObjectInScene { get; }
-    public Transform ObjectTransform { get; }
+    public readonly NPCInformation npcInformation;
+    public readonly Transform npcTransform;
+    public readonly CharacterVisualDirection npcDirection;
 
-    public NPCInstance(CharacterScriptableObject scriptable, Vector2 position)
+    public NPCInstance(NPCInformation info, Transform npcTransform)
     {
-        this.CharacterInformation = scriptable;
-
-        Vector2 vec = position;
-        float depth = DynamicZDepth.GetDynamicZDepth(vec, DynamicZDepth.NPC_OFFSET);
-
-        ObjectInScene = GameObject.Instantiate(ResourceManager.Instance.Character, new Vector3(position.x, position.y, depth), Quaternion.identity);
-        ObjectTransform = ObjectInScene.transform;
-
-        ObjectInScene.GetComponent<CharacterCustomizationLoader>().LoadCustomization(scriptable.CharacterCustomization);
-
-        ObjectInScene.layer = LayerMask.NameToLayer("Interactable");
-        ObjectInScene.tag = "NPC";
+        this.npcInformation = info;
+        this.npcTransform = npcTransform;
+        npcDirection = new CharacterVisualDirection(npcTransform);
     }
 }

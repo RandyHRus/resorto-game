@@ -26,7 +26,17 @@ public class BuildingStructureVariant : StructureInformation, IBuildable
         return size;
     }
 
-    public void OnRemoveThroughState(BuildOnTile buildOnTile)
+    public void OnCreate(BuildOnTile buildOnTile)
+    {
+        
+    }
+
+    public void OnRemove(BuildOnTile buildOnTile)
+    {
+        
+    }
+
+    public void OnRemoveThroughPlayerInteraction(BuildOnTile buildOnTile)
     {
         //Nothing for now
     }

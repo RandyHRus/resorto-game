@@ -9,10 +9,13 @@ public abstract class ListComponentUI : UIObject
     public event Selected OnSelect;
 
     private Image buttonImage;
+    protected Button button;
 
     private void AddListener(Button button)
     {
+        this.button = button;
         button.onClick.AddListener(OnClick);
+        OnDestroy += UnSub;
     }
 
     public virtual void OnClick()
@@ -45,10 +48,24 @@ public abstract class ListComponentUI : UIObject
 
         void ShiftProgress(float value)
         {
-            RectTransform.anchoredPosition = new Vector2(0, value);
+            RectTransform.anchoredPosition = new Vector2(0, value); 
         }
 
         startPos = RectTransform.anchoredPosition;
         Coroutines.Instance.StartCoroutine(LerpEffect.LerpSpeed(startPos.y, startPos.y + change, speed, ShiftProgress, null));
+    }
+
+    /*
+    public void GreyOut()
+    {
+        button.onClick.RemoveListener(OnClick);
+        buttonImage.color = new Color32(255, 255, 255, 100);
+    }
+    */
+
+    private void UnSub()
+    {
+        OnDestroy -= UnSub;
+        button.onClick.RemoveListener(OnClick);
     }
 }

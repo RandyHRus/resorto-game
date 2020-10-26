@@ -6,8 +6,6 @@ using UnityEngine;
 public class PlayerFishingState : PlayerState
 {
     private static FishingStateController controller;
-    private static ProgressBar progressBar;
-    private static Transform player;
 
     public override bool AllowMovement
     {
@@ -23,22 +21,14 @@ public class PlayerFishingState : PlayerState
     {
         base.Initialize();
 
-        player = ResourceManager.Instance.Player;
-        FishingResources resources = new FishingResources(player);
+        FishingResources resources = new FishingResources(Player);
 
         controller = new FishingStateController(new PlayerFishingDefaultPhase(resources),
                                                 new PlayerFishingChargingPhase(resources),
-                                                new PlayerFishingCastingPhase(resources),
+                                                new FishingCastingPhase(resources),
                                                 new PlayerFishingBobbingPhase(resources),
                                                 new PlayerFishingHookedPhase(resources),
                                                 resources);
-
-        //Configure progress bar
-        {
-            Canvas progressBarCanvas = ResourceManager.Instance.IndicatorsCanvas;
-            progressBar = new ProgressBar(progressBarCanvas);
-            progressBar.Show(false);
-        }
     }
 
     public class PlayerFishingDefaultPhase: FishingDefaultPhase
@@ -79,18 +69,16 @@ public class PlayerFishingState : PlayerState
             //StartState is called 1 frame before, so we dont want the progress bar showing 1 frame before
             if (firstExecute)
             {
-                progressBar.ObjectTransform.position
-                    = (new Vector2(player.position.x, player.position.y + 1.5f));
-                progressBar.Show(true);
+
+                ProgressBar.Show(true);
             }
 
-            progressBar.SetFill(timer / maxCastHoldTime);
+            ProgressBar.SetFill(timer / maxCastHoldTime);
 
             if (Input.GetButtonUp("Primary"))
             {
-                float xDir = PlayerDirection.Instance.VisualDirection.DirectionVector.x;
-                float yDir = PlayerDirection.Instance.VisualDirection.DirectionVector.y;
                 InvokeChangePhase(typeof(FishingCastingPhase), new object[] { timer / maxCastHoldTime, xDir, yDir });
+                return;
             }
 
             firstExecute = false;
@@ -99,17 +87,7 @@ public class PlayerFishingState : PlayerState
         public override void EndState()
         {
             base.EndState();
-            progressBar.Show(false);
-        }
-    }
-
-    public class PlayerFishingCastingPhase: FishingCastingPhase
-    {
-        public PlayerFishingCastingPhase(FishingResources resources) : base(resources) { }
-
-        public override void StartState(object[] args)
-        {
-            base.StartState(args);
+            ProgressBar.Show(false);
         }
     }
 
@@ -173,9 +151,10 @@ public class PlayerFishingState : PlayerState
                 randomFish = CaughtFishGenerator.Instance.GetRandomFish();
                 caughtFishFlyingInstance.GetComponent<SpriteRenderer>().sprite = randomFish.ItemInformation.ItemIcon;
 
-                Coroutines.Instance.StartCoroutine(LerpEffect.LerpVectorSpeed(lineEndPosition, player.position, fishCaughtFlySpeed, FishFlyingProgress, FishFlyingEnd));
+                Coroutines.Instance.StartCoroutine(LerpEffect.LerpVectorSpeed(lineEndPosition, Player.position, fishCaughtFlySpeed, FishFlyingProgress, FishFlyingEnd));
 
                 InvokeChangePhase(typeof(FishingDefaultPhase), null);
+                return;
             }
         }
     }

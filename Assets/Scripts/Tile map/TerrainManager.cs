@@ -11,7 +11,7 @@ public class TerrainManager : MonoBehaviour
     [SerializeField] private Tilemap landTileMapPrefab = null;
     [SerializeField] private Tilemap waterBGTilemap = null;
 
-    private List<Tilemap> tilemapLayers_ = new List<Tilemap>(); //Starts at 0, which is the first layer of land
+    private List<Tilemap> tilemapLayers_ = new List<Tilemap>(32); //Starts at 0, which is the first layer of land
 
     private class TilemapInformation {
         public Dictionary<string, int> tileNameToCode = new Dictionary<string, int>();
@@ -119,8 +119,18 @@ public class TerrainManager : MonoBehaviour
         }
     }
 
-    public bool TryCreateSand(Vector3Int position)
+    public bool TryCreateSand(Vector2Int position)
     {
+        void AddCodeToWaterBackgroundTile(Vector2Int pos, int code)
+        {
+            if (AddOrRemoveTileCode(pos, code, waterBGTilemapInfo, waterBGTilemap, true, out int newCode))
+            {
+                int[] tileTracker = TileInformationManager.Instance.GetTileInformation(pos).waterBGTracker;
+                for (int i = 0; i < 4; i++)
+                    tileTracker[i] += (code >> i & 1); //Add 1 or 0
+            }
+        }
+
         if (TerrainPlaceable(position, out int ln))
         {
             if (ln != 0)
@@ -138,18 +148,18 @@ public class TerrainManager : MonoBehaviour
             }
 
             //Neighbours
-            Dictionary<Vector3Int, int> codesToAddToNeighbours = new Dictionary<Vector3Int, int>()
+            Dictionary<Vector2Int, int> codesToAddToNeighbours = new Dictionary<Vector2Int, int>()
                 {
-                    {  new Vector3Int(position.x-1, position.y+1, 0), 0b000001000 }, //UpLeft    
-                    {  new Vector3Int(position.x,   position.y+1, 0), 0b000001110 }, //Up        
-                    {  new Vector3Int(position.x+1, position.y+1, 0), 0b000000010 }, //UpRight   
-                    {  new Vector3Int(position.x+1, position.y,   0), 0b010000011 }, //Right    
-                    {  new Vector3Int(position.x+1, position.y-1, 0), 0b010000000 }, //DownRight
-                    {  new Vector3Int(position.x,   position.y-1, 0), 0b011100000 }, //Down      
-                    {  new Vector3Int(position.x-1, position.y-1, 0), 0b000100000 }, //DownLeft 
-                    {  new Vector3Int(position.x-1, position.y,   0), 0b000111000 }  //Left      
+                    {  new Vector2Int(position.x-1, position.y+1), 0b000001000 }, //UpLeft    
+                    {  new Vector2Int(position.x,   position.y+1), 0b000001110 }, //Up        
+                    {  new Vector2Int(position.x+1, position.y+1), 0b000000010 }, //UpRight   
+                    {  new Vector2Int(position.x+1, position.y),   0b010000011 }, //Right    
+                    {  new Vector2Int(position.x+1, position.y-1), 0b010000000 }, //DownRight
+                    {  new Vector2Int(position.x,   position.y-1), 0b011100000 }, //Down      
+                    {  new Vector2Int(position.x-1, position.y-1), 0b000100000 }, //DownLeft 
+                    {  new Vector2Int(position.x-1, position.y),   0b000111000 }  //Left      
                 };
-            foreach (KeyValuePair<Vector3Int, int> neighbour in codesToAddToNeighbours)
+            foreach (KeyValuePair<Vector2Int, int> neighbour in codesToAddToNeighbours)
             {
                 AddOrRemoveTileCode(neighbour.Key, neighbour.Value, sandWaterTilemapInfo, sandTilemap, true, out int newCode);
                 TileInformation neighbourInfo = TileInformationManager.Instance.GetTileInformation(neighbour.Key);
@@ -159,47 +169,38 @@ public class TerrainManager : MonoBehaviour
         }
         //Water background
         {
-            HashSet<Vector3Int> visitedPositions = new HashSet<Vector3Int>();
+            HashSet<Vector2Int> visitedPositions = new HashSet<Vector2Int>();
 
             for (int i = -1; i <= 1; i++)
             {
                 for (int j = -1; j <= 1; j++)
                 {
-                    Vector3Int neighbourPos = new Vector3Int(position.x + i, position.y + j, 0);
-                    Dictionary<Vector3Int, int> neigbourOfNeighbours = new Dictionary<Vector3Int, int>()
+                    Vector2Int neighbourPos = new Vector2Int(position.x + i, position.y + j);
+                    Dictionary<Vector2Int, int> neigbourOfNeighbours = new Dictionary<Vector2Int, int>()
                         {
-                            {  new Vector3Int(neighbourPos.x-1, neighbourPos.y+1, 0), 0b0010 }, //UpLeft    
-                            {  new Vector3Int(neighbourPos.x,   neighbourPos.y+1, 0), 0b0011 }, //Up        
-                            {  new Vector3Int(neighbourPos.x+1, neighbourPos.y+1, 0), 0b0001 }, //UpRight   
-                            {  new Vector3Int(neighbourPos.x+1, neighbourPos.y,   0), 0b1001 }, //Right    
-                            {  new Vector3Int(neighbourPos.x+1, neighbourPos.y-1, 0), 0b1000 }, //DownRight
-                            {  new Vector3Int(neighbourPos.x,   neighbourPos.y-1, 0), 0b1100 }, //Down      
-                            {  new Vector3Int(neighbourPos.x-1, neighbourPos.y-1, 0), 0b0100 }, //DownLeft 
-                            {  new Vector3Int(neighbourPos.x-1, neighbourPos.y,   0), 0b0110 }  //Left      
+                            {  new Vector2Int(neighbourPos.x-1, neighbourPos.y+1), 0b0010 }, //UpLeft    
+                            {  new Vector2Int(neighbourPos.x,   neighbourPos.y+1), 0b0011 }, //Up        
+                            {  new Vector2Int(neighbourPos.x+1, neighbourPos.y+1), 0b0001 }, //UpRight   
+                            {  new Vector2Int(neighbourPos.x+1, neighbourPos.y),   0b1001 }, //Right    
+                            {  new Vector2Int(neighbourPos.x+1, neighbourPos.y-1), 0b1000 }, //DownRight
+                            {  new Vector2Int(neighbourPos.x,   neighbourPos.y-1), 0b1100 }, //Down      
+                            {  new Vector2Int(neighbourPos.x-1, neighbourPos.y-1), 0b0100 }, //DownLeft 
+                            {  new Vector2Int(neighbourPos.x-1, neighbourPos.y),   0b0110 }  //Left      
                         };
 
                     AddCodeToWaterBackgroundTile(neighbourPos, 0b1111);
-                    foreach (KeyValuePair<Vector3Int, int> neighbourOfNeighbour in neigbourOfNeighbours)
+                    foreach (KeyValuePair<Vector2Int, int> neighbourOfNeighbour in neigbourOfNeighbours)
                     {
                         AddCodeToWaterBackgroundTile(neighbourOfNeighbour.Key, neighbourOfNeighbour.Value);
                     }
                 }
             }
         }
-        return true;
 
-        void AddCodeToWaterBackgroundTile(Vector3Int pos, int code)
-        {
-            if (AddOrRemoveTileCode(pos, code, waterBGTilemapInfo, waterBGTilemap, true, out int newCode))
-            {
-                int[] tileTracker = TileInformationManager.Instance.GetTileInformation(pos).waterBGTracker;
-                for (int i = 0; i < 4; i++)
-                    tileTracker[i] += (code >> i & 1); //Add 1 or 0
-            }
-        }
+        return true;
     }
 
-    public bool TryRemoveSand(Vector3Int position)
+    public bool TryRemoveSand(Vector2Int position)
     {
         if (TerrainRemoveable(position, out int ln))
         {
@@ -209,22 +210,22 @@ public class TerrainManager : MonoBehaviour
         else
             return false;
 
-        Dictionary<Vector3Int, int> mouseTileBitsToAddFromNeighbours = new Dictionary<Vector3Int, int>()
+        Dictionary<Vector2Int, int> mouseTileBitsToAddFromNeighbours = new Dictionary<Vector2Int, int>()
             {
-                {  new Vector3Int(position.x-1, position.y+1, 0), 0b010000000 }, //UpLeft    
-                {  new Vector3Int(position.x,   position.y+1, 0), 0b011100000 }, //Up        
-                {  new Vector3Int(position.x+1, position.y+1, 0), 0b000100000 }, //UpRight   
-                {  new Vector3Int(position.x+1, position.y,   0), 0b000111000 }, //Right    
-                {  new Vector3Int(position.x+1, position.y-1, 0), 0b000001000 }, //DownRight
-                {  new Vector3Int(position.x,   position.y-1, 0), 0b000001110 }, //Down      
-                {  new Vector3Int(position.x-1, position.y-1, 0), 0b000000010 }, //DownLeft 
-                {  new Vector3Int(position.x-1, position.y,   0), 0b010000011 }  //Left      
+                {  new Vector2Int(position.x-1, position.y+1), 0b010000000 }, //UpLeft    
+                {  new Vector2Int(position.x,   position.y+1), 0b011100000 }, //Up        
+                {  new Vector2Int(position.x+1, position.y+1), 0b000100000 }, //UpRight   
+                {  new Vector2Int(position.x+1, position.y),   0b000111000 }, //Right    
+                {  new Vector2Int(position.x+1, position.y-1), 0b000001000 }, //DownRight
+                {  new Vector2Int(position.x,   position.y-1), 0b000001110 }, //Down      
+                {  new Vector2Int(position.x-1, position.y-1), 0b000000010 }, //DownLeft 
+                {  new Vector2Int(position.x-1, position.y),   0b010000011 }  //Left      
             };
 
         //Change self tile
         {
             int newTileCode = 0b000000000;
-            foreach (KeyValuePair<Vector3Int, int> neighbour in mouseTileBitsToAddFromNeighbours)
+            foreach (KeyValuePair<Vector2Int, int> neighbour in mouseTileBitsToAddFromNeighbours)
             {
                 if (TileInformationManager.Instance.GetTileInformation(neighbour.Key).tileLocation != TileLocation.WaterEdge)
                 {
@@ -232,14 +233,14 @@ public class TerrainManager : MonoBehaviour
                 }
             }
             SetTileCode(position, newTileCode, sandWaterTilemapInfo, sandTilemap);
-            if (sandTilemap.GetTile(position) == null)
+            if (sandTilemap.GetTile((Vector3Int)position) == null)
                 TileInformationManager.Instance.GetTileInformation(position).tileLocation = TileLocation.DeepWater;
             else
                 TileInformationManager.Instance.GetTileInformation(position).tileLocation = TileLocation.WaterEdge;
         }
         //Change neighbours tile
         {
-            foreach (KeyValuePair<Vector3Int, int> neighbour in mouseTileBitsToAddFromNeighbours)
+            foreach (KeyValuePair<Vector2Int, int> neighbour in mouseTileBitsToAddFromNeighbours)
             {
                 //If neighbour is not water, we don't need to change it.
                 if (TileInformationManager.Instance.GetTileInformation(neighbour.Key).tileLocation != TileLocation.WaterEdge)
@@ -247,20 +248,20 @@ public class TerrainManager : MonoBehaviour
                     continue;
                 }
 
-                Dictionary<Vector3Int, int> neighboursTileBitsToAddFromNeighbours = new Dictionary<Vector3Int, int>()
+                Dictionary<Vector2Int, int> neighboursTileBitsToAddFromNeighbours = new Dictionary<Vector2Int, int>()
                     {
-                        {  new Vector3Int(neighbour.Key.x-1, neighbour.Key.y+1, 0), 0b010000000 }, //UpLeft    
-                        {  new Vector3Int(neighbour.Key.x,   neighbour.Key.y+1, 0), 0b011100000 }, //Up        
-                        {  new Vector3Int(neighbour.Key.x+1, neighbour.Key.y+1, 0), 0b000100000 }, //UpRight   
-                        {  new Vector3Int(neighbour.Key.x+1, neighbour.Key.y,   0), 0b000111000 }, //Right    
-                        {  new Vector3Int(neighbour.Key.x+1, neighbour.Key.y-1, 0), 0b000001000 }, //DownRight
-                        {  new Vector3Int(neighbour.Key.x,   neighbour.Key.y-1, 0), 0b000001110 }, //Down      
-                        {  new Vector3Int(neighbour.Key.x-1, neighbour.Key.y-1, 0), 0b000000010 }, //DownLeft 
-                        {  new Vector3Int(neighbour.Key.x-1, neighbour.Key.y,   0), 0b010000011 }  //Left      
+                        {  new Vector2Int(neighbour.Key.x-1, neighbour.Key.y+1), 0b010000000 }, //UpLeft    
+                        {  new Vector2Int(neighbour.Key.x,   neighbour.Key.y+1), 0b011100000 }, //Up        
+                        {  new Vector2Int(neighbour.Key.x+1, neighbour.Key.y+1), 0b000100000 }, //UpRight   
+                        {  new Vector2Int(neighbour.Key.x+1, neighbour.Key.y),   0b000111000 }, //Right    
+                        {  new Vector2Int(neighbour.Key.x+1, neighbour.Key.y-1), 0b000001000 }, //DownRight
+                        {  new Vector2Int(neighbour.Key.x,   neighbour.Key.y-1), 0b000001110 }, //Down      
+                        {  new Vector2Int(neighbour.Key.x-1, neighbour.Key.y-1), 0b000000010 }, //DownLeft 
+                        {  new Vector2Int(neighbour.Key.x-1, neighbour.Key.y),   0b010000011 }  //Left      
                     };
 
                 int neighbourTileCode = 0b000000000;
-                foreach (KeyValuePair<Vector3Int, int> neighboursNeighbour in neighboursTileBitsToAddFromNeighbours)
+                foreach (KeyValuePair<Vector2Int, int> neighboursNeighbour in neighboursTileBitsToAddFromNeighbours)
                 {
                     TileLocation tileLocation = TileInformationManager.Instance.GetTileInformation(neighboursNeighbour.Key).tileLocation;
                     if (!TileLocation.Water.HasFlag(tileLocation))
@@ -279,21 +280,21 @@ public class TerrainManager : MonoBehaviour
             {
                 for (int j = -1; j <= 1; j++)
                 {
-                    Vector3Int neighbourPos = new Vector3Int(position.x + i, position.y + j, 0);
-                    Dictionary<Vector3Int, int> neigbourOfNeighbours = new Dictionary<Vector3Int, int>()
+                    Vector2Int neighbourPos = new Vector2Int(position.x + i, position.y + j);
+                    Dictionary<Vector2Int, int> neigbourOfNeighbours = new Dictionary<Vector2Int, int>()
                         {
-                            {  new Vector3Int(neighbourPos.x-1, neighbourPos.y+1, 0), 0b0010 }, //UpLeft    
-                            {  new Vector3Int(neighbourPos.x,   neighbourPos.y+1, 0), 0b0011 }, //Up        
-                            {  new Vector3Int(neighbourPos.x+1, neighbourPos.y+1, 0), 0b0001 }, //UpRight   
-                            {  new Vector3Int(neighbourPos.x+1, neighbourPos.y,   0), 0b1001 }, //Right    
-                            {  new Vector3Int(neighbourPos.x+1, neighbourPos.y-1, 0), 0b1000 }, //DownRight
-                            {  new Vector3Int(neighbourPos.x,   neighbourPos.y-1, 0), 0b1100 }, //Down      
-                            {  new Vector3Int(neighbourPos.x-1, neighbourPos.y-1, 0), 0b0100 }, //DownLeft 
-                            {  new Vector3Int(neighbourPos.x-1, neighbourPos.y,   0), 0b0110 }  //Left      
+                            {  new Vector2Int(neighbourPos.x-1, neighbourPos.y+1), 0b0010 }, //UpLeft    
+                            {  new Vector2Int(neighbourPos.x,   neighbourPos.y+1), 0b0011 }, //Up        
+                            {  new Vector2Int(neighbourPos.x+1, neighbourPos.y+1), 0b0001 }, //UpRight   
+                            {  new Vector2Int(neighbourPos.x+1, neighbourPos.y),   0b1001 }, //Right    
+                            {  new Vector2Int(neighbourPos.x+1, neighbourPos.y-1), 0b1000 }, //DownRight
+                            {  new Vector2Int(neighbourPos.x,   neighbourPos.y-1), 0b1100 }, //Down      
+                            {  new Vector2Int(neighbourPos.x-1, neighbourPos.y-1), 0b0100 }, //DownLeft 
+                            {  new Vector2Int(neighbourPos.x-1, neighbourPos.y),   0b0110 }  //Left      
                         };
 
                     RemoveCodeFromWaterBackgroundTile(neighbourPos, 0b1111);
-                    foreach (KeyValuePair<Vector3Int, int> neighbourOfNeighbour in neigbourOfNeighbours)
+                    foreach (KeyValuePair<Vector2Int, int> neighbourOfNeighbour in neigbourOfNeighbours)
                     {
                         RemoveCodeFromWaterBackgroundTile(neighbourOfNeighbour.Key, neighbourOfNeighbour.Value);
                     }
@@ -304,7 +305,7 @@ public class TerrainManager : MonoBehaviour
 
         return true;
 
-        void RemoveCodeFromWaterBackgroundTile(Vector3Int toRemovePosition, int code)
+        void RemoveCodeFromWaterBackgroundTile(Vector2Int toRemovePosition, int code)
         {
             if (!TileInformationManager.Instance.PositionInMap(toRemovePosition))
                 return;
@@ -330,7 +331,7 @@ public class TerrainManager : MonoBehaviour
         }
     }
 
-    public bool TryCreateLand(Vector3Int position, int layerNumber) {
+    public bool TryCreateLand(Vector2Int position, int layerNumber) {
 
         if (TerrainPlaceable(position, out int ln))
         {
@@ -354,25 +355,25 @@ public class TerrainManager : MonoBehaviour
                 tilemapLayer = GetTilemapLayer(layerNumber);
         }
 
-        Dictionary<Vector3Int, int> codesToAddToTiles = new Dictionary<Vector3Int, int>()
+        Dictionary<Vector2Int, int> codesToAddToTiles = new Dictionary<Vector2Int, int>()
         {
-            { position,                                            0b1100 },
-            { new Vector3Int(position.x - 1, position.y, 0),       0b0100 },
-            { new Vector3Int(position.x + 1, position.y, 0),       0b1000 },
-            { new Vector3Int(position.x, position.y + 1, 0),       0b0011 },
-            { new Vector3Int(position.x - 1, position.y + 1, 0),   0b0010 },
-            { new Vector3Int(position.x + 1, position.y + 1, 0),   0b0001 },
+            { position,                                         0b1100 },
+            { new Vector2Int(position.x - 1, position.y),       0b0100 },
+            { new Vector2Int(position.x + 1, position.y),       0b1000 },
+            { new Vector2Int(position.x, position.y + 1),       0b0011 },
+            { new Vector2Int(position.x - 1, position.y + 1),   0b0010 },
+            { new Vector2Int(position.x + 1, position.y + 1),   0b0001 },
         };
 
-        foreach(KeyValuePair<Vector3Int, int> pair in codesToAddToTiles)
+        foreach(KeyValuePair<Vector2Int, int> pair in codesToAddToTiles)
         {
-            bool existingTileIsGrass = TileIsGrass(tilemapLayer.GetTile(pair.Key), tilemapLayer);
+            bool existingTileIsGrass = TileIsGrass(tilemapLayer.GetTile((Vector3Int)pair.Key), tilemapLayer);
 
             AddOrRemoveTileCode(pair.Key, pair.Value, landTilemapInfo, tilemapLayer, true, out int newCode);
 
             //Set new layers
             TileInformation tile = TileInformationManager.Instance.GetTileInformation(pair.Key);
-            bool newTileIsGrass = TileIsGrass(tilemapLayer.GetTile(pair.Key), tilemapLayer);
+            bool newTileIsGrass = TileIsGrass(tilemapLayer.GetTile((Vector3Int)pair.Key), tilemapLayer);
 
             if (newTileIsGrass && !existingTileIsGrass)
                 tile.layerNum++;
@@ -382,7 +383,7 @@ public class TerrainManager : MonoBehaviour
         return true;
     }
 
-    public bool TryRemoveLand(Vector3Int position, int layerNumber)
+    public bool TryRemoveLand(Vector2Int position, int layerNumber)
     {
         //Skip if there is there is no land at position
         {
@@ -397,31 +398,31 @@ public class TerrainManager : MonoBehaviour
 
         Tilemap tilemapLayer = GetTilemapLayer(layerNumber);
 
-        Dictionary<Vector3Int, int> bitsToRemoveFromTiles = new Dictionary<Vector3Int, int>()
+        Dictionary<Vector2Int, int> bitsToRemoveFromTiles = new Dictionary<Vector2Int, int>()
         {
-            { position,                                           0b0011 },
-            { new Vector3Int(position.x - 1, position.y, 0),      0b1011 },
-            { new Vector3Int(position.x + 1, position.y, 0),      0b0111 },
-            { new Vector3Int(position.x, position.y + 1, 0),      0b1100 },
-            { new Vector3Int(position.x - 1, position.y + 1, 0),  0b1101 },
-            { new Vector3Int(position.x + 1, position.y + 1, 0),  0b1110 },
+            { position,                                        0b0011 },
+            { new Vector2Int(position.x - 1, position.y),      0b1011 },
+            { new Vector2Int(position.x + 1, position.y),      0b0111 },
+            { new Vector2Int(position.x, position.y + 1),      0b1100 },
+            { new Vector2Int(position.x - 1, position.y + 1),  0b1101 },
+            { new Vector2Int(position.x + 1, position.y + 1),  0b1110 },
         };
 
-        foreach (KeyValuePair<Vector3Int, int> pair in bitsToRemoveFromTiles)
+        foreach (KeyValuePair<Vector2Int, int> pair in bitsToRemoveFromTiles)
         {
-            TileBase existingTile = tilemapLayer.GetTile(pair.Key);
+            TileBase existingTile = tilemapLayer.GetTile((Vector3Int)pair.Key);
             bool existingTileIsGrass = TileIsGrass(existingTile, tilemapLayer);
 
             if (AddOrRemoveTileCode(pair.Key, pair.Value, landTilemapInfo, tilemapLayer, false, out int newCode))
             {
                 //Set new layers
                 TileInformation tile = TileInformationManager.Instance.GetTileInformation(pair.Key);
-                bool newTileIsGrass = TileIsGrass(tilemapLayer.GetTile(pair.Key), tilemapLayer);
+                bool newTileIsGrass = TileIsGrass(tilemapLayer.GetTile((Vector3Int)pair.Key), tilemapLayer);
 
                 if (!newTileIsGrass && existingTileIsGrass)
                     tile.layerNum--;
 
-                TileBase newTile = tilemapLayer.GetTile(pair.Key);
+                TileBase newTile = tilemapLayer.GetTile((Vector3Int)pair.Key);
 
                 if (newTile == null && existingTile == null)
                 {
@@ -470,9 +471,9 @@ public class TerrainManager : MonoBehaviour
     }
 
     //Returns 0 if sand is removeable 1> for land is removeable
-    public bool TerrainRemoveable(Vector3Int position, out int layerNumber)
+    public bool TerrainRemoveable(Vector2Int position, out int layerNumber)
     {
-        Vector3Int aboveTilePosition = new Vector3Int(position.x, position.y + 1, 0);
+        Vector2Int aboveTilePosition = new Vector2Int(position.x, position.y + 1);
         if (!TileInformationManager.Instance.PositionInMap(position) ||
             !TileInformationManager.Instance.PositionInMap(aboveTilePosition))
         {
@@ -519,14 +520,14 @@ public class TerrainManager : MonoBehaviour
 
             // Check If Removing codes actually results in change
             {
-                Dictionary<Vector3Int, int> codesToKeepInTiles = new Dictionary<Vector3Int, int>()
+                Dictionary<Vector2Int, int> codesToKeepInTiles = new Dictionary<Vector2Int, int>()
                 {
-                    { position,                                           0b0011 },
-                    { new Vector3Int(position.x - 1, position.y, 0),      0b1011 },
-                    { new Vector3Int(position.x + 1, position.y, 0),      0b0111 },
-                    { new Vector3Int(position.x, position.y + 1, 0),      0b1100 },
-                    { new Vector3Int(position.x - 1, position.y + 1, 0),  0b1101 },
-                    { new Vector3Int(position.x + 1, position.y + 1, 0),  0b1110 },
+                    { position,                                        0b0011 },
+                    { new Vector2Int(position.x - 1, position.y),      0b1011 },
+                    { new Vector2Int(position.x + 1, position.y),      0b0111 },
+                    { new Vector2Int(position.x, position.y + 1),      0b1100 },
+                    { new Vector2Int(position.x - 1, position.y + 1),  0b1101 },
+                    { new Vector2Int(position.x + 1, position.y + 1),  0b1110 },
                 };
 
                 Tilemap tilemap = GetTilemapLayer(proposedLayerNumber);
@@ -537,9 +538,9 @@ public class TerrainManager : MonoBehaviour
                 }
 
                 bool codeChangeFound = false;
-                foreach (KeyValuePair<Vector3Int, int> pair in codesToKeepInTiles)
+                foreach (KeyValuePair<Vector2Int, int> pair in codesToKeepInTiles)
                 {
-                    TileBase existingTile = tilemap.GetTile(pair.Key);
+                    TileBase existingTile = tilemap.GetTile((Vector3Int)pair.Key);
                     if (existingTile == null)
                         continue;
 
@@ -557,18 +558,18 @@ public class TerrainManager : MonoBehaviour
             //Check layer up
             {
                 int objectLayerNumToCheck = proposedLayerNumber;
-                Vector3Int[] positionsToCheck = new Vector3Int[]
+                Vector2Int[] positionsToCheck = new Vector2Int[]
                 {
-                    new Vector3Int(aboveTilePosition.x,     aboveTilePosition.y, 0),
-                    new Vector3Int(aboveTilePosition.x + 1, aboveTilePosition.y, 0),
-                    new Vector3Int(aboveTilePosition.x - 1, aboveTilePosition.y, 0),
-                    new Vector3Int(position.x,     position.y, 0),
-                    new Vector3Int(position.x + 1, position.y, 0),
-                    new Vector3Int(position.x - 1, position.y, 0)
+                    new Vector2Int(aboveTilePosition.x,     aboveTilePosition.y),
+                    new Vector2Int(aboveTilePosition.x + 1, aboveTilePosition.y),
+                    new Vector2Int(aboveTilePosition.x - 1, aboveTilePosition.y),
+                    new Vector2Int(position.x,     position.y),
+                    new Vector2Int(position.x + 1, position.y),
+                    new Vector2Int(position.x - 1, position.y)
                 };
 
                 //Check for objects
-                foreach (Vector3Int positionToCheck in positionsToCheck)
+                foreach (Vector2Int positionToCheck in positionsToCheck)
                 {
                     if (checkForBuildAtPosition(positionToCheck, objectLayerNumToCheck)) {
                         layerNumber = Constants.INVALID_TILE_LAYER;
@@ -581,9 +582,9 @@ public class TerrainManager : MonoBehaviour
                 Tilemap tilemapLayerToCheck = GetTilemapLayer(terrainLayerNumToCheck);
                 if (tilemapLayerToCheck != null)
                 {
-                    foreach (Vector3Int positionToCheck in positionsToCheck)
+                    foreach (Vector2Int positionToCheck in positionsToCheck)
                     {
-                        if (tilemapLayerToCheck.GetTile(positionToCheck) != null)
+                        if (tilemapLayerToCheck.GetTile((Vector3Int)positionToCheck) != null)
                         {
                             layerNumber = Constants.INVALID_TILE_LAYER;
                             return false;
@@ -596,7 +597,7 @@ public class TerrainManager : MonoBehaviour
             return true;
         }
 
-        bool checkForBuildAtPosition(Vector3Int pos, int layerNum)
+        bool checkForBuildAtPosition(Vector2Int pos, int layerNum)
         {
             TileInformation info = TileInformationManager.Instance.GetTileInformation(pos);
             if (info.layerNum == layerNum && info.TopMostBuild != null)
@@ -608,9 +609,9 @@ public class TerrainManager : MonoBehaviour
     }
 
     //Returns 0 if sand is placeable 1> for land is placeable
-    public bool TerrainPlaceable(Vector3Int position, out int layerNumber)
+    public bool TerrainPlaceable(Vector2Int position, out int layerNumber)
     {
-        Vector3Int aboveTilePosition = new Vector3Int(position.x, position.y + 1, 0);
+        Vector2Int aboveTilePosition = new Vector2Int(position.x, position.y + 1);
         if (!TileInformationManager.Instance.PositionInMap(position) ||
             !TileInformationManager.Instance.PositionInMap(aboveTilePosition))
         {
@@ -626,7 +627,7 @@ public class TerrainManager : MonoBehaviour
         if (TileLocation.Water.HasFlag(mainTileLocation))
         {
             //Look for docks
-            if (mainTile.GetTopFlooringGroup() != null)
+            if (mainTile.TopFlooringGroup != null)
             {
                 layerNumber = Constants.INVALID_TILE_LAYER;
                 return false;
@@ -636,7 +637,7 @@ public class TerrainManager : MonoBehaviour
             for (int i = -2; i <= 2; i++) {
                 for (int j = -2; j <= 2; j++) {
 
-                    TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(new Vector3Int(position.x + i, position.y + j, 0));
+                    TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(new Vector2Int(position.x + i, position.y + j));
                     if (tileInfo == null)
                     {
                         layerNumber = Constants.INVALID_TILE_LAYER;
@@ -650,17 +651,17 @@ public class TerrainManager : MonoBehaviour
         //Check if land is placeable
         else
         {
-            Vector3Int[] positionsToCheck = new Vector3Int[]
+            Vector2Int[] positionsToCheck = new Vector2Int[]
             {
-                new Vector3Int(position.x,     position.y, 0),
-                new Vector3Int(position.x + 1, position.y, 0),
-                new Vector3Int(position.x - 1, position.y, 0),
-                new Vector3Int(position.x,     position.y + 1, 0),
-                new Vector3Int(position.x + 1, position.y + 1, 0),
-                new Vector3Int(position.x - 1, position.y + 1, 0),
+                new Vector2Int(position.x,     position.y),
+                new Vector2Int(position.x + 1, position.y),
+                new Vector2Int(position.x - 1, position.y),
+                new Vector2Int(position.x,     position.y + 1),
+                new Vector2Int(position.x + 1, position.y + 1),
+                new Vector2Int(position.x - 1, position.y + 1),
             };
             //First check easy stuff
-            foreach (Vector3Int positionToCheck in positionsToCheck)
+            foreach (Vector2Int positionToCheck in positionsToCheck)
             {
                 //Check if outside map
                 if (!TileInformationManager.Instance.PositionInMap(positionToCheck)) {
@@ -677,7 +678,7 @@ public class TerrainManager : MonoBehaviour
 
             //Check if placeable above
             bool placeableAbove = true;
-            foreach (Vector3Int positionToCheck in positionsToCheck) {
+            foreach (Vector2Int positionToCheck in positionsToCheck) {
                 TileInformation tile = TileInformationManager.Instance.GetTileInformation(positionToCheck);
 
                 //Check if on correct location
@@ -685,7 +686,7 @@ public class TerrainManager : MonoBehaviour
                     placeableAbove = false;
 
                 //Check for objects
-                if (tile.TopMostBuild != null || tile.GetTopFlooringGroup() != null)
+                if (tile.TopMostBuild != null || tile.TopFlooringGroup != null)
                     placeableAbove = false;
             }
             //Placeable above
@@ -696,7 +697,7 @@ public class TerrainManager : MonoBehaviour
             }
             //Check if placeable below
             bool placeableBelow = true;
-            foreach (Vector3Int positionToCheck in positionsToCheck)
+            foreach (Vector2Int positionToCheck in positionsToCheck)
             {
                 TileInformation tile = TileInformationManager.Instance.GetTileInformation(positionToCheck);
                 TileLocation location = tile.tileLocation;
@@ -706,7 +707,7 @@ public class TerrainManager : MonoBehaviour
                     placeableBelow = false;
 
                 //Check for objects (but only if they are on below)
-                if (tile.TopMostBuild != null || tile.GetTopFlooringGroup() != null)
+                if (tile.TopMostBuild != null || tile.TopFlooringGroup != null)
                 {
                     if (aboveTileInformation.layerNum == tile.layerNum)
                         placeableBelow = false;
@@ -725,23 +726,23 @@ public class TerrainManager : MonoBehaviour
 
             bool CheckIfAddingCodesResultsInChange(int layerNum)
             {
-                Dictionary<Vector3Int, int> codesToAddToTiles = new Dictionary<Vector3Int, int>()
+                Dictionary<Vector2Int, int> codesToAddToTiles = new Dictionary<Vector2Int, int>()
                 {
                     { position,                                            0b1100 },
-                    { new Vector3Int(position.x - 1, position.y, 0),       0b0100 },
-                    { new Vector3Int(position.x + 1, position.y, 0),       0b1000 },
-                    { new Vector3Int(position.x, position.y + 1, 0),       0b0011 },
-                    { new Vector3Int(position.x - 1, position.y + 1, 0),   0b0010 },
-                    { new Vector3Int(position.x + 1, position.y + 1, 0),   0b0001 },
+                    { new Vector2Int(position.x - 1, position.y),       0b0100 },
+                    { new Vector2Int(position.x + 1, position.y),       0b1000 },
+                    { new Vector2Int(position.x, position.y + 1),       0b0011 },
+                    { new Vector2Int(position.x - 1, position.y + 1),   0b0010 },
+                    { new Vector2Int(position.x + 1, position.y + 1),   0b0001 },
                 };
 
                 Tilemap tilemap = GetTilemapLayer(layerNum);
                 if (tilemap == null)
                     return true;
 
-                foreach (KeyValuePair<Vector3Int, int> pair in codesToAddToTiles)
+                foreach (KeyValuePair<Vector2Int, int> pair in codesToAddToTiles)
                 {
-                    TileBase existingTile = tilemap.GetTile(pair.Key);
+                    TileBase existingTile = tilemap.GetTile((Vector3Int)pair.Key);
                     if (existingTile == null)
                         return true;
 
@@ -756,29 +757,35 @@ public class TerrainManager : MonoBehaviour
 
     // On addMode    - 1 in code is bits to add
     // On removeMode - 1 in code is bits to keep
-    private bool AddOrRemoveTileCode(Vector3Int position, int code, TilemapInformation tilemapInfo, Tilemap tilemap, bool addMode, out int newCode)
+    private bool AddOrRemoveTileCode(Vector2Int position, int code, TilemapInformation tilemapInfo, Tilemap tilemap, bool addMode, out int newCode)
     {
-        if (!TileInformationManager.Instance.PositionInMap(position))
+        TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(position);
+
+        if (tileInfo == null)
         {
             newCode = Constants.EMPTY_TILECODE;
             return false;
         }
 
-        TileBase existingTile = tilemap.GetTile(position);
+        TileBase existingTile = tilemap.GetTile((Vector3Int)position);
         int existingCode = (existingTile == null) ? 0 : tilemapInfo.tileNameToCode[existingTile.name];
 
         newCode = addMode ? code | existingCode : code & existingCode;
 
-        tilemap.SetTile(position, tilemapInfo.codeToTile[newCode]);
+        tilemap.SetTile((Vector3Int)position, tilemapInfo.codeToTile[newCode]);
+        tileInfo.InvokeTerrainModified();
+
         return true;
     }
 
-    private bool SetTileCode(Vector3Int position, int code, TilemapInformation tilemapInfo, Tilemap tilemap)
+    private bool SetTileCode(Vector2Int position, int code, TilemapInformation tilemapInfo, Tilemap tilemap)
     {
-        if (!TileInformationManager.Instance.PositionInMap(position))
+        TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(position);
+        if (tileInfo == null)
             return false;
 
-        tilemap.SetTile(position, tilemapInfo.codeToTile[code]);
+        tilemap.SetTile((Vector3Int)position, tilemapInfo.codeToTile[code]);
+        tileInfo.InvokeTerrainModified();
         return true;
     }
 
@@ -799,7 +806,7 @@ public class TerrainManager : MonoBehaviour
         {
             for (int j = 0; j < mapSize; j++)
             {
-                TileInformation t = TileInformationManager.Instance.GetTileInformation(new Vector3Int(i, j, 0));
+                TileInformation t = TileInformationManager.Instance.GetTileInformation(new Vector2Int(i, j));
                 t.ResetTerrainInformation();
             }
         }

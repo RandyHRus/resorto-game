@@ -9,6 +9,4 @@ public interface ITileObjectFunctions
     void StepOn();
 
     void StepOff();
-
-    void ClickInteract();
 }

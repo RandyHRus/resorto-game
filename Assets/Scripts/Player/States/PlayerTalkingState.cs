@@ -38,7 +38,6 @@ public class PlayerTalkingState : PlayerState
                 dialogueText = new OutlinedText(t.gameObject);
             }
         }
-
         dialogueBox.SetActive(false);
     }
 
@@ -107,7 +106,7 @@ public class PlayerTalkingState : PlayerState
     private void EndDialogueAndState()
     {
         EndCurrentDialogue();
-        PlayerStateMachine.Instance.SwitchState<DefaultState>();
+        PlayerStateMachineManager.Instance.SwitchState<DefaultState>();
     }
 
     public override void EndState()

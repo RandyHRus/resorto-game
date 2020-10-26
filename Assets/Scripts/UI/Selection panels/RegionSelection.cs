@@ -14,7 +14,7 @@ public class RegionSelection : ListComponentUI
             if (t.tag == "Name Field")
             {
                 OutlinedText text = new OutlinedText(t.gameObject);
-                text.SetText(info.name);
+                text.SetText(info.RegionName);
             }
             else if (t.tag == "Icon Field")
             {
@@ -29,6 +29,6 @@ public class RegionSelection : ListComponentUI
     public override void OnClick()
     {
         base.OnClick();
-        PlayerStateMachine.Instance.SwitchState<CreateRegionState>(new object[] { info });
+        PlayerStateMachineManager.Instance.SwitchState<CreateRegionState>(new object[] { info });
     }
 }

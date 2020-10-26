@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class IslandObjectsGenerator : MonoBehaviour
 {
-    [Header("Grass")]
-    [SerializeField] private ObjectInformation grassObjectInfo = null;
-    [SerializeField] private float tilesToGrassPatchesTryCountRatio = 0.003f;
-    [SerializeField] private int minGrassPatchRadius = 2;
-    [SerializeField] private int maxGrassPatchRadius = 3;  
-    [SerializeField] private float grassPatchDensity = 0.8f;
+    //[Header("Grass")]
+    //[SerializeField] private ObjectInformation grassObjectInfo = null;
+    //[SerializeField] private float tilesToGrassPatchesTryCountRatio = 0.003f;
+    //[SerializeField] private int minGrassPatchRadius = 2;
+    //[SerializeField] private int maxGrassPatchRadius = 3;  
+    //[SerializeField] private float grassPatchDensity = 0.8f;
 
     [Header("Seashells")]
     [SerializeField] private ObjectInformation[] seashellObjectInfos = null;
@@ -18,6 +18,14 @@ public class IslandObjectsGenerator : MonoBehaviour
     [Header("Bush")]
     [SerializeField] private ObjectInformation[] bushObjectInfos = null;
     [SerializeField] private float tilesToBushTryCountRatio = 0.003f;
+
+    [Header("Trees")]
+    [SerializeField] private ObjectInformation[] palmTreesInfo = null;
+    [SerializeField] private float tilesToPalmTreesTryCountRatio = 0.002f;
+
+    [Header("Driftwood")]
+    [SerializeField] private ObjectInformation[] driftwoodInfo = null;
+    [SerializeField] private float tilesToDriftwoodTryCountRatio = 0.002f;
 
     private static IslandObjectsGenerator _instance;
     public static IslandObjectsGenerator Instance { get { return _instance; } }
@@ -41,6 +49,8 @@ public class IslandObjectsGenerator : MonoBehaviour
         //GenerateGrass();
         GenerateSeashells();
         GenerateBush();
+        GenerateTrees();
+        GenerateDriftwood();
     }
 
     public void RemoveAllBuilds()
@@ -51,11 +61,11 @@ public class IslandObjectsGenerator : MonoBehaviour
         {
             for (int j = 0; j < mapSize; j++)
             {
-                TileInformationManager.Instance.GetTileInformation(new Vector3Int(i, j, 0)).RemoveAllBuilds();
+                TileInformationManager.Instance.GetTileInformation(new Vector2Int(i, j)).RemoveAllBuilds();
             }
         }
     }
-
+    /*
     private void GenerateGrass()
     {
         int mapSize = TileInformationManager.mapSize;
@@ -68,7 +78,7 @@ public class IslandObjectsGenerator : MonoBehaviour
             //Get random point
             int randomX = Random.Range(0, mapSize);
             int randomY = Random.Range(0, mapSize);
-            Vector3Int middlePosition = new Vector3Int(randomX, randomY, 0);
+            Vector2Int middlePosition = new Vector2Int(randomX, randomY);
 
             int radius = Random.Range(minGrassPatchRadius, maxGrassPatchRadius + 1);
 
@@ -76,8 +86,8 @@ public class IslandObjectsGenerator : MonoBehaviour
             {
                 for (int y = randomY - radius; y <= randomY + radius; y++)
                 {
-                    Vector3Int proposedPos = new Vector3Int(x, y, 0);
-                    float distanceToTile = Vector2.Distance(new Vector2(middlePosition.x, middlePosition.y), new Vector2(proposedPos.x, proposedPos.y));
+                    Vector2Int proposedPos = new Vector2Int(x, y);
+                    float distanceToTile = Vector2.Distance(middlePosition, new Vector2(proposedPos.x, proposedPos.y));
 
                     if (distanceToTile > radius)
                         continue;
@@ -90,6 +100,7 @@ public class IslandObjectsGenerator : MonoBehaviour
             }
         }
     }
+    */
 
     private void GenerateBush()
     {
@@ -105,7 +116,7 @@ public class IslandObjectsGenerator : MonoBehaviour
             //Get random point
             int randomX = Random.Range(0, mapSize);
             int randomY = Random.Range(0, mapSize);
-            Vector3Int proposedPos = new Vector3Int(randomX, randomY, 0);
+            Vector2Int proposedPos = new Vector2Int(randomX, randomY);
 
             if (TileInformationManager.Instance.GetTileInformation(proposedPos).tileLocation != TileLocation.Grass)
                 continue;
@@ -128,12 +139,73 @@ public class IslandObjectsGenerator : MonoBehaviour
             //Get random point
             int randomX = Random.Range(0, mapSize);
             int randomY = Random.Range(0, mapSize);
-            Vector3Int proposedPos = new Vector3Int(randomX, randomY, 0);
+            Vector2Int proposedPos = new Vector2Int(randomX, randomY);
 
             if (TileInformationManager.Instance.GetTileInformation(proposedPos).tileLocation != TileLocation.Sand)
                 continue;
 
             TileObjectsManager.TryCreateObject(seashellObjectInfo, proposedPos, out BuildOnTile buildOnTile);
+        }
+    }
+
+    private void GenerateTrees()
+    {
+        int mapSize = TileInformationManager.mapSize;
+        int tileCount = mapSize * mapSize;
+        int palmTreesTryCount = (int)(tileCount * tilesToPalmTreesTryCountRatio);
+
+        for (int c = 0; c < palmTreesTryCount; c++)
+        {
+            //Get random seashell
+            ObjectInformation palmTreeObjectInfo = palmTreesInfo[Random.Range(0, palmTreesInfo.Length)];
+
+            //Get random point
+            int randomX = Random.Range(0, mapSize);
+            int randomY = Random.Range(0, mapSize);
+            Vector2Int proposedPos = new Vector2Int(randomX, randomY);
+
+            if (TileInformationManager.Instance.GetTileInformation(proposedPos).tileLocation != TileLocation.Sand)
+                continue;
+
+            TileObjectsManager.TryCreateObject(palmTreeObjectInfo, proposedPos, out BuildOnTile buildOnTile);
+        }
+    }
+
+    private void GenerateDriftwood()
+    {
+        int mapSize = TileInformationManager.mapSize;
+        int tileCount = mapSize * mapSize;
+        int driftwoodTryCount = (int)(tileCount * tilesToDriftwoodTryCountRatio);
+
+        for (int c = 0; c < driftwoodTryCount; c++)
+        {
+            //Get random seashell
+            ObjectInformation driftwoodObjectInfo = driftwoodInfo[Random.Range(0, driftwoodInfo.Length)];
+
+            //Get random point
+            int randomX = Random.Range(0, mapSize);
+            int randomY = Random.Range(0, mapSize);
+            Vector2Int proposedPos = new Vector2Int(randomX, randomY);
+
+            if (!TileObjectsManager.ObjectPlaceable(proposedPos, driftwoodObjectInfo, out ObjectType modifiedType, out float yOffset))
+                continue;
+
+            bool placeable = true;
+            for (int i = 0; i < driftwoodObjectInfo.GetSizeOnTile(0).x; i++)
+            {
+                for (int j = 0; j < driftwoodObjectInfo.GetSizeOnTile(0).y; j++)
+                {
+                    Vector2Int thisLocation = proposedPos + new Vector2Int(i, j);
+                    TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(thisLocation);
+                    if (!(tileInfo.tileLocation == TileLocation.Sand || tileInfo.tileLocation == TileLocation.WaterEdge))
+                        placeable = false;
+                }
+            }
+
+            if (!placeable)
+                continue;
+
+            TileObjectsManager.TryCreateObject(driftwoodObjectInfo, proposedPos, out BuildOnTile buildOnTile);
         }
     }
 }

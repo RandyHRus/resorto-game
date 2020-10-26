@@ -7,27 +7,10 @@ using UnityEngine.EventSystems;
 
 public class CharacterCustomizationMenu : MonoBehaviour
 {
-    [SerializeField] private CharacterEyebrows[] eyebrowsOptions = null;
-    [SerializeField] private CharacterHair[] hairOptions = null;
-    [SerializeField] private CharacterShirtItemInformation[] shirtOptions = null;
-    [SerializeField] private CharacterPantsItemInformation pants = null;
-
-    [SerializeField] private CharacterScriptableObject defaultCharacter = null;
-
     private ColorCustomizationPart currentColorPart = 0;
     private CharacterSex currentSex = 0;
     private int currentEyebrowIndex = 0, currentHairIndex = 0, currentShirtIndex = 0;
     private TurnDirection currentTurnDirection = 0;
-
-    private List<Color32> commonSkinColors = new List<Color32>()
-    {
-        new Color32(141, 85, 36, 255),
-        new Color32(198, 134, 66, 255),
-        new Color32(224, 172, 105, 255),
-        new Color32(241, 194, 125, 255),
-        new Color32(255, 219, 172, 255)
-    };
-
 
     //Customization Menu UI Components
     //*************************************************************
@@ -85,7 +68,7 @@ public class CharacterCustomizationMenu : MonoBehaviour
         hairSelectionOutlinedText = new OutlinedText(hairSelectionText);
         sexSelectionOutlinedText = new OutlinedText(sexSelectionText);
 
-        LoadCustomization(defaultCharacter.CharacterCustomization);
+        LoadCustomization(ScenesSharedResources.Instance.DefaultCharacter.CharacterCustomization);
     }
 
     private void Update()
@@ -151,8 +134,8 @@ public class CharacterCustomizationMenu : MonoBehaviour
     {
         int nextEyebrowIndex = currentEyebrowIndex + (next ? 1 : -1);
         if (nextEyebrowIndex < 0)
-            nextEyebrowIndex = eyebrowsOptions.Length - 1;
-        else if (nextEyebrowIndex >= eyebrowsOptions.Length)
+            nextEyebrowIndex = ScenesSharedResources.Instance.EyebrowsOptions.Length - 1;
+        else if (nextEyebrowIndex >= ScenesSharedResources.Instance.EyebrowsOptions.Length)
             nextEyebrowIndex = 0;
 
         SetEyebrowOption(nextEyebrowIndex);
@@ -161,7 +144,7 @@ public class CharacterCustomizationMenu : MonoBehaviour
     private void SetEyebrowOption(int index)
     {
         currentEyebrowIndex = index;
-        customizationLoader.SetEyebrows(eyebrowsOptions[currentEyebrowIndex]);
+        customizationLoader.SetEyebrows(ScenesSharedResources.Instance.EyebrowsOptions[currentEyebrowIndex]);
         eyebrowSelectionOutlinedText.SetText(currentEyebrowIndex.ToString());
     }
 
@@ -169,8 +152,8 @@ public class CharacterCustomizationMenu : MonoBehaviour
     {
         int nextHairIndex = currentHairIndex + (next ? 1 : -1);
         if (nextHairIndex < 0)
-            nextHairIndex = hairOptions.Length - 1;
-        else if (nextHairIndex >= hairOptions.Length)
+            nextHairIndex = ScenesSharedResources.Instance.HairOptions.Length - 1;
+        else if (nextHairIndex >= ScenesSharedResources.Instance.HairOptions.Length)
             nextHairIndex = 0;
 
         SetHairOption(nextHairIndex);
@@ -179,7 +162,7 @@ public class CharacterCustomizationMenu : MonoBehaviour
     private void SetHairOption(int index)
     {
         currentHairIndex = index;
-        customizationLoader.SetHair(hairOptions[currentHairIndex]);
+        customizationLoader.SetHair(ScenesSharedResources.Instance.HairOptions[currentHairIndex]);
         hairSelectionOutlinedText.SetText(currentHairIndex.ToString());
     }
 
@@ -187,8 +170,8 @@ public class CharacterCustomizationMenu : MonoBehaviour
     {
         int nextShirtIndex = currentShirtIndex + (next ? 1 : -1);
         if (nextShirtIndex < 0)
-            nextShirtIndex = shirtOptions.Length - 1;
-        else if (nextShirtIndex >= shirtOptions.Length)
+            nextShirtIndex = ScenesSharedResources.Instance.ShirtOptions.Length - 1;
+        else if (nextShirtIndex >= ScenesSharedResources.Instance.ShirtOptions.Length)
             nextShirtIndex = 0;
 
         SetShirtOption(nextShirtIndex);
@@ -198,10 +181,10 @@ public class CharacterCustomizationMenu : MonoBehaviour
     {
         currentShirtIndex = index;
 
-        colorPickerImage[(int)ColorCustomizationPart.ShirtBase].enabled = shirtOptions[currentShirtIndex] != null && shirtOptions[currentShirtIndex].BaseColorable;
-        colorPickerImage[(int)ColorCustomizationPart.ShirtColorable].enabled = shirtOptions[currentShirtIndex] != null && shirtOptions[currentShirtIndex].HasColorable;
+        colorPickerImage[(int)ColorCustomizationPart.ShirtBase].enabled = ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex] != null && ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex].BaseColorable;
+        colorPickerImage[(int)ColorCustomizationPart.ShirtColorable].enabled = ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex] != null && ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex].HasColorable;
 
-        customizationLoader.SetShirt(shirtOptions[currentShirtIndex]);
+        customizationLoader.SetShirt(ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex]);
         shirtSelectionOutlinedText.SetText(currentShirtIndex.ToString());
     }
 
@@ -249,50 +232,17 @@ public class CharacterCustomizationMenu : MonoBehaviour
 
     public void RandomizeButtonPressed()
     {
-        LoadCustomization(CreateRandomCharacter());
-    }
-
-    public CharacterCustomization CreateRandomCharacter()
-    {
-        Color32 GetRandomColor()
-        {
-            return new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255);
-        }
-
-        CharacterEyebrows eyebrows = eyebrowsOptions[Random.Range(0, eyebrowsOptions.Length)];
-        Color32 eyebrowsColor = GetRandomColor();
-
-        CharacterHair hair = hairOptions[Random.Range(0, hairOptions.Length)];
-        Color32 hairColor = GetRandomColor();
-
-        Color32 skinColor;
-        //Most times, pick a common skin color
-        if (Random.Range(0, 10) < 8)
-        {
-            skinColor = commonSkinColors[Random.Range(0, commonSkinColors.Count)];
-        }
-        else
-        {
-            skinColor = GetRandomColor();
-        }
-
-        Color32 eyesColor = GetRandomColor();
-
-        PantsItemInstance pantsInstance = new PantsItemInstance(pants, GetRandomColor());
-
-        ShirtItemInstance shirtItem = new ShirtItemInstance(shirtOptions[Random.Range(0, shirtOptions.Length)], GetRandomColor(), GetRandomColor());
-
-        //Sex will not be randomized
-        return new CharacterCustomization("", eyebrows, eyebrowsColor, hair, hairColor, skinColor, eyesColor, currentSex, null, shirtItem, pantsInstance);
+        LoadCustomization(CharacterCustomization.RandomCharacterCustomization());
     }
 
     private void LoadCustomization(CharacterCustomization customization)
     {
-        SetEyebrowOption(System.Array.IndexOf(eyebrowsOptions, customization.Eyebrows));
-        SetHairOption(System.Array.IndexOf(hairOptions, customization.Hair));
-        SetShirtOption(System.Array.IndexOf(shirtOptions, customization.Shirt?.ItemInformation));
+        SetEyebrowOption(System.Array.IndexOf(ScenesSharedResources.Instance.EyebrowsOptions, customization.Eyebrows));
+        SetHairOption(System.Array.IndexOf(ScenesSharedResources.Instance.HairOptions, customization.Hair));
+        SetShirtOption(System.Array.IndexOf(ScenesSharedResources.Instance.ShirtOptions, customization.Shirt?.ItemInformation));
 
-        SetSex(customization.Sex);
+        //Sex will not be randomized
+        //SetSex(customization.Sex);
 
         SetPartColor(ColorCustomizationPart.Eyebrows, customization.EyebrowsColor);
         SetPartColor(ColorCustomizationPart.Eyes,     customization.EyesColor);
@@ -320,16 +270,17 @@ public class CharacterCustomizationMenu : MonoBehaviour
         Color32 shirtBaseColor = colorPickerImage[(int)ColorCustomizationPart.ShirtBase].color;
         Color shirtColorableColor = colorPickerImage[(int)ColorCustomizationPart.ShirtColorable].color;
 
-        PlayerCharacterCustomization.Customization = new CharacterCustomization(
-            nameInputField.text,
-            eyebrowsOptions[currentEyebrowIndex], 
+        PlayerCustomization.Character = new CharacterCustomization(
+            ScenesSharedResources.Instance.EyebrowsOptions[currentEyebrowIndex], 
             colorPickerImage[(int)ColorCustomizationPart.Eyebrows].color,
-            hairOptions[currentHairIndex], colorPickerImage[(int)ColorCustomizationPart.Hair].color, 
+            ScenesSharedResources.Instance.HairOptions[currentHairIndex], colorPickerImage[(int)ColorCustomizationPart.Hair].color, 
             colorPickerImage[(int)ColorCustomizationPart.Skin].color,
             colorPickerImage[(int)ColorCustomizationPart.Eyes].color, currentSex, 
             null, 
-            new ShirtItemInstance(shirtOptions[currentShirtIndex], shirtBaseColor, shirtColorableColor), 
-            new PantsItemInstance(pants, colorPickerImage[(int)ColorCustomizationPart.Pants].color));
+            new ShirtItemInstance(ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex], shirtBaseColor, shirtColorableColor), 
+            new PantsItemInstance(ScenesSharedResources.Instance.Pants, colorPickerImage[(int)ColorCustomizationPart.Pants].color));
+
+        PlayerCustomization.PlayerName = nameInputField.text;
 
         SceneManager.LoadScene("Loading");
     }

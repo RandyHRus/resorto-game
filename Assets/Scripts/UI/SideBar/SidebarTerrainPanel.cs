@@ -48,7 +48,7 @@ public class SidebarTerrainPanel : SidebarPanel
         public override void OnClick()
         {
             base.OnClick();
-            PlayerStateMachine.Instance.SwitchState(info.OnSelectState.GetType(), null);
+            PlayerStateMachineManager.Instance.SwitchState(info.OnSelectState.GetType(), null);
         }
     }
 

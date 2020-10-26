@@ -17,7 +17,7 @@ public class ShirtItemInstance : TwoColorsCosmeticInstance
                 return primaryColor;
             else
                 return null;
-        }
+        } 
     }
 
     [TwoColorsCosmeticColorHide(false, "shirtItemInformation"), SerializeField] private Color32 secondaryColor = Color.white;

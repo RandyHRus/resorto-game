@@ -31,7 +31,7 @@ public class CheckMouseOverUI
     {
         PointerEventData eventData = new PointerEventData(EventSystem.current);
         eventData.position = Input.mousePosition;
-        List<RaycastResult> raysastResults = new List<RaycastResult>();
+        List<RaycastResult> raysastResults = new List<RaycastResult>(10);
         EventSystem.current.RaycastAll(eventData, raysastResults);
         return raysastResults;
     }

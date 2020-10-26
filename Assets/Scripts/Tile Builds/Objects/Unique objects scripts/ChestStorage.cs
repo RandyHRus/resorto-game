@@ -37,7 +37,7 @@ public class ChestStorage : MonoBehaviour, ITileObjectFunctions
 
     public void InsertItemInRandomEmptySlot(InventoryItemInstance item, int count)
     {
-        List<StorageItemInventorySlot> emptySlots = new List<StorageItemInventorySlot>();
+        List<StorageItemInventorySlot> emptySlots = new List<StorageItemInventorySlot>(storage.SlotCount);
 
         for (int i = 0; i < storage.SlotCount; i++)
         {

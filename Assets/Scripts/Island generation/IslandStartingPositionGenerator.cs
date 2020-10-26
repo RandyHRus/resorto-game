@@ -38,22 +38,22 @@ public class IslandStartingPositionGenerator : MonoBehaviour
     */
     private List<IslandStartingPosition> FindValidPositions()
     {
-        List<Vector3Int> waterEdgesConnectedToOcean = new List<Vector3Int>();
+        List<Vector2Int> waterEdgesConnectedToOcean = new List<Vector2Int>(128);
 
         // Use flood fill to find all edges connected to ocean
         // Sand next to any of the found water edges is a valid position 
 
         // Flood fill start at (0,0), (0,0) should be ocean
 
-        HashSet<Vector3Int> visitedPositions = new HashSet<Vector3Int>();
+        HashSet<Vector2Int> visitedPositions = new HashSet<Vector2Int>();
 
-        Stack<Vector3Int> positionsToCheck = new Stack<Vector3Int>();
-        positionsToCheck.Push(new Vector3Int(0, 0, 0));
+        Stack<Vector2Int> positionsToCheck = new Stack<Vector2Int>();
+        positionsToCheck.Push(new Vector2Int(0, 0));
 
         //Flood fill, find edges
         while (positionsToCheck.Count > 0)
         {
-            Vector3Int thisPosition = positionsToCheck.Pop();
+            Vector2Int thisPosition = positionsToCheck.Pop();
 
             if (visitedPositions.Contains(thisPosition))
             {
@@ -69,14 +69,14 @@ public class IslandStartingPositionGenerator : MonoBehaviour
                 continue;
             }
 
-            Vector3Int[] positionsToAdd = new Vector3Int[]
+            Vector2Int[] positionsToAdd = new Vector2Int[]
             {
-                new Vector3Int(thisPosition.x + 1, thisPosition.y,     0),
-                new Vector3Int(thisPosition.x - 1, thisPosition.y,     0),
-                new Vector3Int(thisPosition.x,     thisPosition.y + 1, 0),
-                new Vector3Int(thisPosition.x,     thisPosition.y - 1, 0)
+                new Vector2Int(thisPosition.x + 1, thisPosition.y   ),
+                new Vector2Int(thisPosition.x - 1, thisPosition.y   ),
+                new Vector2Int(thisPosition.x,     thisPosition.y + 1),
+                new Vector2Int(thisPosition.x,     thisPosition.y - 1)
             };
-            foreach (Vector3Int addPosition in positionsToAdd)
+            foreach (Vector2Int addPosition in positionsToAdd)
             {
                 positionsToCheck.Push(addPosition);
             }
@@ -88,23 +88,23 @@ public class IslandStartingPositionGenerator : MonoBehaviour
         if (waterEdgesConnectedToOcean.Count == 0)
             throw new IslandGenerationException("Could not find any water edge connected to ocean"); //Request new island generation
 
-        HashSet<Vector3Int> sandPositionsNextToOcean = new HashSet<Vector3Int>();
+        HashSet<Vector2Int> sandPositionsNextToOcean = new HashSet<Vector2Int>();
 
         // Find all edges from the found edges that is connected to sand
         // Could fail if all edges are not next to sand (they may be connected to cliff, land etc)
-        foreach (Vector3Int edge in waterEdgesConnectedToOcean)
+        foreach (Vector2Int edge in waterEdgesConnectedToOcean)
         {
-            Vector3Int[] neighboursToCheckForSand = new Vector3Int[]
+            Vector2Int[] neighboursToCheckForSand = new Vector2Int[]
             {
-                new Vector3Int(edge.x + 1, edge.y,     0),
-                new Vector3Int(edge.x - 1, edge.y,     0),
-                new Vector3Int(edge.x,     edge.y + 1, 0),
-                new Vector3Int(edge.x,     edge.y - 1, 0)
+                new Vector2Int(edge.x + 1, edge.y),
+                new Vector2Int(edge.x - 1, edge.y),
+                new Vector2Int(edge.x,     edge.y + 1),
+                new Vector2Int(edge.x,     edge.y - 1)
             };
 
-            List<Vector3Int> validSandPositions = new List<Vector3Int>();
+            List<Vector2Int> validSandPositions = new List<Vector2Int>(128);
 
-            foreach (Vector3Int neighbour in neighboursToCheckForSand)
+            foreach (Vector2Int neighbour in neighboursToCheckForSand)
             {
                 TileInformation neighbourInfo = TileInformationManager.Instance.GetTileInformation(neighbour);
                 if (neighbourInfo?.tileLocation == TileLocation.Sand)
@@ -119,18 +119,18 @@ public class IslandStartingPositionGenerator : MonoBehaviour
         }
 
         //A set of all valid groups of sand positions
-        List<IslandStartingPosition> validStartingPositions = new List<IslandStartingPosition>();
+        List<IslandStartingPosition> validStartingPositions = new List<IslandStartingPosition>(128);
 
         //Find positions with more sand nearby
-        foreach (Vector3Int pos in sandPositionsNextToOcean)
+        foreach (Vector2Int pos in sandPositionsNextToOcean)
         {
-            List<Vector3Int> nearbySand = new List<Vector3Int>();
+            List<Vector2Int> nearbySand = new List<Vector2Int>(128);
 
             for (int i = - 2; i <= 2; i++)
             {
                 for (int j = -2; j <= 2; j++)
                 {
-                    Vector3Int checkPosition = new Vector3Int(pos.x + i, pos.y + j, 0);
+                    Vector2Int checkPosition = new Vector2Int(pos.x + i, pos.y + j);
 
                     if (checkPosition == pos)
                         continue;
@@ -147,7 +147,7 @@ public class IslandStartingPositionGenerator : MonoBehaviour
             if (nearbySand.Count >= 1)
             {
                 int randomChestPositionIndex = Random.Range(0, nearbySand.Count);
-                Vector3Int randomChestPosition = nearbySand[randomChestPositionIndex];
+                Vector2Int randomChestPosition = nearbySand[randomChestPositionIndex];
                 nearbySand.RemoveAt(randomChestPositionIndex);
 
                 IslandStartingPosition startingPosition = new IslandStartingPosition(pos, randomChestPosition);
@@ -168,10 +168,10 @@ public class IslandStartingPositionGenerator : MonoBehaviour
 
 public class IslandStartingPosition
 {
-    public Vector3Int ActualStartingPosition { get; private set; }
-    public Vector3Int StartingChestPosition { get; private set; }
+    public Vector2Int ActualStartingPosition { get; private set; }
+    public Vector2Int StartingChestPosition { get; private set; }
 
-    public IslandStartingPosition(Vector3Int actualStartingPosition, Vector3Int startingChestPosition)
+    public IslandStartingPosition(Vector2Int actualStartingPosition, Vector2Int startingChestPosition)
     {
         this.ActualStartingPosition = actualStartingPosition;
         this.StartingChestPosition = startingChestPosition;

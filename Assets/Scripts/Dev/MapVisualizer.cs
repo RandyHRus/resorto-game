@@ -38,28 +38,48 @@ public class MapVisualizer : MonoBehaviour
             //Activative/Deactivate tilemap
             {
                 if (currentVisualization == DevMapVisualizations.None)
+                {
+                    colorTilemap.ClearAllTiles();
                     colorTilemap.gameObject.SetActive(false);
+                }
                 else
                     colorTilemap.gameObject.SetActive(true);
             }
 
-            if (currentVisualization == DevMapVisualizations.Elevation)
+            Color32[,] proposedVisualization = null;
+
+            switch (currentVisualization)
             {
-                ShowVisualization(GetElevationMap());
+                case (DevMapVisualizations.Elevation):
+                    proposedVisualization = GetElevationMap();
+                    break;
+                case (DevMapVisualizations.TileLocation):
+                    proposedVisualization = GetLocationMap();
+                    break;
+                case (DevMapVisualizations.ObjectsAndFloorings):
+                    proposedVisualization = GetObjectsAndFlooringsMap();
+                    break;
+                case (DevMapVisualizations.Stairs):
+                    proposedVisualization = GetStairsMap();
+                    break;
+                case (DevMapVisualizations.FishingPositions):
+                    proposedVisualization = GetFishingPositionsMap();
+                    break;
+                case (DevMapVisualizations.None):
+                    break;
+                default:
+                    throw new System.NotImplementedException();
             }
-            else if (currentVisualization == DevMapVisualizations.TileLocation)
-            {
-                ShowVisualization(GetLocationMap());
-            }
-            else if (currentVisualization == DevMapVisualizations.ObjectsAndFloorings)
-            {
-                ShowVisualization(GetObjectsAndFlooringsMap());
-            }
+
+            if (proposedVisualization != null)
+                ShowVisualization(proposedVisualization);
         }
     }
 
     private void ShowVisualization(Color32[,] colorMap)
     {
+        colorTilemap.ClearAllTiles();
+
         for (int x = 0; x < colorMap.GetLength(0); x++)
         {
             for (int y = 0; y < colorMap.GetLength(1); y++)
@@ -72,7 +92,7 @@ public class MapVisualizer : MonoBehaviour
         }
     }
 
-    private  Color32[,] GetObjectsAndFlooringsMap()
+    private Color32[,] GetObjectsAndFlooringsMap()
     {
         int mapSize = TileInformationManager.mapSize;
 
@@ -84,7 +104,7 @@ public class MapVisualizer : MonoBehaviour
         {
             for (int y = 0; y < mapSize; y++)
             {
-                Vector3Int pos = new Vector3Int(x, y, 0);
+                Vector2Int pos = new Vector2Int(x, y);
                 TileInformation info = TileInformationManager.Instance.GetTileInformation(pos);
 
                 Color32 proposedColor;
@@ -140,7 +160,7 @@ public class MapVisualizer : MonoBehaviour
         {
             for (int j = 0; j < mapSize; j++)
             {
-                Vector3Int pos = new Vector3Int(i, j, 0);
+                Vector2Int pos = new Vector2Int(i, j);
                 int layerNum = TileInformationManager.Instance.GetTileInformation(pos).layerNum;
 
                 if (layerNum != Constants.INVALID_TILE_LAYER)
@@ -175,7 +195,7 @@ public class MapVisualizer : MonoBehaviour
         {
             for (int y = 0; y < mapSize; y++)
             {
-                Vector3Int pos = new Vector3Int(x, y, 0);
+                Vector2Int pos = new Vector2Int(x, y);
                 TileInformation info = TileInformationManager.Instance.GetTileInformation(pos);
 
                 int devVisualizationIndex = Array.IndexOf(Enum.GetValues(info.tileLocation.GetType()), info.tileLocation);
@@ -188,12 +208,74 @@ public class MapVisualizer : MonoBehaviour
         return colorMap;
     }
 
+    private Color32[,] GetStairsMap()
+    {
+        int mapSize = TileInformationManager.mapSize;
+
+        Color32[,] colorMap = new Color32[mapSize, mapSize];
+
+        for (int x = 0; x < mapSize; x++)
+        {
+            for (int y = 0; y < mapSize; y++)
+            {
+                Vector2Int pos = new Vector2Int(x, y);
+                TileInformation info = TileInformationManager.Instance.GetTileInformation(pos);
+
+                int stairsConnectionsCount = info.StairsStartPositions.Count;
+
+                Color32 color = ElevationColors[stairsConnectionsCount];
+                colorMap[x, y] = color;
+            }
+        }
+
+        return colorMap;
+    }
+
+    private Color32[,] GetFishingPositionsMap()
+    {
+        int mapSize = TileInformationManager.mapSize;
+
+        Color32[,] colorMap = new Color32[mapSize, mapSize];
+
+        for (int x = 0; x < mapSize; x++)
+        {
+            for (int y = 0; y < mapSize; y++)
+            {
+                Vector2Int pos = new Vector2Int(x, y);
+                TileInformation info = TileInformationManager.Instance.GetTileInformation(pos);
+
+                Color32 color;
+                if (info.region?.regionInformation.GetType() == typeof(FishingRegionInformation))
+                {
+                    if (((FishingRegionInstance)info.region).IsValidFishingPositionInThisRegion(pos))
+                    {
+                        color = ElevationColors[0];
+                    }
+                    else
+                    {
+                        color = ElevationColors[1];
+                    }
+                }
+                else
+                {
+                    color = ElevationColors[1];
+                }
+
+                colorMap[x, y] = color;
+            }
+        }
+
+        return colorMap;
+    }
+
     private enum DevMapVisualizations
     {
         None,
         Elevation,
         TileLocation,
-        ObjectsAndFloorings
+        ObjectsAndFloorings,
+        Stairs,
+        FishingPositions
     }
 
     private enum ObjectsAndFloorings

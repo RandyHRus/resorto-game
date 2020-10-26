@@ -17,7 +17,8 @@ public class UIManager : MonoBehaviour
     }
     private SavedUI savedUI;
 
-    private HashSet<UIObject> otherExternalOpenUI = new HashSet<UIObject>();
+    public delegate void AllUIClosed();
+    public static event AllUIClosed OnAllUIClosed;
 
     private static UIManager _instance;
     public static UIManager Instance { get { return _instance; } }
@@ -31,12 +32,6 @@ public class UIManager : MonoBehaviour
         {
             _instance = this;
         }
-    }
-
-    public void ShowExternalUI(UIObject ui)
-    {
-        ui.Show(true);
-        otherExternalOpenUI.Add(ui);
     }
 
     //Returns true if something was closed
@@ -57,16 +52,10 @@ public class UIManager : MonoBehaviour
             somethingClosed = true;
         }
 
-        //External ui will not be saved when reloaded
-        foreach (UIObject ui in otherExternalOpenUI)
-        {
-            ui.Show(false);
-            somethingClosed = true;
-        }
-        otherExternalOpenUI.Clear();
-
         if (somethingClosed)
             savedUI = proposedSavedUI;
+
+        OnAllUIClosed?.Invoke();
 
         return somethingClosed;
     }

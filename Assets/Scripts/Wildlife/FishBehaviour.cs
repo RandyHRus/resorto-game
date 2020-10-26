@@ -163,7 +163,7 @@ public class FishBehaviour : WildlifeBehaviour
         float currentRotatingSpeed = 0f;     //Can vary between -maxIdleTurnSpeed to +maxIdleTurnSpeed
         bool rotatingCW = true;              //True - CW, false - CCW       
 
-        Vector3Int currentTile = new Vector3Int(Mathf.RoundToInt(Transform.position.x), Mathf.RoundToInt(Transform.position.y), 0);
+        Vector2Int currentTile = new Vector2Int(Mathf.RoundToInt(Transform.position.x), Mathf.RoundToInt(Transform.position.y));
 
         while (state == FishState.Idle)
         {
@@ -242,7 +242,7 @@ public class FishBehaviour : WildlifeBehaviour
             {
                 Vector2 change = (-Transform.right) * currentMoveSpeed * Time.deltaTime;
                 Vector2 proposedPosition = (Vector2)Transform.position + change;
-                Vector3Int proposedTile = new Vector3Int(Mathf.RoundToInt(proposedPosition.x), Mathf.RoundToInt(proposedPosition.y), 0);
+                Vector2Int proposedTile = new Vector2Int(Mathf.RoundToInt(proposedPosition.x), Mathf.RoundToInt(proposedPosition.y));
 
                 //Fade out if there is collision(land/sand) ahead
                 if (proposedTile != currentTile)
@@ -283,7 +283,7 @@ public class FishBehaviour : WildlifeBehaviour
         }
     }
 
-    private void CheckForHeadingCollision(Vector2 headingVector, Vector3Int tile, out bool tile_h_collision, out bool tile_v_collision, out bool tile_hv_collision)
+    private void CheckForHeadingCollision(Vector2 headingVector, Vector2Int tile, out bool tile_h_collision, out bool tile_v_collision, out bool tile_hv_collision)
     {
         TileInformation tile_h = null, tile_v = null, tile_hv = null; //Tiles next to tile
 
@@ -291,15 +291,15 @@ public class FishBehaviour : WildlifeBehaviour
         int signY = (int)Mathf.Sign(headingVector.y);
         if (headingVector.x != 0)
         {
-            tile_h = TileInformationManager.Instance.GetTileInformation(new Vector3Int(tile.x + signX, tile.y, 0));
+            tile_h = TileInformationManager.Instance.GetTileInformation(new Vector2Int(tile.x + signX, tile.y));
         }
         if (headingVector.y != 0)
         {
-            tile_v = TileInformationManager.Instance.GetTileInformation(new Vector3Int(tile.x, tile.y + signY, 0));
+            tile_v = TileInformationManager.Instance.GetTileInformation(new Vector2Int(tile.x, tile.y + signY));
         }
         if (headingVector.x != 0 && headingVector.y != 0)
         {
-            tile_hv = TileInformationManager.Instance.GetTileInformation(new Vector3Int(tile.x + signX, tile.y + signY, 0));
+            tile_hv = TileInformationManager.Instance.GetTileInformation(new Vector2Int(tile.x + signX, tile.y + signY));
         }
 
         tile_h_collision = (tile_h == null || tile_h.tileLocation != TileLocation.DeepWater);

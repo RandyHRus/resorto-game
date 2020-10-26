@@ -12,45 +12,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d8ebe6e1146b6947aba627a5ffdef21, type: 3}
   m_Name: Broco
   m_EditorClassIdentifier: 
-  characterCustomization:
-    characterName: Broco
-    eyebrows: {fileID: 11400000, guid: 07d4eb248d9cd1748bb63976c87c6177, type: 2}
-    eyebrowsColor:
-      serializedVersion: 2
-      rgba: 4289450708
-    hair: {fileID: 11400000, guid: 14f1d81dd16a0084981a65ea48d035b6, type: 2}
-    hairColor:
-      serializedVersion: 2
-      rgba: 4281186499
-    skinColor:
-      serializedVersion: 2
-      rgba: 4283747463
-    eyesColor:
-      serializedVersion: 2
-      rgba: 4280032424
-    sex: 0
-    hat:
-      hatItemInformation: {fileID: 11400000, guid: d7cef26125bd23f4db327d2802931efd,
-        type: 2}
-      primaryColor:
+  touristInformation:
+    npcName: Broco
+    characterCustomization:
+      eyebrows: {fileID: 11400000, guid: f6eac92c1700813408ff6bc5292e347b, type: 2}
+      eyebrowsColor:
         serializedVersion: 2
-        rgba: 4291434180
-      secondaryColor:
+        rgba: 4283023567
+      hair: {fileID: 11400000, guid: 1347da320231d1d4f9efc28b332d30ac, type: 2}
+      hairColor:
         serializedVersion: 2
-        rgba: 4294909184
-    shirt:
-      shirtItemInformation: {fileID: 11400000, guid: 3ff12e44f92ea704e8e83f3f966501fc,
-        type: 2}
-      primaryColor:
+        rgba: 4284598458
+      skinColor:
         serializedVersion: 2
-        rgba: 4291561199
-      secondaryColor:
+        rgba: 4279751789
+      eyesColor:
         serializedVersion: 2
-        rgba: 0
-    pants:
-      pantsItemInformation: {fileID: 11400000, guid: 147c5b5dd5a3010439d5b87747ec5dc0,
-        type: 2}
-      color:
-        serializedVersion: 2
-        rgba: 4280822015
-  dialogueFile: {fileID: 4900000, guid: ffa52775b36361141a75a14638e9932f, type: 3}
+        rgba: 4291042270
+      sex: 0
+      hat:
+        hatItemInformation: {fileID: 0}
+        primaryColor:
+          serializedVersion: 2
+          rgba: 0
+        secondaryColor:
+          serializedVersion: 2
+          rgba: 0
+      shirt:
+        shirtItemInformation: {fileID: 0}
+        primaryColor:
+          serializedVersion: 2
+          rgba: 0
+        secondaryColor:
+          serializedVersion: 2
+          rgba: 0
+      pants:
+        pantsItemInformation: {fileID: 11400000, guid: 147c5b5dd5a3010439d5b87747ec5dc0,
+          type: 2}
+        color:
+          serializedVersion: 2
+          rgba: 4287846803
+    personality: 0

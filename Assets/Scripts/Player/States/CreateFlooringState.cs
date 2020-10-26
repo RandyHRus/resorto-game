@@ -29,7 +29,7 @@ public class CreateFlooringState : PlayerState
                 rotation = 0;
         }
 
-        Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
+        Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
         bool floorPlaceable = FlooringManager.FlooringPlaceable(flooringVariant, mouseTilePosition);
 
         //Indicator things
@@ -51,23 +51,23 @@ public class CreateFlooringState : PlayerState
     IEnumerator PlaceFloor()
     {
         coroutineRunning = true;
-        Vector3Int previousTilePosition = new Vector3Int(-1, -1, -1);
+        Vector2Int previousTilePosition = new Vector2Int(-1, -1);
         indicatorManager = new TilesIndicatorManager(); //We need to refresh the previous tiles
 
-        Vector3Int startPos = TileInformationManager.Instance.GetMouseTile();
+        Vector2Int startPos = TileInformationManager.Instance.GetMouseTile();
         int[,] floorPlaceableCache = new int[TileInformationManager.mapSize, TileInformationManager.mapSize]; // 0 not visited, -1 not placeable, 1 placeable
 
         int minX = -1, maxX = -1, minY = -1, maxY = -1;
 
         bool placeable = false;
 
-        HashSet<Vector3Int> currentPositions = new HashSet<Vector3Int>();
+        HashSet<Vector2Int> currentPositions = new HashSet<Vector2Int>();
 
         while (Input.GetButton("Primary"))
         {
             currentPositions.Clear();
 
-            Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
+            Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
 
             if (mouseTilePosition != previousTilePosition)
                 previousTilePosition = mouseTilePosition;
@@ -84,14 +84,14 @@ public class CreateFlooringState : PlayerState
             {
                 for (int j = minY; j <= maxY; j++)
                 {
-                    Vector3Int pos = new Vector3Int(i, j, 0);
+                    Vector2Int pos = new Vector2Int(i, j);
                     if (!TileInformationManager.Instance.PositionInMap(pos))
                         continue;
 
                     int tilePlaceable = floorPlaceableCache[i, j];
                     if (tilePlaceable != 0)
                     {
-                        tilePlaceable = (FlooringManager.FlooringPlaceable(flooringVariant, new Vector3Int(i, j, 0))) ? 1 : 0;
+                        tilePlaceable = (FlooringManager.FlooringPlaceable(flooringVariant, new Vector2Int(i, j))) ? 1 : 0;
                         floorPlaceableCache[i, j] = tilePlaceable;
                     }
 
@@ -100,14 +100,14 @@ public class CreateFlooringState : PlayerState
                         placeable = false;
                     }
 
-                    currentPositions.Add(new Vector3Int(i, j, 0));
+                    currentPositions.Add(new Vector2Int(i, j));
                 }
             }
 
             //Show new indicators
             indicatorManager.SwapCurrentTiles(currentPositions);
             
-            foreach (Vector3Int pos in currentPositions)
+            foreach (Vector2Int pos in currentPositions)
             {
                 indicatorManager.SetSprite(pos, FlooringManager.GetSprite(flooringVariant, currentPositions, true, pos, rotation));
                 indicatorManager.SetColor(pos, ResourceManager.Instance.Green);

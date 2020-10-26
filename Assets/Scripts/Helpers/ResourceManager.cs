@@ -71,8 +71,8 @@ public class ResourceManager : MonoBehaviour
     [SerializeField] private GameObject dialogueBoxInstance = null;
     public GameObject DialogueBoxInstance => dialogueBoxInstance;
 
-    [SerializeField] private Transform player = null;
-    public Transform Player => player;
+    [SerializeField] private GameObject rightClickOptionUIPrefab = null;
+    public GameObject RightClickOptionUIPrefab => rightClickOptionUIPrefab;
 
     [Header("Colors")]
 
@@ -85,6 +85,12 @@ public class ResourceManager : MonoBehaviour
     [SerializeField] private Color32 yellow = Color.white;
     public Color32 Yellow => yellow;
 
+    [SerializeField] private Color32 purple = Color.white;
+    public Color32 Purple => purple;
+
+    [SerializeField] private Color32 orange = Color.white;
+    public Color32 Orange => orange;
+
     [EnumNamedArray(typeof(ItemTag)), SerializeField]
     private Color32[] itemTagColors = new Color32[Enum.GetNames(typeof(ItemTag)).Length];
     public Color32[] ItemTagColors => itemTagColors;
@@ -96,6 +102,15 @@ public class ResourceManager : MonoBehaviour
 
     [SerializeField] private GameObject character = null;
     public GameObject Character => character;
+
+    [SerializeField] private GameObject touristNpc = null;
+    public GameObject TouristNpc => touristNpc;
+
+    [SerializeField] private GameObject workerNpc = null;
+    public GameObject WorkerNpc => workerNpc;
+
+    [SerializeField] private GameObject visitorNpc = null;
+    public GameObject VisitorNpc => visitorNpc;
 
     [SerializeField] private Material diffuse = null;
     public Material Diffuse => diffuse;
@@ -111,6 +126,16 @@ public class ResourceManager : MonoBehaviour
 
     [SerializeField] private GameObject caughtFishPrefab = null;
     public GameObject CaughtFishPrefab => caughtFishPrefab;
+
+    [SerializeField] private LineRenderer pathFindingVisualizerLineRenderer = null;
+    public LineRenderer PathFindingVisualizerLineRenderer => pathFindingVisualizerLineRenderer;
+
+    [SerializeField] private Transform player = null;
+    public Transform Player => player;
+
+    [EnumNamedArray(typeof(TouristHappinessEnum)), SerializeField]
+    private Sprite[] touristHappinessIcons = new Sprite[Enum.GetNames(typeof(TouristHappinessEnum)).Length];
+    public Sprite GetTouristHappinessIcon(TouristHappinessEnum happiness) { return touristHappinessIcons[(int)happiness]; } 
 
     private static ResourceManager _instance;
     public static ResourceManager Instance { get { return _instance; } }

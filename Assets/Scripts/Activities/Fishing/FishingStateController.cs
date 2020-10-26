@@ -11,6 +11,9 @@ public class FishingStateController
     private FishingResources resources;
     private Animator animator;
 
+    public delegate void FishingEnd();
+    public event FishingEnd OnFishingEnd;
+
     public FishingStateController(FishingDefaultPhase defaultPhase, FishingChargingPhase chargingPhase, FishingCastingPhase castingPhase,
             FishingBobbingPhase bobbingPhase, FishingHookedPhase hookedPhase, FishingResources resources)
     {
@@ -26,8 +29,6 @@ public class FishingStateController
             { typeof(FishingBobbingPhase),  bobbingPhase },
             { typeof(FishingHookedPhase),   hookedPhase }
         };
-
-        SwitchPhase<FishingDefaultPhase>();
     }
 
     public void Execute()
@@ -60,6 +61,7 @@ public class FishingStateController
         SwitchPhase(typeof(T), args);
     }
 
+    //Switch to null to end fishing
     public void SwitchPhase(Type t, object[] args = null)
     {
         if (CurrentPhase != null)
@@ -68,7 +70,12 @@ public class FishingStateController
             CurrentPhase.EndState();
         }
 
-        if (t.IsAssignableFrom(typeof(FishingDefaultPhase)))
+        if (t == null)
+        {
+            OnFishingEnd?.Invoke();
+            return;
+        }
+        else if (t.IsAssignableFrom(typeof(FishingDefaultPhase)))
         {
             ResetFishing();
         }

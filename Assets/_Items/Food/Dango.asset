@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb375f5564ce9894eb95b265089f1dce, type: 3}
+  m_Name: Dango
+  m_EditorClassIdentifier: 
+  itemName: Dango
+  itemIcon: {fileID: 1920056429998888880, guid: 8a302f82af935f44cbc804188b15d1a6,
+    type: 3}
+  restoration: 2

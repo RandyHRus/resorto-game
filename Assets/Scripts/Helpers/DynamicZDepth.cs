@@ -14,7 +14,7 @@ public class DynamicZDepth : MonoBehaviour
     public static float ParrotFlying = 0.8f;
     public static float ParrotOnGround = 0f;
 
-    public static float GetDynamicZDepth(Vector3 pos, float offset)
+    public static float GetDynamicZDepth(Vector2 pos, float offset)
     {
         return GetDynamicZDepth(pos.y, offset);
     }

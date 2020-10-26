@@ -11,7 +11,7 @@ public abstract class CharacterCosmeticItemInformation : InventoryItemInformatio
 
     public override void ItemSelected()
     {
-        PlayerStateMachine.Instance.SwitchState<DefaultState>();
+        PlayerStateMachineManager.Instance.SwitchState<DefaultState>();
     }
 
     public abstract bool HasPrimaryColor { get; }

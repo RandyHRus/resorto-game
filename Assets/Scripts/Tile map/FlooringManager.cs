@@ -24,10 +24,10 @@ public class FlooringManager
 
     private static int MAX_SUPPORTS_SPACING = 4;
 
-    public static bool FlooringPlaceable(FlooringVariantBase flooringVariant, Vector3Int position)
+    public static bool FlooringPlaceable(FlooringVariantBase flooringVariant, Vector2Int position)
     {
         TileInformation info = TileInformationManager.Instance.GetTileInformation(position);
-        TileInformation belowInfo = TileInformationManager.Instance.GetTileInformation(new Vector3Int(position.x, position.y -1, 0));
+        TileInformation belowInfo = TileInformationManager.Instance.GetTileInformation(new Vector2Int(position.x, position.y -1));
 
         if (info == null || belowInfo == null)
             return false;
@@ -52,24 +52,9 @@ public class FlooringManager
         return true;
     }
 
-    public static bool FlooringRemoveable(Vector3Int position)
+    public static bool TryPlaceFlooring(FlooringVariantBase flooringVariant, HashSet<Vector2Int> positions, FlooringRotation rotation)
     {
-        TileInformation info = TileInformationManager.Instance.GetTileInformation(position);
-        if (info == null)
-            return false;
-
-        if (info.TopMostBuild != null)
-            return false;
-
-        if (info.GetTopFlooringGroup() == null)
-            return false;
-
-        return true;
-    }
-
-    public static bool TryPlaceFlooring(FlooringVariantBase flooringVariant, HashSet<Vector3Int> positions, FlooringRotation rotation)
-    {
-        foreach (Vector3Int position in positions)
+        foreach (Vector2Int position in positions)
         {
             //Exit if can't place flooring
             if (!FlooringPlaceable(flooringVariant, position))
@@ -88,20 +73,20 @@ public class FlooringManager
         return true;
     }
 
-    private static void CreateDock(FlooringVariantBase flooringVariant, HashSet<Vector3Int> positions, FlooringRotation rotation)
+    private static void CreateDock(FlooringVariantBase flooringVariant, HashSet<Vector2Int> positions, FlooringRotation rotation)
     {
         FindEdges(positions, out int minX, out int maxX, out int minY, out int maxY);
 
         //Create docks
-        Dictionary<Vector3Int, FlooringNormalPartOnTile> floorings = new Dictionary<Vector3Int, FlooringNormalPartOnTile>();
-        foreach (Vector3Int position in positions)
+        Dictionary<Vector2Int, FlooringNormalPartOnTile> floorings = new Dictionary<Vector2Int, FlooringNormalPartOnTile>();
+        foreach (Vector2Int position in positions)
         {
             FlooringNormalPartOnTile f = CreateSingleDock((DockFlooringVariant)flooringVariant, position);
             floorings.Add(position, f);
         }
 
         //Create supports
-        List<GameObject> supportObjects = new List<GameObject>();
+        List<GameObject> supportObjects = new List<GameObject>(128);
         {
             float xSupportsSpacing = GetSpacing(minX, maxX, out int xSupportsCount);
             float ySupportsSpacing = GetSpacing(minY, maxY, out int ySupportsCount);
@@ -112,7 +97,7 @@ public class FlooringManager
                 {
                     int xPos = minX + Mathf.RoundToInt(i * xSupportsSpacing);
                     int yPos = minY + Mathf.RoundToInt(j * ySupportsSpacing);
-                    Vector3Int position = new Vector3Int(xPos, yPos, 0);
+                    Vector2Int position = new Vector2Int(xPos, yPos);
                     GameObject supportObject = CreateDockSupport((DockFlooringVariant)flooringVariant, position);
                     supportObjects.Add(supportObject);
                 }
@@ -141,29 +126,19 @@ public class FlooringManager
         }
 
         //Get support positions
-        HashSet<Vector3Int> supportPositions = new HashSet<Vector3Int>();
+        HashSet<Vector2Int> supportPositions = new HashSet<Vector2Int>();
         for (int i = minX; i <= maxX; i++)
         {
-            Vector3Int pos = new Vector3Int(i, minY - 1, 0);
+            Vector2Int pos = new Vector2Int(i, minY - 1);
             supportPositions.Add(pos);
         }
 
-        //Set tiles
-        FlooringGroup group = new FlooringGroup(floorings, supportPositions, new Vector2Int(minX, minY), new Vector2Int(maxX, maxY), supportObjects, flooringVariant, rotation);
-        foreach (KeyValuePair<Vector3Int, FlooringNormalPartOnTile> pair in floorings)
-        {
-            TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(pair.Key);
-            tileInfo.NormalFlooringGroup = group;
-            tileInfo.layerNum++;
-        }
-        foreach (Vector3Int p in supportPositions)
-        {
-            TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(p);
-            tileInfo.SupportFlooringGroup = group;
-        }
+        //Set tiles through tileInformation script
+        TileInformation mainTileInfo = TileInformationManager.Instance.GetTileInformation(new Vector2Int(minX, minY));
+        mainTileInfo.CreateFlooringGroup(floorings, supportPositions, new Vector2Int(maxX, maxY), supportObjects, flooringVariant, rotation);
 
         //The support object
-        GameObject CreateDockSupport(DockFlooringVariant dockVariant, Vector3Int position)
+        GameObject CreateDockSupport(DockFlooringVariant dockVariant, Vector2Int position)
         {
             GameObject supportTop = new GameObject("SupportTop");
             SpriteRenderer topRenderer = supportTop.AddComponent<SpriteRenderer>();
@@ -185,14 +160,14 @@ public class FlooringManager
             return parent;
         }
 
-        FlooringNormalPartOnTile CreateSingleDock(DockFlooringVariant dockVariant, Vector3Int position)
+        FlooringNormalPartOnTile CreateSingleDock(DockFlooringVariant dockVariant, Vector2Int position)
         {
-            List<Vector3Int> neighbours = new List<Vector3Int>()
+            List<Vector2Int> neighbours = new List<Vector2Int>
             {
-                new Vector3Int(position.x,     position.y + 1, 0),
-                new Vector3Int(position.x + 1, position.y,     0),
-                new Vector3Int(position.x,     position.y - 1, 0),
-                new Vector3Int(position.x - 1, position.y,     0)
+                new Vector2Int(position.x,     position.y + 1),
+                new Vector2Int(position.x + 1, position.y),
+                new Vector2Int(position.x,     position.y - 1),
+                new Vector2Int(position.x - 1, position.y)
             };
 
             //Create this dock
@@ -211,7 +186,7 @@ public class FlooringManager
             }
 
             //Set neighbour sprites
-            foreach (Vector3Int neighbour in neighbours)
+            foreach (Vector2Int neighbour in neighbours)
             {
                 TileInformation info = TileInformationManager.Instance.GetTileInformation(neighbour);
 
@@ -226,11 +201,11 @@ public class FlooringManager
         }
     }
 
-    private static void FindEdges(HashSet<Vector3Int> positions, out int minX, out int maxX, out int minY, out int maxY)
+    private static void FindEdges(HashSet<Vector2Int> positions, out int minX, out int maxX, out int minY, out int maxY)
     {
         maxX = int.MinValue; maxY = int.MinValue; minX = int.MaxValue; minY = int.MaxValue;
 
-        foreach (Vector3Int position in positions)
+        foreach (Vector2Int position in positions)
         {
             if (position.x > maxX)
                 maxX = position.x;
@@ -246,28 +221,28 @@ public class FlooringManager
         }
     }
 
-    public static Sprite GetSprite(FlooringVariantBase flooringVariant, HashSet<Vector3Int> positionsToBeAddedOrRemoved, bool addingPositions, Vector3Int p, FlooringRotation r)
+    public static Sprite GetSprite(FlooringVariantBase flooringVariant, HashSet<Vector2Int> positionsToBeAddedOrRemoved, bool addingPositions, Vector2Int p, FlooringRotation r)
     {
         int resultCode = (r == FlooringRotation.Horizontal) ? 0b00000 : 0b10000;
 
-        List<Tuple<Vector3Int, int>> codeToAddFromNeighbours = new List<Tuple<Vector3Int, int>>()
+        List<Tuple<Vector2Int, int>> codeToAddFromNeighbours = new List<Tuple<Vector2Int, int>>()
         {
-            Tuple.Create(new Vector3Int(p.x,     p.y + 1, 0), 0b0001),
-            Tuple.Create(new Vector3Int(p.x + 1, p.y,     0), 0b0010),
-            Tuple.Create(new Vector3Int(p.x,     p.y - 1, 0), 0b0100),
-            Tuple.Create(new Vector3Int(p.x - 1, p.y,     0), 0b1000)
+            Tuple.Create(new Vector2Int(p.x,     p.y + 1), 0b0001),
+            Tuple.Create(new Vector2Int(p.x + 1, p.y),     0b0010),
+            Tuple.Create(new Vector2Int(p.x,     p.y - 1), 0b0100),
+            Tuple.Create(new Vector2Int(p.x - 1, p.y),     0b1000)
         };
 
-        List<Tuple<Vector3Int, int>> codeToAddFromStairs = new List<Tuple<Vector3Int, int>>()
+        List<Tuple<Vector2Int, int>> codeToAddFromStairs = new List<Tuple<Vector2Int, int>>()
         {
-            Tuple.Create(new Vector3Int(p.x,     p.y + 1, 0), 0b0001),
-            Tuple.Create(new Vector3Int(p.x + 1, p.y - 1, 0), 0b0010),
-            Tuple.Create(new Vector3Int(p.x,     p.y - 2, 0), 0b0100),
-            Tuple.Create(new Vector3Int(p.x - 1, p.y - 1, 0), 0b1000)
+            Tuple.Create(new Vector2Int(p.x,     p.y + 1), 0b0001),
+            Tuple.Create(new Vector2Int(p.x + 1, p.y - 1), 0b0010),
+            Tuple.Create(new Vector2Int(p.x,     p.y - 2), 0b0100),
+            Tuple.Create(new Vector2Int(p.x - 1, p.y - 1), 0b1000)
         };
 
         //Add code from neighbours
-        foreach (Tuple<Vector3Int, int> t in codeToAddFromNeighbours)
+        foreach (Tuple<Vector2Int, int> t in codeToAddFromNeighbours)
         {
             TileInformation info = TileInformationManager.Instance.GetTileInformation(t.Item1);
 
@@ -286,7 +261,7 @@ public class FlooringManager
         }
 
         //Add code from stairs
-        foreach (Tuple<Vector3Int, int> t in codeToAddFromStairs)
+        foreach (Tuple<Vector2Int, int> t in codeToAddFromStairs)
         {
             TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(t.Item1);
             if (tileInfo?.TopMostBuild?.BuildInfo is StairsVariant stairs)
@@ -298,7 +273,7 @@ public class FlooringManager
         return flooringVariant.CodeToSprite[resultCode];
     }
 
-    private static bool PositionHasFlooringVariant(FlooringVariantBase flooringVariant, Vector3Int p, out FlooringNormalPartOnTile flooring)
+    private static bool PositionHasFlooringVariant(FlooringVariantBase flooringVariant, Vector2Int p, out FlooringNormalPartOnTile flooring)
     {
         flooring = null;
         TileInformation info = TileInformationManager.Instance.GetTileInformation(p);
@@ -316,81 +291,4 @@ public class FlooringManager
         flooring = group.NormalFloorings[p];
         return true;
     }
-
-    public static bool TryRemoveFlooring(Vector3Int pos)
-    {
-        if (!FlooringRemoveable(pos))
-            return false;
-
-        TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(pos);
-
-        //Update neighbour tiles
-        {
-            HashSet<Vector3Int> neighbourTiles = new HashSet<Vector3Int>();
-            FlooringGroup thisGroup = tileInfo.GetTopFlooringGroup();
-            for (int i = thisGroup.BottomLeft.x; i <= thisGroup.TopRight.x; i++)
-            {
-                neighbourTiles.Add(new Vector3Int(i, thisGroup.BottomLeft.y - 1, 0));
-                neighbourTiles.Add(new Vector3Int(i, thisGroup.TopRight.y + 1, 0));
-            }
-            for (int i = thisGroup.BottomLeft.y; i <= thisGroup.TopRight.y; i++)
-            {
-                neighbourTiles.Add(new Vector3Int(thisGroup.BottomLeft.x - 1, i, 0));
-                neighbourTiles.Add(new Vector3Int(thisGroup.TopRight.x + 1, i, 0));
-            }
-
-            HashSet<Vector3Int> toBeRemoved = new HashSet<Vector3Int>();
-            foreach (KeyValuePair<Vector3Int, FlooringNormalPartOnTile> p in thisGroup.NormalFloorings)
-                toBeRemoved.Add(p.Key);
-
-            foreach (Vector3Int n in neighbourTiles)
-            {
-                TileInformation neighbourTileInfo = TileInformationManager.Instance.GetTileInformation(n);
-
-                if (neighbourTileInfo == null || neighbourTileInfo.NormalFlooringGroup == null)
-                    continue;
-
-                FlooringGroup group = neighbourTileInfo.NormalFlooringGroup;
-
-                group.NormalFloorings[n].Renderer.sprite = GetSprite(group.FlooringVariant, toBeRemoved, false, n, group.Rotation);
-            }
-        }
-
-        //Actual removal
-        {
-            FlooringGroup topGroup = tileInfo.GetTopFlooringGroup();
-
-            if (topGroup == null)
-                throw new System.Exception("No flooring to remove!");
-
-            topGroup.Destroy();
-
-            //Clear tiles
-            {
-                //Clear normal floorings
-                foreach (KeyValuePair<Vector3Int, FlooringNormalPartOnTile> pair in topGroup.NormalFloorings)
-                {
-                    TileInformation checkTileInfo = TileInformationManager.Instance.GetTileInformation(pair.Key);
-                    if (checkTileInfo.NormalFlooringGroup.FlooringVariant.GetType() == typeof(DockFlooringVariant))
-                        checkTileInfo.layerNum--;
-                    checkTileInfo.NormalFlooringGroup = null;
-                }
-
-                //Clear support floorings
-                foreach (Vector3Int s in topGroup.SupportFloorings)
-                {
-                    TileInformation checkTileInfo = TileInformationManager.Instance.GetTileInformation(s);
-                    checkTileInfo.SupportFlooringGroup = null;
-                }
-            }
-        }
-
-        return true;
-    }
-}
-
-public enum FlooringRotation
-{
-    Horizontal,
-    Vertical
 }

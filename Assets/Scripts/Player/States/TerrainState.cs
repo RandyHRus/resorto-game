@@ -34,7 +34,7 @@ public class TerrainState : PlayerState
         if (coroutineRunning)
             return;
 
-        Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
+        Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
 
         if (indicatorManager.SwapCurrentTiles(mouseTilePosition))
         {
@@ -91,11 +91,11 @@ public class TerrainState : PlayerState
     {
         coroutineRunning = true;
         indicatorManager.ClearCurrentTiles();
-        Vector3Int previousTilePosition = new Vector3Int(-1, -1, -1);
+        Vector2Int previousTilePosition = new Vector2Int(-1, -1);
 
         while (Input.GetButton("Primary"))
         {
-            Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
+            Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
 
             if (mouseTilePosition != previousTilePosition)
             {
@@ -115,11 +115,11 @@ public class TerrainState : PlayerState
     {
         coroutineRunning = true;
         indicatorManager.ClearCurrentTiles();
-        Vector3Int previousTilePosition = new Vector3Int(-1, -1, -1);
+        Vector2Int previousTilePosition = new Vector2Int(-1, -1);
 
         while (Input.GetButton("Secondary"))
         {
-            Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
+            Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
 
             if (mouseTilePosition != previousTilePosition)
             {
@@ -139,11 +139,11 @@ public class TerrainState : PlayerState
     {
         coroutineRunning = true;
         indicatorManager.ClearCurrentTiles();
-        Vector3Int previousTilePosition = new Vector3Int(-1, -1, -1);
+        Vector2Int previousTilePosition = new Vector2Int(-1, -1);
 
         while (Input.GetButton("Primary"))
         {
-            Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
+            Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
 
             if (mouseTilePosition != previousTilePosition)
             {
@@ -163,11 +163,11 @@ public class TerrainState : PlayerState
     {
         coroutineRunning = true;
         indicatorManager.ClearCurrentTiles();
-        Vector3Int previousTilePosition = new Vector3Int(-1, -1, -1);
+        Vector2Int previousTilePosition = new Vector2Int(-1, -1);
 
         while (Input.GetButton("Secondary"))
         {
-            Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
+            Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
 
             if (mouseTilePosition != previousTilePosition)
             {

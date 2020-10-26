@@ -23,6 +23,7 @@ public class DroppedItem : MonoBehaviour
 
     private static ItemInformationDisplayWithCountUI itemInformationDisplayUI;
 
+
     public void Initialize(InventoryItemInstance itemInstance, int count, Vector2 positionOnGround, float dropHeight, float xSpeed)
     {
         float zPosition = DynamicZDepth.GetDynamicZDepth(positionOnGround.y, 0);
@@ -52,7 +53,12 @@ public class DroppedItem : MonoBehaviour
         bounceCoroutine = StartCoroutine(BounceEffect.Bounce(dropHeight, xSpeed, OnBounceMove, OnBounceEnd));
         Moving = true;
 
-        itemInformationDisplayUI = new ItemInformationDisplayWithCountUI();
+        //Only runs once for everything cause static
+        if (itemInformationDisplayUI == null)
+        {
+            itemInformationDisplayUI = new ItemInformationDisplayWithCountUI();
+            itemInformationDisplayUI.Show(false);
+        }
     }
 
     public void AddToStack(int count)
@@ -145,5 +151,10 @@ public class DroppedItem : MonoBehaviour
     private void OnMouseExit()
     {
         itemInformationDisplayUI.Show(false);
+    }
+
+    private void OnDestroy()
+    {
+        
     }
 }

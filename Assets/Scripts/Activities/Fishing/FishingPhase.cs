@@ -8,6 +8,8 @@ public abstract class FishingPhase
     public delegate void ChangePhase(Type phaseType, object[] args);
     public event ChangePhase OnChangePhase;
 
+    public static readonly float maxCastLength = 3f;
+
     public void InvokeChangePhase(Type phaseType, object[] args)
     {
         OnChangePhase?.Invoke(phaseType, args);
@@ -29,7 +31,7 @@ public abstract class FishingPhase
     public abstract void EndState();
 }
 
-public abstract class FishingDefaultPhase : FishingPhase
+public class FishingDefaultPhase : FishingPhase
 {
     public FishingDefaultPhase(FishingResources resources) : base(resources) { }
 
@@ -47,13 +49,13 @@ public abstract class FishingDefaultPhase : FishingPhase
     }
 }
 
-public abstract class FishingChargingPhase : FishingPhase
+public class FishingChargingPhase : FishingPhase
 {
     protected static readonly float maxCastHoldTime = 1f;
     protected float timer;
 
-    float xDir;
-    float yDir;
+    protected float xDir;
+    protected float yDir;
 
     public FishingChargingPhase(FishingResources resources) : base(resources) { }
 
@@ -83,6 +85,7 @@ public abstract class FishingChargingPhase : FishingPhase
         if (timer >= maxCastHoldTime)
         {
             InvokeChangePhase(typeof(FishingCastingPhase), new object[] { 1f, xDir, yDir });
+            return;
         }
     }
 
@@ -91,9 +94,8 @@ public abstract class FishingChargingPhase : FishingPhase
     }
 }
 
-public abstract class FishingCastingPhase : FishingPhase
+public class FishingCastingPhase : FishingPhase
 {
-    static readonly float maxCastLength = 5f;
     static readonly float castSpeed = 0.6f;
     static readonly float castDragSpeed = 0.8f;
     static readonly float castAngle = 150f;
@@ -107,7 +109,7 @@ public abstract class FishingCastingPhase : FishingPhase
     float yDir;
     Vector2 lineStartPosition, lineEndPosition, lineMiddlePosition;
     float beginLineAngle;
-    float maxLineLength;
+    float targetLineLength;
     bool firstExecute;
 
     Coroutine initializeCoroutine;
@@ -140,7 +142,7 @@ public abstract class FishingCastingPhase : FishingPhase
 
         var minimumOffset = 0.02f; //this is there so that line can't be completely 90 degrees down
         float minCastLength = heightToEndOfRod + minimumOffset;
-        maxLineLength = ((maxCastLength - minCastLength) * chargeFrac) + minCastLength;
+        targetLineLength = ((maxCastLength - minCastLength) * chargeFrac) + minCastLength;
 
         if (yDir != 0)
         {
@@ -148,7 +150,7 @@ public abstract class FishingCastingPhase : FishingPhase
         }
         else
         {
-            float endLineAngle = 270 + (Mathf.Rad2Deg * Mathf.Acos(heightToEndOfRod / maxLineLength)); //Degrees
+            float endLineAngle = 270 + (Mathf.Rad2Deg * Mathf.Acos(heightToEndOfRod / targetLineLength)); //Degrees
             beginLineAngle = endLineAngle + castAngle; //Degrees
         }
 
@@ -203,7 +205,7 @@ public abstract class FishingCastingPhase : FishingPhase
             #endregion
 
             lineStartPosition = resources.fishingRod.position;
-            float currentLineLength = maxLineLength * (timer / castSpeed);
+            float currentLineLength = targetLineLength * (timer / castSpeed);
             float lineAngle = beginLineAngle - ((timer / castSpeed) * castAngle);
             float lineDragAngle = beginLineAngle - ((dragTimer / castDragSpeed) * castAngle) - dragOffsetAngle;
 
@@ -250,6 +252,7 @@ public abstract class FishingCastingPhase : FishingPhase
         else
         {
             InvokeChangePhase(typeof(FishingBobbingPhase), new object[] { lineMiddlePosition, lineEndPosition });
+            return;
         }
     }
 
@@ -260,7 +263,7 @@ public abstract class FishingCastingPhase : FishingPhase
     }
 }
 
-public abstract class FishingBobbingPhase : FishingPhase
+public class FishingBobbingPhase : FishingPhase
 {
     private static readonly float bobHeight = 0.04f;
     private static readonly float bobSpeed = 3f;
@@ -335,7 +338,7 @@ public abstract class FishingBobbingPhase : FishingPhase
 
     public IEnumerator AlertNearbyFishToTarget(Vector2 lineEndPosition)
     {
-        List<Collider2D> results = new List<Collider2D>();
+        List<Collider2D> results = new List<Collider2D>(5);
         Physics2D.OverlapCircle(lineEndPosition, FishInformation.FISH_SEEING_DISTANCE, wildlifeFilter, results);
 
         foreach (FishBehaviour fish in fishInRange)
@@ -364,10 +367,11 @@ public abstract class FishingBobbingPhase : FishingPhase
         this.hookedFish = hookedFish;
         fishInRange.Remove(hookedFish); //So it doesn't flee
         InvokeChangePhase(typeof(FishingHookedPhase), new object[] { hookedFish.transform });
+        return;
     }
 }
 
-public abstract class FishingHookedPhase : FishingPhase
+public class FishingHookedPhase : FishingPhase
 {
     protected Transform swimmingFishTransform;
     protected Vector2 lineEndPosition, lineStartPosition;
@@ -388,7 +392,10 @@ public abstract class FishingHookedPhase : FishingPhase
     public override void Execute()
     {
         if (swimmingFishTransform == null)
+        {
             InvokeChangePhase(typeof(FishingDefaultPhase), null);
+            return;
+        }
 
         lineEndPosition = swimmingFishTransform.position + ((-swimmingFishTransform.right) * FishInformation.FISH_WORLD_WIDTH / 2);
         lineStartPosition = resources.fishingRod.position;
@@ -408,15 +415,16 @@ public struct FishingResources
 {
     public static readonly int numPoints = 10;
 
-    public Animator animator;
-    public GameObject fishinglineInstance;
-    public LineRenderer fishinglineRenderer;
-    public Transform fishinglineTransform;
-    public Transform characterTransform;
-    public Transform fishingRod;
-    public Vector3[] points;
+    public readonly Animator animator;
+    public readonly GameObject fishinglineInstance;
+    public readonly LineRenderer fishinglineRenderer;
+    public readonly Transform fishinglineTransform;
+    public readonly Transform characterTransform;
+    public readonly Transform fishingRod;
+    public readonly Vector3[] points;
+    public readonly object[] additionalResources;
 
-    public FishingResources(Transform characterTransform)
+    public FishingResources(Transform characterTransform, object[] additionalResources = null)
     {
         Transform FindChildWithTag(Transform t, string tag)
         {
@@ -451,5 +459,7 @@ public struct FishingResources
         fishingRod = FindChildWithTag(characterTransform, "FishingRod");
 
         points = new Vector3[numPoints];
+
+        this.additionalResources = additionalResources;
     }
 }

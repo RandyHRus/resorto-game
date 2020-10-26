@@ -8,6 +8,8 @@ public class InventoryExternalUI : UIObject
     {
         InventoryManager.Instance.ShowInventory();
         InventoryManager.OnInventoryClosed += Hide;
+
+        OnDestroy += UnSub;
     }
 
     public void Hide()
@@ -25,9 +27,9 @@ public class InventoryExternalUI : UIObject
             InventoryManager.OnInventoryClosed -= Hide;
     }
 
-    public override void Destroy()
+    public void UnSub()
     {
-        base.Destroy();
         InventoryManager.OnInventoryClosed -= Hide;
+        OnDestroy -= UnSub;
     }
 }

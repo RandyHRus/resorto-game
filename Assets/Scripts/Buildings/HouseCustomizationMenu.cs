@@ -124,6 +124,6 @@ public class HouseCustomizationMenu : MonoBehaviour
     public void CreateButtonPressed()
     {
         //UIPanelsManager.Instance.CloseCurrentPanel();
-        PlayerStateMachine.Instance.SwitchState<CreateBuildingsState>(new object[] { houseStructure, houseCustomization });
+        PlayerStateMachineManager.Instance.SwitchState<CreateBuildingsState>(new object[] { houseStructure, houseCustomization });
     }
 }

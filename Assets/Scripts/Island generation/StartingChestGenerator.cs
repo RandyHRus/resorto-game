@@ -33,8 +33,6 @@ public class StartingChestGenerator : MonoBehaviour
                 _instance = this;
             }
         }
-
-        IslandGenerationPipeline.IslandCompleted += CreateStartingChest;
     }
 
     public void CreateStartingChest(IslandStartingPosition position)

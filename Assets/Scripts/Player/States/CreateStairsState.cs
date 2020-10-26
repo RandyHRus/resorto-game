@@ -15,7 +15,7 @@ public class CreateStairsState : PlayerState
 
     public override void Execute()
     {
-        Vector3Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
+        Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
         bool placeable = StairsManager.StairsPlaceable(mouseTilePosition, out BuildRotation rot);
 
         //Indicator things

@@ -18,15 +18,11 @@ public interface IBuildable
 
     Vector2Int GetSizeOnTile(BuildRotation rotation);
 
-    void OnRemoveThroughState(BuildOnTile buildOnTile);
-}
+    void OnCreate(BuildOnTile buildOnTile);
 
-public enum ObjectPlaceableLocation
-{
-    Land,
-    Water,
-    SandOnly,
-    GrassOnly
+    void OnRemoveThroughPlayerInteraction(BuildOnTile buildOnTile);
+
+    void OnRemove(BuildOnTile buildOnTile);
 }
 
 public enum ObjectType

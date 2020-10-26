@@ -4,20 +4,20 @@ using UnityEngine;
 
 public class BuildingsManager
 {
-    public static bool BuildingPlaceable(Vector3Int pos, BuildingStructureVariant variant, out HashSet<Vector3Int> tilesToOccupy)
+    public static bool BuildingPlaceable(Vector2Int pos, BuildingStructureVariant variant, out HashSet<Vector2Int> tilesToOccupy)
     {
-        tilesToOccupy = new HashSet<Vector3Int>();
+        tilesToOccupy = new HashSet<Vector2Int>();
 
         for (int i = 0; i < variant.GetSizeOnTile(0).x; i++)
         {
             for (int j = 0; j < variant.GetSizeOnTile(0).y; j++)
             {
-                Vector3Int tilePosition = new Vector3Int(pos.x + i, pos.y + j, 0);
+                Vector2Int tilePosition = new Vector2Int(pos.x + i, pos.y + j);
                 tilesToOccupy.Add(tilePosition);
             }
         }
 
-        foreach (Vector3Int t in tilesToOccupy)
+        foreach (Vector2Int t in tilesToOccupy)
         {
             TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(t);
 
@@ -34,13 +34,15 @@ public class BuildingsManager
         return true;
     }
 
-    public static bool TryCreateBuilding(Vector3Int pos, BuildingStructureVariant variant, IBuildingCustomization customization)
+    public static bool TryCreateBuilding(Vector2Int pos, BuildingStructureVariant variant, IBuildingCustomization customization)
     {
-        if (!BuildingPlaceable(pos, variant, out HashSet<Vector3Int> tilesToOccupy))
+        if (!BuildingPlaceable(pos, variant, out HashSet<Vector2Int> tilesToOccupy))
             return false;
 
         GameObject obj = GameObject.Instantiate(variant.Prefab, new Vector3(pos.x, pos.y, DynamicZDepth.GetDynamicZDepth(pos.y, DynamicZDepth.OBJECTS_STANDARD_OFFSET)), Quaternion.identity);
-        new BuildOnTile(obj, variant, tilesToOccupy, BuildRotation.Front, ObjectType.Ground, (Vector2Int)pos);
+
+        TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(pos);
+        tileInfo.CreateBuild(obj, variant, tilesToOccupy, BuildRotation.Front, ObjectType.Ground);
 
         //Load customization here
         obj.GetComponent<IBuildingCustomizationLoader>().LoadCustomization(customization);

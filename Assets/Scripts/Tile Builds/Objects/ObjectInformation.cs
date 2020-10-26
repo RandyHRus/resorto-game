@@ -25,8 +25,8 @@ public class ObjectInformation : StructureInformation, IBuildable
     [SerializeField] private ObjectType type = ObjectType.Standard;
     public ObjectType Type => type;
 
-    [SerializeField] private ObjectPlaceableLocation location = ObjectPlaceableLocation.Land;
-    public ObjectPlaceableLocation Location => location;
+    [SerializeField] private TileLocation placeableLocations = 0;
+    public TileLocation PlaceableLocations => placeableLocations;
 
     [SerializeField] private bool hasSprite = true;
     public bool HasSprite => hasSprite;
@@ -77,7 +77,7 @@ public class ObjectInformation : StructureInformation, IBuildable
         }
     }
 
-    public void OnRemoveThroughState(BuildOnTile build)
+    public void OnRemoveThroughPlayerInteraction(BuildOnTile build)
     {
         if (dropItem != null)
         {
@@ -89,6 +89,16 @@ public class ObjectInformation : StructureInformation, IBuildable
     public Vector2Int GetSizeOnTile(BuildRotation rotation)
     {
         return GetSpriteInformation(rotation).Size;
+    }
+
+    public void OnCreate(BuildOnTile buildOnTile)
+    {
+        
+    }
+
+    public void OnRemove(BuildOnTile buildOnTile)
+    {
+        
     }
 }
 

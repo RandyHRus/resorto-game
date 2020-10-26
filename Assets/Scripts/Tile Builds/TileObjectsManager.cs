@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class TileObjectsManager
 {
-    public static bool ObjectPlaceable(Vector3Int mainPos, ObjectInformation info, out ObjectType modifiedType, out float yOffset, BuildRotation rotation = BuildRotation.Front)
+    public static bool ObjectPlaceable(Vector2Int mainPos, ObjectInformation info, out ObjectType modifiedType, out float yOffset, BuildRotation rotation = BuildRotation.Front)
     {
         modifiedType = 0;
         yOffset = 0;
@@ -22,7 +22,6 @@ public static class TileObjectsManager
         }
 
         int mainTileLayer = mainTile.layerNum;
-        ObjectPlaceableLocation objectLocation = info.Location;
 
         if (info.HasSprite)
         {
@@ -32,7 +31,7 @@ public static class TileObjectsManager
             {
                 for (int j = 0; j < proposedSprite.Size.y; j++)
                 {
-                    if (!ObjectPlaceableOnTile(new Vector3Int(mainPos.x + i, mainPos.y + j, 0)))
+                    if (!ObjectPlaceableOnTile(new Vector2Int(mainPos.x + i, mainPos.y + j)))
                         return false;
                 }
             }
@@ -43,7 +42,7 @@ public static class TileObjectsManager
             {
                 for (int j = 0; j < info.SizeWhenNoSprite.y; j++)
                 {
-                    if (!ObjectPlaceableOnTile(new Vector3Int(mainPos.x + i, mainPos.y + j, 0)))
+                    if (!ObjectPlaceableOnTile(new Vector2Int(mainPos.x + i, mainPos.y + j)))
                         return false;
                 }
             }
@@ -61,7 +60,7 @@ public static class TileObjectsManager
         }
         return true;
 
-        bool ObjectPlaceableOnTile(Vector3Int pos)
+        bool ObjectPlaceableOnTile(Vector2Int pos)
         {
             TileInformation checkTile = TileInformationManager.Instance.GetTileInformation(pos);
             if (checkTile == null)
@@ -73,38 +72,25 @@ public static class TileObjectsManager
                 return false;
 
             //Check for valid terrain
-            switch (objectLocation)
             {
-                case (ObjectPlaceableLocation.Land):
-                    if (!TileLocation.Land.HasFlag(checkTile.tileLocation))
+                //Case when checkTile is water
+                if (TileLocation.Water.HasFlag(checkTile.tileLocation))
+                {
+                    if (checkTile.NormalFlooringGroup != null)
                     {
-                        //Can be still placed on water if there is dock
-                        if (TileLocation.Water.HasFlag(checkTile.tileLocation))
-                        {
-                            if (checkTile.NormalFlooringGroup == null)
-                                return false;
-                        }
-                        else
-                        {
+                        if (!info.PlaceableLocations.HasFlag(TileLocation.Land))
                             return false;
-                        }
                     }
-                    break;
-                case (ObjectPlaceableLocation.Water):
-                    if (!TileLocation.Water.HasFlag(checkTile.tileLocation))
+                    else if (!info.PlaceableLocations.HasFlag(checkTile.tileLocation))
+                    {
                         return false;
-                    break;
-                case (ObjectPlaceableLocation.GrassOnly):
-                    if (checkTile.tileLocation != TileLocation.Grass)
-                        return false;
-                    break;
-                case (ObjectPlaceableLocation.SandOnly):
-                    if (checkTile.tileLocation != TileLocation.Sand)
-                        return false;
-                    break;
-                default:
-                    Debug.Log("Unknown location type");
-                    break;
+                    }
+                }
+                //Other tiles can be directly checked easily
+                else if (!info.PlaceableLocations.HasFlag(checkTile.tileLocation))
+                {
+                    return false;
+                }
             }
 
             //Check for valid objects
@@ -121,7 +107,7 @@ public static class TileObjectsManager
         }
     }
 
-    public static bool TryCreateObject(ObjectInformation info, Vector3Int mainPos, out BuildOnTile buildOnTile, BuildRotation rotation = BuildRotation.Front)
+    public static bool TryCreateObject(ObjectInformation info, Vector2Int mainPos, out BuildOnTile buildOnTile, BuildRotation rotation = BuildRotation.Front)
     {
         if (!ObjectPlaceable(mainPos, info, out ObjectType modifiedType, out float yOffset, rotation))
         {
@@ -146,7 +132,7 @@ public static class TileObjectsManager
                     break;
                 case (ObjectType.OnTop):
                     BuildOnTile objectBelow = tileInfo.ObjectTypeToObject[ObjectType.Standard];
-                    Vector3Int objectBelowMainPosition = (Vector3Int)objectBelow.BottomLeft;
+                    Vector2Int objectBelowMainPosition = (Vector2Int)objectBelow.BottomLeft;
                     proposedPos = new Vector3(mainPos.x, mainPos.y + yOffset, DynamicZDepth.GetDynamicZDepth(objectBelowMainPosition, DynamicZDepth.OBJECTS_ONTOP_OFFSET));
                     break;
                 default:
@@ -165,7 +151,7 @@ public static class TileObjectsManager
             obj.name = info.Name;
         }
 
-        HashSet<Vector3Int> tilesToOccupy = new HashSet<Vector3Int>();
+        HashSet<Vector2Int> tilesToOccupy = new HashSet<Vector2Int>();
 
         //Set sprite
         if (info.HasSprite)
@@ -201,7 +187,7 @@ public static class TileObjectsManager
             {
                 for (int j = 0; j < sprInfo.Size.y; j++)
                 {
-                    Vector3Int pos = new Vector3Int(mainPos.x + i, mainPos.y + j, 0);
+                    Vector2Int pos = new Vector2Int(mainPos.x + i, mainPos.y + j);
                     tilesToOccupy.Add(pos);
                 }
             }
@@ -213,14 +199,14 @@ public static class TileObjectsManager
             {
                 for (int j = 0; j < info.SizeWhenNoSprite.y; j++)
                 {
-                    Vector3Int pos = new Vector3Int(mainPos.x + i, mainPos.y + j, 0);
+                    Vector2Int pos = new Vector2Int(mainPos.x + i, mainPos.y + j);
                     tilesToOccupy.Add(pos);
                 }
             }
         }
 
         //Actual set tiles part
-        buildOnTile = new BuildOnTile(obj, info, tilesToOccupy, rotation, modifiedType, (Vector2Int)mainPos);
+        buildOnTile = tileInfo.CreateBuild(obj, info, tilesToOccupy, rotation, modifiedType);
 
         return true;
     }

@@ -58,6 +58,7 @@ public class LerpEffect
 
             Vector2 proposedPos = Vector2.Lerp(startPos, targetPos, distanceTravelled / distanceToTravel);
             valueChangedCallback(proposedPos);
+
             yield return 0;
         }
 

@@ -33,7 +33,7 @@ public class UIObject
         ObjectInScene.SetActive(show);
     }
 
-    public virtual void Destroy()
+    public void Destroy()
     {
         GameObject.Destroy(ObjectInScene);
         OnDestroy?.Invoke();

@@ -34,8 +34,11 @@ public class IslandGenerationPipeline : MonoBehaviour
                 try
                 {
                     IslandTerrainGenerator.Instance.GenerateIsland();
-                    IslandObjectsGenerator.Instance.GenerateIslandObjects();
+
                     IslandStartingPosition startingPosition = IslandStartingPositionGenerator.Instance.GetRandomStartingPosition();
+                    StartingChestGenerator.Instance.CreateStartingChest(startingPosition);
+
+                    IslandObjectsGenerator.Instance.GenerateIslandObjects();
 
                     completed = true;
                     IslandCompleted?.Invoke(startingPosition);

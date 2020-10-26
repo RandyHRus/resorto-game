@@ -6,9 +6,9 @@ public class NPCManager : MonoBehaviour
 {
     [SerializeField] private TouristScriptableObject[] touristsTemp = null;
 
-    private List<TouristInstance> tourists = new List<TouristInstance>();
+    private List<TouristMonoBehaviour> tourists = new List<TouristMonoBehaviour>();
 
-    public delegate void TouristAdded(TouristInstance instance);
+    public delegate void TouristAdded(TouristMonoBehaviour touristMono);
     public static event TouristAdded OnTouristAdded;
 
     private static NPCManager _instance;
@@ -35,27 +35,20 @@ public class NPCManager : MonoBehaviour
         //TODO remove
         foreach(TouristScriptableObject tourist in touristsTemp)
         {
-            CreateNPC(tourist, new Vector2Int(startingPosition.ActualStartingPosition.x, startingPosition.ActualStartingPosition.y));
+            TouristInformation info = tourist.TouristInformation;
+            CreateTourist(info, new Vector2Int(startingPosition.ActualStartingPosition.x, startingPosition.ActualStartingPosition.y));
+        }
+
+        for (int i = 0; i < 3; i++)
+        {
+            CreateTourist(TouristInformation.CreateRandomTouristInformation(), new Vector2Int(startingPosition.ActualStartingPosition.x, startingPosition.ActualStartingPosition.y));
         }
     }
 
-    public void CreateNPC(TouristScriptableObject tourist, Vector2 position)
+    public void CreateTourist(TouristInformation touristInfo, Vector2 position)
     {
-        TouristInstance t = new TouristInstance(tourist, position);
+        TouristMonoBehaviour t = (TouristMonoBehaviour)touristInfo.CreateInScene(position);
         tourists.Add(t);
         OnTouristAdded?.Invoke(t);
     }
-}
-
-public enum RelationshipLevel
-{
-    Strangers,
-    Acquaintance,
-    Dislike,
-    Friends1,
-    Friends2,
-    Friends3,
-    Intimate,
-    Engaged,
-    Married
 }

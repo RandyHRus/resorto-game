@@ -4,9 +4,13 @@ using UnityEngine;
 
 public class TilesIndicatorManager
 {
+    private static TileIndicator[,] tileIndicators;
+    private static Vector2Int defaultPos = new Vector2Int(-1, -1);
+    private HashSet<Vector2Int> currentTileIndicatorPositions;
+
     public TilesIndicatorManager()
     {
-        currentTileIndicatorPositions = new HashSet<Vector3Int>();
+        currentTileIndicatorPositions = new HashSet<Vector2Int>();
     }
 
     private class TileIndicator
@@ -41,11 +45,6 @@ public class TilesIndicatorManager
         public GameObject Object { get; private set; }
     }
 
-    private static TileIndicator[,] tileIndicators;
-    private static Vector3Int defaultPos = new Vector3Int(-1, -1, -1);
-
-    private HashSet<Vector3Int> currentTileIndicatorPositions;
-
     //Initializer
     static TilesIndicatorManager()
     {
@@ -60,19 +59,19 @@ public class TilesIndicatorManager
         }
     }
 
-    public void SetColor(Vector3Int pos, Color32 color)
+    public void SetColor(Vector2Int pos, Color32 color)
     {
         if (TileInformationManager.Instance.PositionInMap(pos))
             tileIndicators[pos.x, pos.y].Renderer.color = color;
     }
 
-    public void SetSprite(Vector3Int pos, Sprite sprite)
+    public void SetSprite(Vector2Int pos, Sprite sprite)
     {
         if (TileInformationManager.Instance.PositionInMap(pos))
             tileIndicators[pos.x, pos.y].Renderer.sprite = sprite;
     }
 
-    public void Offset(Vector3Int pos, Vector2 offset)
+    public void Offset(Vector2Int pos, Vector2 offset)
     {
         if (TileInformationManager.Instance.PositionInMap(pos))
             tileIndicators[pos.x, pos.y].Transform.position = new Vector2(pos.x, pos.y) + offset;
@@ -80,12 +79,12 @@ public class TilesIndicatorManager
 
     // Hides current tiles, show new current tiles
     // Returns a list of new showing tiles
-    public List<Vector3Int> SwapCurrentTiles(HashSet<Vector3Int> newTilePositions)
+    public List<Vector2Int> SwapCurrentTiles(HashSet<Vector2Int> newTilePositions)
     {
-        List<Vector3Int> newlyShownTiles = new List<Vector3Int>();
+        List<Vector2Int> newlyShownTiles = new List<Vector2Int>(newTilePositions.Count);
 
         //Show new indicators
-        foreach (Vector3Int pos in newTilePositions)
+        foreach (Vector2Int pos in newTilePositions)
         {
             if (!currentTileIndicatorPositions.Contains(pos))
             {
@@ -95,24 +94,24 @@ public class TilesIndicatorManager
         }
 
         //Hide old indicators
-        foreach (Vector3Int pos in currentTileIndicatorPositions)
+        foreach (Vector2Int pos in currentTileIndicatorPositions)
         {
             if (!newTilePositions.Contains(pos))
                 Toggle(pos, false);
         }
 
-        currentTileIndicatorPositions = new HashSet<Vector3Int>(newTilePositions);
+        currentTileIndicatorPositions = new HashSet<Vector2Int>(newTilePositions);
 
         return newlyShownTiles;
     }
 
     //Hides current tiles, show new tile
     //Returns true if actually swapped
-    public bool SwapCurrentTiles(Vector3Int newPos)
+    public bool SwapCurrentTiles(Vector2Int newPos)
     {
         bool isNewPosition = true;
 
-        foreach (Vector3Int pos in currentTileIndicatorPositions)
+        foreach (Vector2Int pos in currentTileIndicatorPositions)
         {
             if (pos == newPos)
             {
@@ -128,7 +127,7 @@ public class TilesIndicatorManager
         {
             Toggle(newPos, true);
 
-            currentTileIndicatorPositions = new HashSet<Vector3Int>()
+            currentTileIndicatorPositions = new HashSet<Vector2Int>()
             {
                 newPos
             };
@@ -137,7 +136,7 @@ public class TilesIndicatorManager
         return isNewPosition;
     }
 
-    private void Toggle(Vector3Int pos, bool show)
+    private void Toggle(Vector2Int pos, bool show)
     {
         if (TileInformationManager.Instance.PositionInMap(pos))
             tileIndicators[pos.x, pos.y].Toggle(show);
@@ -146,7 +145,7 @@ public class TilesIndicatorManager
     //Remember to hide tiles before object destruction
     public void ClearCurrentTiles()
     {
-        foreach (Vector3Int pos in currentTileIndicatorPositions)
+        foreach (Vector2Int pos in currentTileIndicatorPositions)
         {
             Toggle(pos, false);
         }

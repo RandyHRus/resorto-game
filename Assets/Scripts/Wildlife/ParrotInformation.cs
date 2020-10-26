@@ -9,7 +9,7 @@ public class ParrotInformation : WildlifeInformation
 
     public override bool TrySpawn(Vector2 pos, out WildlifeBehaviour behaviourScript)
     {
-        TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(new Vector3Int(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y), 0));
+        TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(new Vector2Int(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y)));
 
         if (tileInfo == null)
             throw new System.Exception("Invalid position");
