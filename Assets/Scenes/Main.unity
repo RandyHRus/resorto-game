@@ -3007,7 +3007,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e98d5f0f6102674299fc17036597eb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeSpeed: 10
   day: 1
   hour: 9
   minute: 0

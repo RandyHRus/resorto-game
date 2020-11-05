@@ -39,7 +39,7 @@ public class NPCManager : MonoBehaviour
             CreateTourist(info, new Vector2Int(playerStartingPosition.x, playerStartingPosition.y));
         }
 
-        for (int i = 0; i < 0; i++)
+        for (int i = 0; i < 3; i++)
         {
             CreateTourist(TouristInformation.CreateRandomTouristInformation(), new Vector2Int(playerStartingPosition.x, playerStartingPosition.y));
         }

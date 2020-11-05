@@ -54,6 +54,30 @@ public static class AStar
         return MOVE_DIAGONAL_COST * Mathf.Min(xDistance, yDistance) + MOVE_STRAIGHT_COST * remaining;
     }
 
+    //Returns -1 if no path
+    public static int EstimatePathTimeInGameMinutes(Vector2Int pathStart, Vector2Int pathEnd, float moveSpeed, out LinkedList<Tuple<Vector2Int, Vector2Int?>> path)
+    {
+        path = GetShortestPath(pathStart, pathEnd);
+
+        if (path == null)
+            return -1;
+
+        LinkedListNode<Tuple<Vector2Int, Vector2Int?>> node = path.First;
+
+        float length = 0;
+
+        while (node.Next != null)
+        {
+            length += Vector2.Distance(node.Value.Item1, node.Next.Value.Item1);
+        }
+
+        float timePerOneTile = TimeManager.Instance.timeSpeed * moveSpeed;
+
+        float timeToWalkPath = timePerOneTile * length;
+
+        return (int)timeToWalkPath;
+    }
+
     /*
      * Use the A* Pathfinding algorithm to return the shortest path, Will return a list of positions from start to finish.
      */

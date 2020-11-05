@@ -52,7 +52,8 @@ public class TouristsGenerator : MonoBehaviour
         int wakeTime = UnityEngine.Random.Range(5, 10);
         int sleepHours = UnityEngine.Random.Range(6, 9);
         int sleepTime = (int)MathFunctions.Mod(wakeTime - sleepHours, 24);
+        int leaveDay = TimeManager.Instance.GetCurrentTime().day + UnityEngine.Random.Range(2, 10);
 
-        return new TouristSchedule(wakeTime, sleepTime);
+        return new TouristSchedule(new InGameTime(wakeTime, 0), new InGameTime(sleepTime, 0), leaveDay);
     }
 }

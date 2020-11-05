@@ -97,6 +97,10 @@ public class SidebarTouristsPanel : SidebarPanel
                             ChangeHappinessBarFill(touristMono.TouristInstance.happiness.Value);
                             break;
                         }
+                    case ("List Field"):
+                        {
+
+                        }
                 }
             }
 

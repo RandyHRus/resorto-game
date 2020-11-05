@@ -22,7 +22,6 @@ public class InventoryItemInstance
         {
             return ((InventoryItemInstance)obj).ItemInformation == this.ItemInformation;
         }
-
     }
 
     public override int GetHashCode()
