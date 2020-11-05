@@ -231,6 +231,21 @@ PrefabInstance:
       propertyPath: m_RaycastTarget
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3050632863177212059, guid: 9261f2b6348345c4e987b8d711110b81,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0.8627451
+      objectReference: {fileID: 0}
+    - target: {fileID: 3050632863177212059, guid: 9261f2b6348345c4e987b8d711110b81,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 0.28627452
+      objectReference: {fileID: 0}
+    - target: {fileID: 3050632863177212059, guid: 9261f2b6348345c4e987b8d711110b81,
+        type: 3}
+      propertyPath: m_FontData.m_Alignment
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 3050632864768980824, guid: 9261f2b6348345c4e987b8d711110b81,
         type: 3}
       propertyPath: m_Name
@@ -299,22 +314,22 @@ PrefabInstance:
     - target: {fileID: 3050632864768980825, guid: 9261f2b6348345c4e987b8d711110b81,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -15.83
+      value: -13.1
       objectReference: {fileID: 0}
     - target: {fileID: 3050632864768980825, guid: 9261f2b6348345c4e987b8d711110b81,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 8.7
+      value: 16.3
       objectReference: {fileID: 0}
     - target: {fileID: 3050632864768980825, guid: 9261f2b6348345c4e987b8d711110b81,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 24.34
+      value: 17.11
       objectReference: {fileID: 0}
     - target: {fileID: 3050632864768980825, guid: 9261f2b6348345c4e987b8d711110b81,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 13.869999
+      value: 8.41
       objectReference: {fileID: 0}
     - target: {fileID: 3050632864768980825, guid: 9261f2b6348345c4e987b8d711110b81,
         type: 3}
@@ -365,6 +380,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_RaycastTarget
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3050632864768980830, guid: 9261f2b6348345c4e987b8d711110b81,
+        type: 3}
+      propertyPath: m_FontData.m_Alignment
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9261f2b6348345c4e987b8d711110b81, type: 3}

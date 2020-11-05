@@ -12,8 +12,9 @@ public class CreateBuildingsState : PlayerState
 
     private TilesIndicatorManager indicatorManager;
 
-    public override bool AllowMovement => true;
-    public override bool AllowMouseDirectionChange => true;
+    public override bool AllowMovement => false;
+    public override bool AllowMouseDirectionChange => false;
+    public override CameraMode CameraMode => CameraMode.Drag;
 
     public override void Execute()
     {

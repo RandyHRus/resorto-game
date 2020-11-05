@@ -6,7 +6,7 @@ public class TouristHappiness
 {
     public int Value { get; private set; }
 
-    public delegate void HappinessChanged(int happinessValue, TouristHappinessEnum happinessEnum);
+    public delegate void HappinessChanged(TouristHappinessFactor changeFactor, int newHappinessValue, TouristHappinessEnum newHappinessEnum);
     public event HappinessChanged OnHappinessChanged;
 
     public TouristHappiness()
@@ -39,7 +39,7 @@ public class TouristHappiness
         else
             Value = proposedValue;
 
-        OnHappinessChanged?.Invoke(Value, GetTouristHappinessEnum());
+        OnHappinessChanged?.Invoke(changeFactor, Value, GetTouristHappinessEnum());
     }
 }
 

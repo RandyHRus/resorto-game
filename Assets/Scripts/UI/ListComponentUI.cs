@@ -52,7 +52,7 @@ public abstract class ListComponentUI : UIObject
         }
 
         startPos = RectTransform.anchoredPosition;
-        Coroutines.Instance.StartCoroutine(LerpEffect.LerpSpeed(startPos.y, startPos.y + change, speed, ShiftProgress, null));
+        Coroutines.Instance.StartCoroutine(LerpEffect.LerpSpeed(startPos.y, startPos.y + change, speed, ShiftProgress, null, false));
     }
 
     /*

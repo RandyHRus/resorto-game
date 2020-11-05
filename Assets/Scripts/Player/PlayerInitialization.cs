@@ -30,9 +30,9 @@ public class PlayerInitialization : MonoBehaviour
     }
 
     //Moves player onto starting position
-    private void SetInitialLocation(IslandStartingPosition startingPosition)
+    private void SetInitialLocation(Vector2Int startingPosition)
     {
-        transform.position = (Vector3Int)startingPosition.ActualStartingPosition;
+        transform.position = (Vector3Int)startingPosition;
         GetComponent<PlayerMovement>().InitializeLayerAndDepth();
     }
 

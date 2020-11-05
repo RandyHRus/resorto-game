@@ -9,6 +9,8 @@ public class RegionSelection : ListComponentUI
 
     public RegionSelection(RegionInformation info, SelectionPanel<RegionSelection> parentPanel): base(ResourceManager.Instance.RegionComponent, parentPanel.ObjectTransform)
     {
+        this.info = info;
+
         foreach (Transform t in ObjectTransform)
         {
             if (t.tag == "Name Field")
@@ -21,8 +23,6 @@ public class RegionSelection : ListComponentUI
                 t.GetComponent<Image>().sprite = info.Icon;
             }
         }
-
-        this.info = info;
     }
 
 

@@ -10,7 +10,6 @@ public class PlayerTalkingState : PlayerState
     private OutlinedText dialogueText = null;
     private OutlinedText nameText = null;
 
-    private bool dialoguePlaying;
     private bool dialogueTyping;
     private int nextNode;
     private DialogueElement currentElement;
@@ -21,6 +20,7 @@ public class PlayerTalkingState : PlayerState
 
     public override bool AllowMovement => false;
     public override bool AllowMouseDirectionChange => false;
+    public override CameraMode CameraMode => CameraMode.Follow;
 
     public override void Initialize()
     {
@@ -45,8 +45,9 @@ public class PlayerTalkingState : PlayerState
     //args[1] = dialogue
     public override void StartState(object[] args)
     {
-        if (dialoguePlaying)
-            return;
+        //if (dialoguePlaying)
+        //    return;
+        PauseManager.Instance.PauseGame(true);
 
         nameText.SetText((string)args[0]);
         Dialogue dialogue = (Dialogue)args[1];
@@ -58,7 +59,6 @@ public class PlayerTalkingState : PlayerState
         }
 
         dialogueBox.SetActive(true);
-        dialoguePlaying = true;
 
         nextNode = 1;
         if (dialogueMap.TryGetValue(nextNode, out currentElement))
@@ -82,7 +82,7 @@ public class PlayerTalkingState : PlayerState
             //Case when no next node, End dialogue when NextNode does not exist in dialogue element
             else if (nextNode == 0)
             {
-                EndDialogueAndState();
+                PlayerStateMachineManager.Instance.SwitchState<DefaultState>();
             }
             else if (dialogueMap.TryGetValue(nextNode, out currentElement))
             {
@@ -92,27 +92,15 @@ public class PlayerTalkingState : PlayerState
             else
             {
                 Debug.LogError("Error: Next node not found. Ending dialogue.");
-                EndDialogueAndState();
+                PlayerStateMachineManager.Instance.SwitchState<DefaultState>();
             }
         }
     }
 
-    private void EndCurrentDialogue()
-    {
-        dialogueBox.SetActive(false);
-        dialoguePlaying = false;
-    }
-
-    private void EndDialogueAndState()
-    {
-        EndCurrentDialogue();
-        PlayerStateMachineManager.Instance.SwitchState<DefaultState>();
-    }
-
     public override void EndState()
     {
-        if (dialoguePlaying)
-            EndCurrentDialogue();
+        dialogueBox.SetActive(false);
+        PauseManager.Instance.UnPauseGame();
     }
 
     IEnumerator TypeDialogueNode(DialogueElement element)
@@ -126,7 +114,7 @@ public class PlayerTalkingState : PlayerState
         int index = 0;
         while (true)
         {
-            int textCount = Mathf.RoundToInt(dialogueLettersPerSecond * Time.deltaTime);
+            int textCount = Mathf.RoundToInt(dialogueLettersPerSecond * Time.unscaledDeltaTime);
             if (textCount == 0)
                 textCount = 1;
 

@@ -15,5 +15,5 @@ MonoBehaviour:
   regionName: Fishing
   showColor:
     serializedVersion: 2
-    rgba: 3359811317
+    rgba: 4281312255
   icon: {fileID: 21300000, guid: 4d27035aa8a44f747a1445aae7fbaa4b, type: 3}

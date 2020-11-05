@@ -45,6 +45,8 @@ public abstract class PlayerState : ScriptableObject, IStateMachineState
 
     public abstract bool AllowMouseDirectionChange { get; }
 
+    public abstract CameraMode CameraMode { get; }
+
     public abstract void StartState(object[] args);
 
     public abstract void EndState();
@@ -52,4 +54,10 @@ public abstract class PlayerState : ScriptableObject, IStateMachineState
     public abstract void Execute();
 
     public virtual void LateExecute() { }
+}
+
+public enum CameraMode
+{
+    Follow,
+    Drag
 }

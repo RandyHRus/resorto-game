@@ -7,6 +7,7 @@ public class FollowNPCState : PlayerState
 {
     public override bool AllowMovement => false;
     public override bool AllowMouseDirectionChange => false;
+    public override CameraMode CameraMode => CameraMode.Follow;
 
     private NPCMonoBehaviour npcMono;
     private NPCWalkToPositionState walkToPositionState;
@@ -17,8 +18,8 @@ public class FollowNPCState : PlayerState
         npcMono = ((NPCInstance)args[0]).npcTransform.GetComponent<NPCMonoBehaviour>() ;
         walkToPositionState = npcMono.GetStateInstance<NPCWalkToPositionState>();
 
-        previousFollowing = MoveCamera.Instance.Following;
-        MoveCamera.Instance.ChangeFollowTarget(npcMono.ObjectTransform);
+        previousFollowing = CameraFollow.Following;
+        CameraFollow.ChangeFollowTarget(npcMono.ObjectTransform);
 
         walkToPositionState.OnPathChanged += PathFindingVisualizer.VisualizePath;
     }
@@ -39,6 +40,6 @@ public class FollowNPCState : PlayerState
     {
         walkToPositionState.OnPathChanged -= PathFindingVisualizer.VisualizePath;
         PathFindingVisualizer.Hide();
-        MoveCamera.Instance.ChangeFollowTarget(previousFollowing);
+        CameraFollow.ChangeFollowTarget(previousFollowing);
     }
 }

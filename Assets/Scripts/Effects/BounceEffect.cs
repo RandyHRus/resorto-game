@@ -12,7 +12,7 @@ public class BounceEffect
     public delegate void Progress(float h, float xChange);
     public delegate void End();
 
-    public static IEnumerator Bounce(float startHeight, float xSpeed, Progress moveCallback, End endCallback)
+    public static IEnumerator Bounce(float startHeight, float xSpeed, Progress moveCallback, End endCallback, bool stopOnPause)
     {
         float maxYSpeed = Mathf.Sqrt(Mathf.Abs(2 * startHeight * g));
 
@@ -25,9 +25,11 @@ public class BounceEffect
         float t_last = -Mathf.Sqrt(2 * h0 / g); // time we would have launched to get to h0 at t=0
         float vmax = Mathf.Sqrt(2 * hmax * g);
 
+        float timeScale = stopOnPause ? Time.deltaTime : Time.unscaledDeltaTime;
+
         while (hmax > hStop) {
             if (freefall) {
-                float hnew = (float)(h + (v * Time.deltaTime) - (0.5 * g * Time.deltaTime * Time.deltaTime));
+                float hnew = (float)(h + (v * timeScale) - (0.5 * g * timeScale * timeScale));
                 if (hnew < 0) {
                     t = t_last + 2 * Mathf.Sqrt(2 * hmax / g);
                     freefall = false;
@@ -35,8 +37,8 @@ public class BounceEffect
                     h = 0;
                 }
                 else {
-                    t = t + Time.deltaTime;
-                    v = v - g * Time.deltaTime;
+                    t = t + timeScale;
+                    v = v - g * timeScale;
                     h = hnew;
                 }
             }
@@ -49,7 +51,7 @@ public class BounceEffect
             }
             hmax = 0.5f * vmax * vmax / g;
 
-            moveCallback(h, xSpeed * Time.deltaTime);
+            moveCallback(h, xSpeed * timeScale);
 
             yield return 0;
         }

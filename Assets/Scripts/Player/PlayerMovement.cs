@@ -115,7 +115,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     //Start stairs Movement
                     StartStairsMovement(stairsStartPosition);
-                    playerTransform.position = new Vector3(proposedX, proposedY, DynamicZDepth.GetDynamicZDepth(proposedY, DynamicZDepth.PLAYER_ON_STAIRS));
+                    playerTransform.position = new Vector3(proposedX, proposedY, DynamicZDepth.GetDynamicZDepth(proposedY, DynamicZDepth.CHARACTER_ON_STAIRS));
                     return;
                 }
                 else
@@ -197,7 +197,7 @@ public class PlayerMovement : MonoBehaviour
         endTileLayer = stairsStartPosition.endLayerNum;
         stairsXDirection = (endTile.x != beginTile.x) ? (int)Mathf.Sign(endTile.x - beginTile.x) : 0; // -1 left, 0 none, 1 right
         stairsYDirection = (endTile.y != beginTile.y) ? (int)Mathf.Sign(endTile.y - beginTile.y) : 0; // -1 left, 0 none, 1 right
-        StairsSortingDepth = (endTile.y < beginTile.y) ? DynamicZDepth.GetDynamicZDepth(endTile, DynamicZDepth.PLAYER_ON_STAIRS) : DynamicZDepth.GetDynamicZDepth(beginTile, DynamicZDepth.PLAYER_ON_STAIRS);
+        StairsSortingDepth = (endTile.y < beginTile.y) ? DynamicZDepth.GetDynamicZDepth(endTile, DynamicZDepth.CHARACTER_ON_STAIRS) : DynamicZDepth.GetDynamicZDepth(beginTile, DynamicZDepth.CHARACTER_ON_STAIRS);
 
     }
 

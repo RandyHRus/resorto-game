@@ -120,7 +120,7 @@ public class NPCFishingState : NPCActivityState, ITouristStateDialogue
         public override void StartState(object[] args)
         {
             base.StartState(args);
-            timerTillEnd = UnityEngine.Random.Range(20f, 40f);
+            timerTillEnd = UnityEngine.Random.Range(5f, 6f);
         }
 
         public override void Execute()

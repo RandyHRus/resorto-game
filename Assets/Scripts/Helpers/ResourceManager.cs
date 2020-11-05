@@ -74,6 +74,12 @@ public class ResourceManager : MonoBehaviour
     [SerializeField] private GameObject rightClickOptionUIPrefab = null;
     public GameObject RightClickOptionUIPrefab => rightClickOptionUIPrefab;
 
+    [SerializeField] private GameObject outlinedText = null;
+    public GameObject OutlinedText => outlinedText;
+
+    [SerializeField] private GameObject mapVisualizerComponentUI = null;
+    public GameObject MapVisualizerComponentUI => mapVisualizerComponentUI;
+
     [Header("Colors")]
 
     [SerializeField] private Color32 red = Color.white;
@@ -132,6 +138,12 @@ public class ResourceManager : MonoBehaviour
 
     [SerializeField] private Transform player = null;
     public Transform Player => player;
+
+    [SerializeField] private Tilemap mapVisualizerTilemapInstance = null;
+    public Tilemap MapVisualizerTilemapInstance => mapVisualizerTilemapInstance;
+
+    [SerializeField] private Tile mapVisualizerColorTile = null;
+    public Tile MapVisualizerColorTile => mapVisualizerColorTile;
 
     [EnumNamedArray(typeof(TouristHappinessEnum)), SerializeField]
     private Sprite[] touristHappinessIcons = new Sprite[Enum.GetNames(typeof(TouristHappinessEnum)).Length];

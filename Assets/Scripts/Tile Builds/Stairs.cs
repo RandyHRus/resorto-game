@@ -54,8 +54,8 @@ public class Stairs
                 throw new System.Exception("Unknown rotation");
         }
 
-        startPositionBelow = new StairsStartPosition(belowStartTile, layerNum,     layerNum + 1, belowDirectionToStairs, aboveStartTile);
-        startPositionAbove = new StairsStartPosition(aboveStartTile, layerNum + 1, layerNum,     aboveDirectionToStairs, belowStartTile);
+        startPositionBelow = new StairsStartPosition(pos, belowStartTile, layerNum,     layerNum + 1, belowDirectionToStairs, aboveStartTile);
+        startPositionAbove = new StairsStartPosition(pos, aboveStartTile, layerNum + 1, layerNum,     aboveDirectionToStairs, belowStartTile);
     }
 }
 
@@ -65,9 +65,11 @@ public class StairsStartPosition
     public readonly int startLayerNum, endLayerNum;
     public readonly Vector2Int directionToStairs;
     public readonly Vector2Int endPosition;
+    public readonly Vector2Int stairsPosition;
 
-    public StairsStartPosition(Vector2Int startPosition, int startLayerNum, int endLayerNum, Vector2Int directionToStairs, Vector2Int endPosition)
+    public StairsStartPosition(Vector2Int stairsPosition, Vector2Int startPosition, int startLayerNum, int endLayerNum, Vector2Int directionToStairs, Vector2Int endPosition)
     {
+        this.stairsPosition = stairsPosition;
         this.startPosition = startPosition;
         this.startLayerNum = startLayerNum;
         this.endLayerNum = endLayerNum;

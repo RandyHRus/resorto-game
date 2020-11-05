@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Priority_Queue;
 using System.Linq;
+using System;
 
 public static class AStar
 {
@@ -13,13 +14,14 @@ public static class AStar
 
     public class AStarNode: FastPriorityQueueNode {
 
-        public AStarNode(Vector2Int position, AStarNode previousNode, Vector2Int pathEnd, int layerNum)
+        public AStarNode(Vector2Int position, AStarNode previousNode, Vector2Int pathEnd, int layerNum, Vector2Int? isEndPositionOfStairsAt)
         {
             this.Position = position;
             this.PreviousNode = previousNode;
             HCost = CalculateDistanceCost(Position, pathEnd);
             ReCalculateGAndFCosts();
             this.layerNum = layerNum;
+            this.isEndPositionOfStairsAt = isEndPositionOfStairsAt;
         }
 
         public void ChangePreviousAndRecalculateCost(AStarNode newPreviousNode)
@@ -41,6 +43,7 @@ public static class AStar
         public int HCost { get; private set; } // Distance to end
         public int FCost { get; private set; } // gCost + hCost
         public readonly int layerNum;
+        public readonly Vector2Int? isEndPositionOfStairsAt;
     }
 
     private static int CalculateDistanceCost(Vector2Int distanceStart, Vector2Int distanceEnd)
@@ -54,7 +57,7 @@ public static class AStar
     /*
      * Use the A* Pathfinding algorithm to return the shortest path, Will return a list of positions from start to finish.
      */
-    public static LinkedList<Vector2Int> GetShortestPath(Vector2Int pathStart, Vector2Int pathEnd)
+    public static LinkedList<Tuple<Vector2Int, Vector2Int?>> GetShortestPath(Vector2Int pathStart, Vector2Int pathEnd)
     {
         AStarPathFinder pathFinder = new AStarPathFinder(pathStart, pathEnd);
 
@@ -88,7 +91,10 @@ public static class AStar
         private NodeUpdate OnNodeUpdated;
 
         public bool Finished { get; private set; }
-        public LinkedList<Vector2Int> ShortestPath { get; private set; }
+
+        //Vector2Int? represents stairs position.
+        //Only the intermediate and end should be put for stairs, because we want the TARGET to be stairs.
+        public LinkedList<Tuple<Vector2Int, Vector2Int?>> ShortestPath { get; private set; }
 
         public AStarPathFinder(Vector2Int pathStart, Vector2Int pathEnd, NodeUpdate OnNodeUpdated = null)
         {
@@ -100,7 +106,8 @@ public static class AStar
             openNodes = new FastPriorityQueue<AStarNode>(TileInformationManager.totalTilesCount);
             closedNodes = new HashSet<AStarNode>();
 
-            AStarNode startNode = new AStarNode(pathStart, null, pathEnd, TileInformationManager.Instance.GetTileInformation(pathStart).layerNum);
+            TileInformation startTileInfo = TileInformationManager.Instance.GetTileInformation(pathStart);
+            AStarNode startNode = new AStarNode(pathStart, null, pathEnd, startTileInfo.layerNum, null);
             openNodes.Enqueue(startNode, startNode.FCost);
             OnNodeUpdated?.Invoke(startNode, AStarNodeUpdateType.NewlyOpen);
 
@@ -155,12 +162,12 @@ public static class AStar
                         if (!(directionVector.x != 0 ^ directionVector.y != 0)) //Either x or y is not 0, exclusively
                             continue;
 
-                        Direction direction = directionVector.x != 0 ?
+                        Direction stairsDirection = directionVector.x != 0 ?
                             (directionVector.x > 0 ? Direction.Right : Direction.Left) :
                             (directionVector.y > 0 ? Direction.Up : Direction.Down);
 
                         TileInformation currentTileInfo = TileInformationManager.Instance.GetTileInformation(currentNode.Position);
-                        if (!currentTileInfo.StairsStartPositionWithDirectionExists(direction, out stairsStartPosition))
+                        if (!currentTileInfo.StairsStartPositionWithDirectionExists(stairsDirection, out stairsStartPosition))
                             continue;
                     }
 
@@ -235,7 +242,8 @@ public static class AStar
                      */
                     else
                     {
-                        AStarNode successorNode = new AStarNode(successorPos, currentNode, pathEnd, successorLayerNum);
+                        TileInformation successorTile = TileInformationManager.Instance.GetTileInformation(successorPos);
+                        AStarNode successorNode = new AStarNode(successorPos, currentNode, pathEnd, successorLayerNum, stairsStartPosition?.stairsPosition);
                         openNodes.Enqueue(successorNode, successorNode.FCost);
                         OnNodeUpdated?.Invoke(successorNode, AStarNodeUpdateType.NewlyOpen);
                     }
@@ -253,7 +261,7 @@ public static class AStar
                 AStarNode previousNode = currentNode.PreviousNode;
 
                 Vector2Int currentDirection = new Vector2Int(0,0);
-                ShortestPath = new LinkedList<Vector2Int>(); 
+                ShortestPath = new LinkedList<Tuple<Vector2Int, Vector2Int?>>(); 
 
                 while (currentNode != null)
                 {
@@ -261,17 +269,45 @@ public static class AStar
 
                     if (previousNode == null)
                     {
-                        ShortestPath.AddFirst(currentNode.Position);
+                        ShortestPath.AddFirst(Tuple.Create<Vector2Int, Vector2Int?>(currentNode.Position, null));
                         OnNodeUpdated?.Invoke(currentNode, AStarNodeUpdateType.MarkPathKeyPoint);
                     }
                     else
                     {
-                        Vector2Int newDirection = currentNode.Position - previousNode.Position;
-                        if (newDirection != currentDirection)
+                        if (currentNode.isEndPositionOfStairsAt != null)
                         {
-                            ShortestPath.AddFirst(currentNode.Position);
-                            OnNodeUpdated?.Invoke(currentNode, AStarNodeUpdateType.MarkPathKeyPoint);
-                            currentDirection = newDirection;
+                            // When on stairs,
+                            // We need to readjust the path taken by AStar because
+                            // Going from straight from stairs start to end on the case where stairs is direction left or right,
+                            // Will not create a nice looking movement.
+                            if (currentNode.Position.x != previousNode.Position.x)
+                            {
+                                Vector2Int intermediatePos = new Vector2Int(-(int)Mathf.Sign(currentNode.Position.x - previousNode.Position.x) + currentNode.Position.x,
+                                                                            currentNode.Position.y > previousNode.Position.y ? currentNode.Position.y : previousNode.Position.y);
+
+                                ShortestPath.AddFirst(Tuple.Create<Vector2Int, Vector2Int?>(currentNode.Position, currentNode.isEndPositionOfStairsAt));
+                                OnNodeUpdated?.Invoke(currentNode, AStarNodeUpdateType.MarkPathKeyPoint);
+
+                                ShortestPath.AddFirst(Tuple.Create<Vector2Int, Vector2Int?>(intermediatePos, currentNode.isEndPositionOfStairsAt));
+                                //OnNodeUpdated?.Invoke(intermediatePos, AStarNodeUpdateType.MarkPathKeyPoint);
+                            }
+                            else
+                            {
+                                ShortestPath.AddFirst(Tuple.Create<Vector2Int, Vector2Int?>(currentNode.Position, currentNode.isEndPositionOfStairsAt));
+                                OnNodeUpdated?.Invoke(currentNode, AStarNodeUpdateType.MarkPathKeyPoint);
+                            }
+
+                            currentDirection = new Vector2Int(0, 0); //reset direction
+                        }
+                        else
+                        {
+                            Vector2Int newDirection = currentNode.Position - previousNode.Position;
+                            if (newDirection != currentDirection)
+                            {
+                                ShortestPath.AddFirst(Tuple.Create<Vector2Int, Vector2Int?>(currentNode.Position, null));
+                                OnNodeUpdated?.Invoke(currentNode, AStarNodeUpdateType.MarkPathKeyPoint);
+                                currentDirection = newDirection;
+                            }
                         }
                     }
 

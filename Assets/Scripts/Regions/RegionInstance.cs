@@ -12,4 +12,9 @@ public class RegionInstance
         this.regionInformation = regionInformation;
         this.regionPositions = positions;
     }
+
+    public List<Vector2Int> GetRegionPositions()
+    {
+        return new List<Vector2Int>(regionPositions);
+    }
 }

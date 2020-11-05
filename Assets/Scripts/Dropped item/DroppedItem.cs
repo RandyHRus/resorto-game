@@ -50,7 +50,7 @@ public class DroppedItem : MonoBehaviour
 
         timer = 0;
 
-        bounceCoroutine = StartCoroutine(BounceEffect.Bounce(dropHeight, xSpeed, OnBounceMove, OnBounceEnd));
+        bounceCoroutine = StartCoroutine(BounceEffect.Bounce(dropHeight, xSpeed, OnBounceMove, OnBounceEnd, true));
         Moving = true;
 
         //Only runs once for everything cause static

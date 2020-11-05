@@ -163,7 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6da96ebe535eb64899c7ba11ca9b8f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetPanel: {fileID: 0}
+  targetPanelTab: 0
 --- !u!114 &-6514716109618718942
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217,7 +217,7 @@ PrefabInstance:
     - target: {fileID: 3050632863177212059, guid: 9261f2b6348345c4e987b8d711110b81,
         type: 3}
       propertyPath: m_FontData.m_Alignment
-      value: 1
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3050632863177212059, guid: 9261f2b6348345c4e987b8d711110b81,
         type: 3}
@@ -287,12 +287,12 @@ PrefabInstance:
     - target: {fileID: 3050632864768980825, guid: 9261f2b6348345c4e987b8d711110b81,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -53
+      value: -52
       objectReference: {fileID: 0}
     - target: {fileID: 3050632864768980825, guid: 9261f2b6348345c4e987b8d711110b81,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -19
+      value: -13.6
       objectReference: {fileID: 0}
     - target: {fileID: 3050632864768980825, guid: 9261f2b6348345c4e987b8d711110b81,
         type: 3}
@@ -337,7 +337,7 @@ PrefabInstance:
     - target: {fileID: 3050632864768980830, guid: 9261f2b6348345c4e987b8d711110b81,
         type: 3}
       propertyPath: m_FontData.m_Alignment
-      value: 1
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3050632864768980830, guid: 9261f2b6348345c4e987b8d711110b81,
         type: 3}

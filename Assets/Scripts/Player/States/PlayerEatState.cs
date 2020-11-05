@@ -7,6 +7,7 @@ public class PlayerEatState : PlayerState
 {
     public override bool AllowMovement => (eatingCoroutine == null);
     public override bool AllowMouseDirectionChange => (eatingCoroutine == null);
+    public override CameraMode CameraMode => CameraMode.Follow;
 
     private static readonly float eatTime = 3f;
     private Coroutine eatingCoroutine;

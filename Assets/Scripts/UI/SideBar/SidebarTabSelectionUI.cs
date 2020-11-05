@@ -51,7 +51,7 @@ public class SidebarTabSelectionUI : MonoBehaviour, IPointerEnterHandler, IPoint
         if (currentCoroutine != null)
             StopCoroutine(currentCoroutine);
 
-        currentCoroutine = StartCoroutine(LerpEffect.LerpSpeed(rectTransform.anchoredPosition.x, slideOutTargetPosition.x, slideSpeed, OnProgress, null));
+        currentCoroutine = StartCoroutine(LerpEffect.LerpSpeed(rectTransform.anchoredPosition.x, slideOutTargetPosition.x, slideSpeed, OnProgress, null, false));
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -73,6 +73,6 @@ public class SidebarTabSelectionUI : MonoBehaviour, IPointerEnterHandler, IPoint
         if (currentCoroutine != null)
             StopCoroutine(currentCoroutine);
 
-        currentCoroutine = StartCoroutine(LerpEffect.LerpSpeed(rectTransform.anchoredPosition.x, defaultPosition.x, slideSpeed, OnProgress, null));
+        currentCoroutine = StartCoroutine(LerpEffect.LerpSpeed(rectTransform.anchoredPosition.x, defaultPosition.x, slideSpeed, OnProgress, null, false));
     }
 }

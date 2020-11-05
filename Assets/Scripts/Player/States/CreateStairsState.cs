@@ -9,9 +9,9 @@ public class CreateStairsState : PlayerState
 
     private StairsVariant stairsVariant;
 
-    public override bool AllowMovement => true;
-    public override bool AllowMouseDirectionChange => true;
-
+    public override bool AllowMovement => false;
+    public override bool AllowMouseDirectionChange => false;
+    public override CameraMode CameraMode => CameraMode.Drag;
 
     public override void Execute()
     {

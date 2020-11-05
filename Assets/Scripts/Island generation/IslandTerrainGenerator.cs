@@ -9,13 +9,14 @@ public class IslandTerrainGenerator : MonoBehaviour
     [SerializeField] private int octaves = 1;
     [SerializeField] private float persistance = 2f;
     [SerializeField] private float lacunarity = 2f;
-    [SerializeField] private float oceanPaddingOnEdgeCount = 1;
     [SerializeField] private int maxLayerHeight = 7; //For layer heights, -1 for water, 0 for sand, 1& above for land
 
     [SerializeField] private Tilemap waterTilemap = null;
     [SerializeField] private Tilemap waterBGTilemap = null;
     [SerializeField] private TileBase waterTile = null;
     [SerializeField] private TileBase waterBGFullDarkTile = null;
+
+    private readonly int waterPaddingOutsideMap = 50;
 
     private readonly int mapSize = TileInformationManager.mapSize;
 
@@ -40,14 +41,17 @@ public class IslandTerrainGenerator : MonoBehaviour
     {
         //Create water tilemap (and water background
         {
-            for (int x = 0; x < mapSize; x++)
+            for (int x = -waterPaddingOutsideMap; x < mapSize + waterPaddingOutsideMap; x++)
             {
-                for (int y = 0; y < mapSize; y++)
+                for (int y = -waterPaddingOutsideMap; y < mapSize + waterPaddingOutsideMap; y++)
                 {
                     Vector2Int pos = new Vector2Int(x, y);
                     waterTilemap.SetTile((Vector3Int)pos, waterTile);
                     waterBGTilemap.SetTile((Vector3Int)pos, waterBGFullDarkTile);
-                    TileInformationManager.Instance.GetTileInformation(pos).tileLocation = TileLocation.DeepWater;
+
+                    TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(pos);
+                    if (tileInfo != null)
+                        tileInfo.tileLocation = TileLocation.DeepWater;
                 }
             }
         }
@@ -188,7 +192,7 @@ public class IslandTerrainGenerator : MonoBehaviour
     {
         float center = mapSize / 2f;
 
-        float maxDistanceFromCenter = (mapSize / 2) - oceanPaddingOnEdgeCount;
+        float maxDistanceFromCenter = (mapSize / 2);
         float minDistanceFromCenter = float.MaxValue;
 
         float[,] map = new float[mapSize, mapSize];

@@ -33,7 +33,7 @@ public class InventorySlotUI : UIObject
             if (ObjectInScene == null)
                 yield break;
 
-            float scale = RectTransform.localScale.x - (enlargeSpeed * Time.deltaTime);
+            float scale = RectTransform.localScale.x - (enlargeSpeed * Time.unscaledDeltaTime);
             if (scale < 1)
                 scale = 1;
             RectTransform.localScale = new Vector2(scale, scale);
@@ -59,7 +59,7 @@ public class InventorySlotUI : UIObject
             if (ObjectInScene == null)
                 yield break;
 
-            float scale = RectTransform.localScale.x + (enlargeSpeed * Time.deltaTime);
+            float scale = RectTransform.localScale.x + (enlargeSpeed * Time.unscaledDeltaTime);
             if (scale > enlargeSize)
                 scale = enlargeSize;
             RectTransform.localScale = new Vector2(scale, scale);

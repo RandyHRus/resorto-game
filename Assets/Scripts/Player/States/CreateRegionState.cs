@@ -6,8 +6,7 @@ using UnityEngine.Tilemaps;
 [CreateAssetMenu(menuName = "States/Region")]
 public class CreateRegionState : PlayerState
 {
-    private Tilemap showRegionTilemap;
-    [SerializeField] private Tile showRegionTile = null;
+    [SerializeField] MapVisualizer regionVisualizer = null;
 
     private RegionInformation selectedRegion;
     private bool coroutineRunning = false;
@@ -15,21 +14,19 @@ public class CreateRegionState : PlayerState
 
     private OutlineIndicatorManager indicatorManager;
 
-    public override bool AllowMovement => true;
-    public override bool AllowMouseDirectionChange => true;
+    public override bool AllowMovement => false;
+    public override bool AllowMouseDirectionChange => false;
+    public override CameraMode CameraMode => CameraMode.Drag;
 
     public override void Initialize()
     {
         base.Initialize();
-
-        showRegionTilemap = GameObject.FindGameObjectWithTag("ShowRegionTilemap").GetComponent<Tilemap>();
-        ShowRegions(false);
     }
 
     public override void StartState(object[] args)
     {
         selectedRegion = (RegionInformation)args[0];
-        ShowRegions(true);
+        regionVisualizer.ShowVisualizer();
 
         indicatorManager = new OutlineIndicatorManager();
         indicatorManager.Toggle(true);
@@ -44,7 +41,8 @@ public class CreateRegionState : PlayerState
         }
 
         indicatorManager.Toggle(false);
-        ShowRegions(false);
+        regionVisualizer.HideVisualizer();
+        regionVisualizer.HideVisualizer();
     }
 
     public override void Execute()
@@ -79,32 +77,6 @@ public class CreateRegionState : PlayerState
         if (regionPlaceable && CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
         {
             currentCoroutine = Coroutines.Instance.StartCoroutine(PlaceRegion(selectedRegion));
-        }
-    }
-
-    private void ShowRegions(bool show)
-    {
-        showRegionTilemap.gameObject.SetActive(show);
-
-        if (show)
-        {
-            for (int i = 0; i < TileInformationManager.mapSize; i++)
-            {
-                for (int j = 0; j < TileInformationManager.mapSize; j++)
-                {
-                    Vector2Int pos = (new Vector2Int(i, j));
-                    if (TileInformationManager.Instance.GetTileInformation(pos).region != null)
-                    {
-                        showRegionTilemap.SetTile((Vector3Int)pos, showRegionTile);
-                        showRegionTilemap.SetTileFlags((Vector3Int)pos, TileFlags.None);
-                        showRegionTilemap.SetColor((Vector3Int)pos, TileInformationManager.Instance.GetTileInformation(pos).region.regionInformation.ShowColor);
-                    }
-                    else
-                    {
-                        showRegionTilemap.SetTile((Vector3Int)  pos, null);
-                    }
-                }
-            }
         }
     }
 
@@ -176,12 +148,8 @@ public class CreateRegionState : PlayerState
         {
             if (RegionManager.TryCreateRegion(info, currentPositions))
             {
-                foreach (Vector3Int pos in currentPositions)
-                {
-                    showRegionTilemap.SetTile(pos, showRegionTile);
-                    showRegionTilemap.SetTileFlags(pos, TileFlags.None);
-                    showRegionTilemap.SetColor(pos, info.ShowColor);
-                }
+                //Refresh visualizer
+                regionVisualizer.ShowVisualizer();
             }
         }
     }

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28ba9ffcbbd06e547b6b1fc03eeaa972, type: 3}
+  m_Name: Base_BoatUnloading
+  m_EditorClassIdentifier: 
+  regionName: Boat unloading
+  showColor:
+    serializedVersion: 2
+    rgba: 4282122099
+  icon: {fileID: -5810390777548091050, guid: 8a302f82af935f44cbc804188b15d1a6, type: 3}

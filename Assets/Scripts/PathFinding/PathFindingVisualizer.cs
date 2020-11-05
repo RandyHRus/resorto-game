@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public static class PathFindingVisualizer
 {
     private static LineRenderer lineRenderer => ResourceManager.Instance.PathFindingVisualizerLineRenderer;
 
-    public static void VisualizePath(LinkedList<Vector2Int> path)
+    public static void VisualizePath(LinkedList<Tuple<Vector2Int, Vector2Int?>> path)
     {
         lineRenderer.gameObject.SetActive(true);
 
@@ -15,9 +16,9 @@ public static class PathFindingVisualizer
         Vector3[] pathArray = new Vector3[path.Count];
 
         int index = 0;
-        foreach (Vector2Int pos in path)
+        foreach (Tuple<Vector2Int, Vector2Int?> pos in path)
         {
-            pathArray[index] = new Vector3(pos.x, pos.y, 0);
+            pathArray[index] = new Vector3(pos.Item1.x, pos.Item1.y, 0);
             index++;
         }
         lineRenderer.SetPositions(pathArray);

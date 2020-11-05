@@ -18,6 +18,7 @@ public class DefaultState : PlayerState
 
     public override bool AllowMovement => true;
     public override bool AllowMouseDirectionChange => true;
+    public override CameraMode CameraMode => CameraMode.Follow;
 
     public override void Initialize()
     {

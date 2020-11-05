@@ -20,17 +20,12 @@ public class TimeManager : MonoBehaviour
     private const int eveningStart = 17;
     private const int nightStart = 20;
 
-    public delegate void OnTurnedMorningDelegate();
-    public static event OnTurnedMorningDelegate OnTurnedMorning;
-
-    public delegate void OnTurnedMidDayDelegate();
-    public static event OnTurnedMidDayDelegate OnTurnedMidDay;
-
-    public delegate void OnTurnedEveningDelegate();
-    public static event OnTurnedEveningDelegate OnTurnedEvening;
-
-    public delegate void OnTurnedNightDelegate();
-    public static event OnTurnedNightDelegate OnTurnedNight;
+    public delegate void OnTurnedTimeOfDayDelegate();
+    public static event OnTurnedTimeOfDayDelegate OnTurnedMorning;
+    public static event OnTurnedTimeOfDayDelegate OnTurnedMidDay;
+    public static event OnTurnedTimeOfDayDelegate OnTurnedEvening;
+    public static event OnTurnedTimeOfDayDelegate OnTurnedNight;
+    private TurnedHourEvent[] hourEvents;
 
     private static TimeManager _instance;
     public static TimeManager Instance { get { return _instance; } }
@@ -51,8 +46,16 @@ public class TimeManager : MonoBehaviour
         {
             timePassed = 0;
         }
-
-        text = new OutlinedText(timeTextObj);
+        {
+            text = new OutlinedText(timeTextObj);
+        }
+        {
+            hourEvents = new TurnedHourEvent[24];
+            for (int i = 0; i < 24; i++)
+            {
+                hourEvents[i] = new TurnedHourEvent();
+            }
+        }
     }
 
     private int previousHour = -1;
@@ -104,21 +107,27 @@ public class TimeManager : MonoBehaviour
 
     private void HourChanged()
     {
+        GetHourEvent(hour).InvokeTurnedHourEvent();
+
         switch (hour) {
             case (morningStart):
                 OnTurnedMorning?.Invoke();
+                Debug.Log("Morning");
                 break;
 
             case (midDayStart):
                 OnTurnedMidDay?.Invoke();
+                Debug.Log("Mid day");
                 break;
 
             case (eveningStart):
                 OnTurnedEvening?.Invoke();
+                Debug.Log("Evening");
                 break;
 
             case (nightStart):
                 OnTurnedNight?.Invoke();
+                Debug.Log("Night");
                 break;
         }
     }
@@ -134,6 +143,12 @@ public class TimeManager : MonoBehaviour
         else
             return TimeOfDay.Night;
     }
+
+    public TurnedHourEvent GetHourEvent(int hour)
+    {
+        //Debug.Log(hour);
+        return hourEvents[hour];
+    }
 }
 
 public enum TimeOfDay
@@ -142,4 +157,15 @@ public enum TimeOfDay
     MidDay,
     Evening,
     Night
+}
+
+public class TurnedHourEvent
+{
+    public delegate void TurnedHour();
+    public event TurnedHour OnTournedHour;
+
+    public void InvokeTurnedHourEvent()
+    {
+        OnTournedHour?.Invoke();
+    }
 }

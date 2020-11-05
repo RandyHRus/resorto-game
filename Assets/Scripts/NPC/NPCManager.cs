@@ -30,18 +30,18 @@ public class NPCManager : MonoBehaviour
         IslandGenerationPipeline.IslandCompleted += CreateStarterNPCs;
     }
 
-    private void CreateStarterNPCs(IslandStartingPosition startingPosition)
+    private void CreateStarterNPCs(Vector2Int playerStartingPosition)
     {
         //TODO remove
         foreach(TouristScriptableObject tourist in touristsTemp)
         {
             TouristInformation info = tourist.TouristInformation;
-            CreateTourist(info, new Vector2Int(startingPosition.ActualStartingPosition.x, startingPosition.ActualStartingPosition.y));
+            CreateTourist(info, new Vector2Int(playerStartingPosition.x, playerStartingPosition.y));
         }
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 0; i++)
         {
-            CreateTourist(TouristInformation.CreateRandomTouristInformation(), new Vector2Int(startingPosition.ActualStartingPosition.x, startingPosition.ActualStartingPosition.y));
+            CreateTourist(TouristInformation.CreateRandomTouristInformation(), new Vector2Int(playerStartingPosition.x, playerStartingPosition.y));
         }
     }
 

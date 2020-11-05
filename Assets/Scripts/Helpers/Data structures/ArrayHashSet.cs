@@ -11,6 +11,15 @@ public class ArrayHashSet<T>
     List<T> elems;
     Dictionary<T, int> locations;
 
+    public HashSet<T> ConvertToHashSet()
+    {
+        HashSet<T> hashSet = new HashSet<T>();
+        foreach (T elem in elems)
+            hashSet.Add(elem);
+
+        return hashSet;
+    }
+
     public int Count => elems.Count;
 
     /** Initialize your data structure here. */

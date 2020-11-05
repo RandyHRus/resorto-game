@@ -88,7 +88,7 @@ public class ParrotBehaviour : WildlifeBehaviour, INonTileClickable
         Animator.SetBool("Flying", true);
         innerTransform.localScale = new Vector3((Transform.position.x >= targetPos.x) ? -1 : 1, 1, 1);
         Animator.SetFloat("yDirection", (Transform.position.y >= targetPos.y) ? -1 : 1);
-        targetingCoroutine = StartCoroutine(LerpEffect.LerpVectorSpeed(Transform.position, targetPos, flySpeed, Progress, End));
+        targetingCoroutine = StartCoroutine(LerpEffect.LerpVectorSpeed(Transform.position, targetPos, flySpeed, Progress, End, true));
 
         return targetingCoroutine;
     }

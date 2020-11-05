@@ -4,15 +4,29 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class OutlinedText
+public class OutlinedText: UIObject
 {
     private Text outline;
     private Text innerText;
+    CanvasGroup group;
 
-    public OutlinedText(GameObject objectInScene)
+    //Existing instance
+    public OutlinedText(GameObject objectInScene): base (objectInScene)
     {
-        outline = objectInScene.GetComponent<Text>();
-        innerText = objectInScene.GetComponentsInChildren<Text>()[1];
+        Initialize();
+    }
+
+    //Creates new instance
+    public OutlinedText(Transform parent): base (ResourceManager.Instance.OutlinedText, parent)
+    {
+        Initialize();
+    }
+
+    private void Initialize()
+    {
+        outline = ObjectInScene.GetComponent<Text>();
+        innerText = ObjectInScene.GetComponentsInChildren<Text>()[1];
+        group = ObjectInScene.GetComponent<CanvasGroup>();
     }
 
     public void SetText(string text)
@@ -24,5 +38,10 @@ public class OutlinedText
     public void SetColor(Color32 color)
     {
         innerText.color = color;
+    }
+
+    public void SetAlpha(float frac)
+    {
+        group.alpha = frac;
     }
 }

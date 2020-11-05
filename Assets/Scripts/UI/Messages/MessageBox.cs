@@ -39,7 +39,7 @@ public abstract class MessageBox : UIObject
 
         MessageManager.Instance.ShowMessage(this);
 
-        Coroutines.Instance.StartCoroutine(LerpEffect.LerpTime(0.5f, 1f, 0.3f, ExpandValueChanged, End));
+        Coroutines.Instance.StartCoroutine(LerpEffect.LerpTime(0.5f, 1f, 0.3f, ExpandValueChanged, End, false));
         //overshootCoroutine = Coroutines.Instance.StartCoroutine(OvershootEffect.Overshoot(overshootHeight, overshootDecay, overshootFrequency, OvershootMove, OvershootMove));
     }
 }

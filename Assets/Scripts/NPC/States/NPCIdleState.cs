@@ -16,7 +16,6 @@ public abstract class NPCIdleState : NPCState
 
     private readonly float minMovementWait = 1f;
     private readonly float maxMovementWait = 2f;
-    private readonly float moveSpeed = 1;
 
     public override string DisplayMessage => "Idle";
 
@@ -28,7 +27,7 @@ public abstract class NPCIdleState : NPCState
 
     public override void StartState(object[] args)
     {
-        Vector2Int position = new Vector2Int(Mathf.RoundToInt(npcInstance.npcTransform.position.x), Mathf.RoundToInt(npcInstance.npcTransform.position.x));
+        Vector2Int position = new Vector2Int(Mathf.RoundToInt(npcInstance.npcTransform.position.x), Mathf.RoundToInt(npcInstance.npcTransform.position.y));
         TileInformation info = TileInformationManager.Instance.GetTileInformation(position);
         tileLayer = info.layerNum;
 

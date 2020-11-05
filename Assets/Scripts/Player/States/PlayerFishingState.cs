@@ -17,6 +17,8 @@ public class PlayerFishingState : PlayerState
         get { return (controller.CurrentPhase is FishingDefaultPhase); }
     }
 
+    public override CameraMode CameraMode => CameraMode.Follow;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -151,7 +153,7 @@ public class PlayerFishingState : PlayerState
                 randomFish = CaughtFishGenerator.Instance.GetRandomFish();
                 caughtFishFlyingInstance.GetComponent<SpriteRenderer>().sprite = randomFish.ItemInformation.ItemIcon;
 
-                Coroutines.Instance.StartCoroutine(LerpEffect.LerpVectorSpeed(lineEndPosition, Player.position, fishCaughtFlySpeed, FishFlyingProgress, FishFlyingEnd));
+                Coroutines.Instance.StartCoroutine(LerpEffect.LerpVectorSpeed(lineEndPosition, Player.position, fishCaughtFlySpeed, FishFlyingProgress, FishFlyingEnd, true));
 
                 InvokeChangePhase(typeof(FishingDefaultPhase), null);
                 return;

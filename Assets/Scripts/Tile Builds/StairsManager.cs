@@ -12,7 +12,7 @@ public class StairsManager: MonoBehaviour
         TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(pos);
         TileInformation aboveTileInfo = TileInformationManager.Instance.GetTileInformation(new Vector2Int(pos.x, pos.y + 1));
 
-        if (tileInfo == null)
+        if (tileInfo == null || aboveTileInfo == null)
             return false;
 
         if (tileInfo.TopMostBuild != null)

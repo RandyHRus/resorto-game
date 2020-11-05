@@ -6,6 +6,7 @@ public class TouristMonoBehaviour : NPCMonoBehaviour
 {
     public TouristInstance TouristInstance => (TouristInstance)NpcInstance;
     private TouristHappinessManager happinessManager;
+    private TouristHappinessChangeDisplay happinessDiaplay;
 
     public override NPCInstance CreateNPCInstance(NPCInformation npcInfo, Transform npcTransform)
     {
@@ -15,9 +16,9 @@ public class TouristMonoBehaviour : NPCMonoBehaviour
         TouristDialogue dialogue = TouristsGenerator.Instance.GenerateRandomDialogue(touristInformation);
         TouristInterest[] interests = TouristsGenerator.Instance.GetRandomInterestsList();
         TouristHappiness happiness = new TouristHappiness();
+        TouristSchedule schedule = TouristsGenerator.Instance.GetRandomSchedule();
 
-        TouristInstance instance = new TouristInstance(touristInformation, npcTransform, dialogue, interests, happiness);
-
+        TouristInstance instance = new TouristInstance(touristInformation, npcTransform, dialogue, interests, happiness, schedule);
         return instance;
     }
 
@@ -26,6 +27,7 @@ public class TouristMonoBehaviour : NPCMonoBehaviour
         base.Initialize(npcInfo);
 
         happinessManager = new TouristHappinessManager(TouristInstance, stateMachine);
+        happinessDiaplay = new TouristHappinessChangeDisplay(TouristInstance);
     }
 
     public override Dialogue GetDialogue()

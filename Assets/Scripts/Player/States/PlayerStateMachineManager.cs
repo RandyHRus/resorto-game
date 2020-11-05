@@ -41,6 +41,8 @@ public class PlayerStateMachineManager : MonoBehaviour
         SwitchState<DefaultState>();
 
         stateMachine.OnStateChanged += OnStateChanged;
+
+        CameraFollow.ChangeFollowTarget(ResourceManager.Instance.Player);
     }
 
     private void Update()
@@ -64,7 +66,6 @@ public class PlayerStateMachineManager : MonoBehaviour
             }
         }
 
-
         //Movement should go before current state execution
         //Things like changing player direction when fishing started will not work otherwise
         if (stateMachine.CurrentState.AllowMovement)
@@ -81,6 +82,19 @@ public class PlayerStateMachineManager : MonoBehaviour
 
     private void LateUpdate()
     {
+        //Camera stuff should go in late execute because player (And other follow targets) will be moved in regular update
+        switch (stateMachine.CurrentState.CameraMode)
+        {
+            case (CameraMode.Follow):
+                CameraFollow.ExecuteLateUpdate();
+                break;
+            case (CameraMode.Drag):
+                CameraDrag.ExecuteLateUpdate();
+                break;
+            default:
+                throw new System.NotImplementedException();
+        }
+
         stateMachine.RunLateExecute();
     }
 

@@ -8,7 +8,7 @@ public class CameraZoom : MonoBehaviour
     int currentIndex = 1;
     float[] cameraSizes = new float[]
     {
-        4f, 8f, 12f, 16f 
+        4f, 8f, 12, 16f, 20f, 24f, 28f, 32f  
     };
 
     void Start()

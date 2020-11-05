@@ -116,10 +116,10 @@ public class SidebarTouristsPanel : SidebarPanel
             stateText.SetText(newState.DisplayMessage);
         }
 
-        private void OnHappinessChangedHandler(int value, TouristHappinessEnum happinessEnum)
+        private void OnHappinessChangedHandler(TouristHappinessFactor changeFactor, int newValue, TouristHappinessEnum newHappinessEnum)
         {
-            ChangeHappinessIcon(happinessEnum);
-            ChangeHappinessBarFill(value);
+            ChangeHappinessIcon(newHappinessEnum);
+            ChangeHappinessBarFill(newValue);
         }
 
         private void ChangeHappinessIcon(TouristHappinessEnum happinessEnum)

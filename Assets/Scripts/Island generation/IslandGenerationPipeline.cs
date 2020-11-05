@@ -7,7 +7,7 @@ public class IslandGenerationPipeline : MonoBehaviour
 {
     int tryCount = 5;
 
-    public delegate void IslandGenerationCompleted(IslandStartingPosition startingPosition);
+    public delegate void IslandGenerationCompleted(Vector2Int playerStartingPosition);
     public static event IslandGenerationCompleted IslandCompleted;
 
     private void Start()
@@ -34,14 +34,15 @@ public class IslandGenerationPipeline : MonoBehaviour
                 try
                 {
                     IslandTerrainGenerator.Instance.GenerateIsland();
-
-                    IslandStartingPosition startingPosition = IslandStartingPositionGenerator.Instance.GetRandomStartingPosition();
-                    StartingChestGenerator.Instance.CreateStartingChest(startingPosition);
-
+                    //IslandStartingPosition startingPosition = IslandStartingPositionGenerator.Instance.GetRandomStartingPosition();
+                    IslandStartingDockGenerator.Instance.CreateStartingDock(out Vector2Int unloadingPosition);
+                    //StartingChestGenerator.Instance.CreateStartingChest(startingPosition);
                     IslandObjectsGenerator.Instance.GenerateIslandObjects();
 
+                    Vector2Int playerStartingPosition = unloadingPosition;
+
                     completed = true;
-                    IslandCompleted?.Invoke(startingPosition);
+                    IslandCompleted?.Invoke(playerStartingPosition);
                 }
                 // If something fails after generating island, will try to create another one
                 // Things that may fails example: If it could not find valid position to spawn player

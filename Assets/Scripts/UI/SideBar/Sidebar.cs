@@ -66,7 +66,7 @@ public class Sidebar : MonoBehaviour
             if (currentCoroutine != null)
                 StopCoroutine(currentCoroutine);
 
-            currentCoroutine = StartCoroutine(LerpEffect.LerpSpeed(rectTransform.anchoredPosition.x, openPosition.x, slideSpeed, OnProgress, null));
+            currentCoroutine = StartCoroutine(LerpEffect.LerpSpeed(rectTransform.anchoredPosition.x, openPosition.x, slideSpeed, OnProgress, null, false));
         }
 
         void Close()
@@ -84,7 +84,7 @@ public class Sidebar : MonoBehaviour
             if (currentCoroutine != null)
                 StopCoroutine(currentCoroutine);
 
-            currentCoroutine = StartCoroutine(LerpEffect.LerpSpeed(rectTransform.anchoredPosition.x, defaultPosition.x, slideSpeed, OnProgress, OnEnd));
+            currentCoroutine = StartCoroutine(LerpEffect.LerpSpeed(rectTransform.anchoredPosition.x, defaultPosition.x, slideSpeed, OnProgress, OnEnd, false));
         }
 
         if (CurrentPanel == panel)
@@ -128,7 +128,7 @@ public class Sidebar : MonoBehaviour
         if (currentCoroutine != null)
             StopCoroutine(currentCoroutine);
 
-        currentCoroutine = StartCoroutine(LerpEffect.LerpSpeed(rectTransform.anchoredPosition.x, defaultPosition.x, slideSpeed, OnProgress, null));
+        currentCoroutine = StartCoroutine(LerpEffect.LerpSpeed(rectTransform.anchoredPosition.x, defaultPosition.x, slideSpeed, OnProgress, null, false));
 
         OnSidebarClosed?.Invoke();
     }
@@ -140,7 +140,9 @@ public enum SidebarTab
     Terrain,
     Region,
     Tasks,
-    Statistics,
+    Management,
     Tourists,
+    MapVisualizer,
+    Statistics,
     Settings
 }

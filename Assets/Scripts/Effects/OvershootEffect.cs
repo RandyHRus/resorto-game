@@ -9,15 +9,15 @@ public class OvershootEffect
     public delegate void Progress(float value);
     public delegate void End();
 
-    public static IEnumerator Overshoot(float startHeight, float hDecaySpeed, float frequency, Progress moveCallback, End endCallback)
+    public static IEnumerator Overshoot(float startHeight, float hDecaySpeed, float frequency, Progress moveCallback, End endCallback, bool stopOnPause)
     {
         float timer = 0;
         float h = startHeight;
 
         while (h > hStop)
         {
-            timer += Time.deltaTime;
-            h -= hDecaySpeed * Time.deltaTime;
+            timer += (stopOnPause ? Time.deltaTime : Time.unscaledDeltaTime);
+            h -= hDecaySpeed * (stopOnPause ? Time.deltaTime : Time.unscaledDeltaTime);
 
             float value = Mathf.Sin(frequency * timer) * h;
 

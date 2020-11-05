@@ -126,7 +126,7 @@ public class SidebarBuildPanel : SidebarPanel
 
             float startValue = currentSize.y;
 
-            Coroutines.Instance.StartCoroutine(LerpEffect.LerpSpeed(startValue, targetYSize, collapseSpeed, OnCollapseProgress, OnCollapseEnd));
+            Coroutines.Instance.StartCoroutine(LerpEffect.LerpSpeed(startValue, targetYSize, collapseSpeed, OnCollapseProgress, OnCollapseEnd, false));
             OnCallapseStart?.Invoke(this, targetYSize - startValue, collapseSpeed);
         }
     }

@@ -4,12 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class MapVisualizer : MonoBehaviour
+public class MapVisualizerOld : MonoBehaviour
 {
     [SerializeField] private Tilemap colorTilemap = null;
     [SerializeField] private Tile indicatorTile = null;
-    [SerializeField] private Color32[] elevationColors = null;
-    public Color32[] ElevationColors => elevationColors;
 
     [EnumNamedArray(typeof(TileLocation)), SerializeField]
     private Color32[] tileLocationColors = new Color32[Enum.GetNames(typeof(TileLocation)).Length];
@@ -50,9 +48,6 @@ public class MapVisualizer : MonoBehaviour
 
             switch (currentVisualization)
             {
-                case (DevMapVisualizations.Elevation):
-                    proposedVisualization = GetElevationMap();
-                    break;
                 case (DevMapVisualizations.TileLocation):
                     proposedVisualization = GetLocationMap();
                     break;
@@ -148,43 +143,6 @@ public class MapVisualizer : MonoBehaviour
         return colorMap;
     }
 
-    private Color32[,] GetElevationMap()
-    {
-        int mapSize = TileInformationManager.mapSize;
-
-        Color32[,] colorMap = new Color32[mapSize, mapSize];
-
-        int elevationColorSize = ElevationColors.Length;
-
-        for (int i = 0; i < mapSize; i++)
-        {
-            for (int j = 0; j < mapSize; j++)
-            {
-                Vector2Int pos = new Vector2Int(i, j);
-                int layerNum = TileInformationManager.Instance.GetTileInformation(pos).layerNum;
-
-                if (layerNum != Constants.INVALID_TILE_LAYER)
-                {
-                    if (layerNum < elevationColorSize)
-                    {
-                        colorMap[i, j] = ElevationColors[layerNum];
-                    }
-                    else
-                    {
-                        Debug.Log("No color set for elevation layer");
-                        colorMap[i, j] = Color.white;
-                    }
-                }
-                else
-                {
-                    colorMap[i, j] = Color.white;
-                }
-            }
-        }
-
-        return colorMap;
-    }
-
     private Color32[,] GetLocationMap()
     {
         int mapSize = TileInformationManager.mapSize;
@@ -223,7 +181,7 @@ public class MapVisualizer : MonoBehaviour
 
                 int stairsConnectionsCount = info.StairsStartPositions.Count;
 
-                Color32 color = ElevationColors[stairsConnectionsCount];
+                Color32 color = objectsAndFlooringsColors[stairsConnectionsCount];
                 colorMap[x, y] = color;
             }
         }
@@ -249,16 +207,16 @@ public class MapVisualizer : MonoBehaviour
                 {
                     if (((FishingRegionInstance)info.region).IsValidFishingPositionInThisRegion(pos))
                     {
-                        color = ElevationColors[0];
+                        color = objectsAndFlooringsColors[0];
                     }
                     else
                     {
-                        color = ElevationColors[1];
+                        color = objectsAndFlooringsColors[1];
                     }
                 }
                 else
                 {
-                    color = ElevationColors[1];
+                    color = objectsAndFlooringsColors[1];
                 }
 
                 colorMap[x, y] = color;
@@ -271,7 +229,6 @@ public class MapVisualizer : MonoBehaviour
     private enum DevMapVisualizations
     {
         None,
-        Elevation,
         TileLocation,
         ObjectsAndFloorings,
         Stairs,

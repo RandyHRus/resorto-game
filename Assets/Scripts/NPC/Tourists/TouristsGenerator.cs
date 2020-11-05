@@ -46,4 +46,13 @@ public class TouristsGenerator : MonoBehaviour
 
         return interests;
     }
+
+    public TouristSchedule GetRandomSchedule()
+    {
+        int wakeTime = UnityEngine.Random.Range(5, 10);
+        int sleepHours = UnityEngine.Random.Range(6, 9);
+        int sleepTime = (int)MathFunctions.Mod(wakeTime - sleepHours, 24);
+
+        return new TouristSchedule(wakeTime, sleepTime);
+    }
 }
