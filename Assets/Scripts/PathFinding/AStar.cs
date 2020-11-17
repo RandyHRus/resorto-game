@@ -55,12 +55,12 @@ public static class AStar
     }
 
     //Returns -1 if no path
-    public static int EstimatePathTimeInGameMinutes(Vector2Int pathStart, Vector2Int pathEnd, float moveSpeed, out LinkedList<Tuple<Vector2Int, Vector2Int?>> path)
+    public static InGameTime? EstimatePathTime(Vector2Int pathStart, Vector2Int pathEnd, float moveSpeed, out LinkedList<Tuple<Vector2Int, Vector2Int?>> path)
     {
         path = GetShortestPath(pathStart, pathEnd);
 
         if (path == null)
-            return -1;
+            return null;
 
         LinkedListNode<Tuple<Vector2Int, Vector2Int?>> node = path.First;
 
@@ -69,13 +69,14 @@ public static class AStar
         while (node.Next != null)
         {
             length += Vector2.Distance(node.Value.Item1, node.Next.Value.Item1);
+            node = node.Next;
         }
 
         float timePerOneTile = TimeManager.Instance.timeSpeed * moveSpeed;
 
-        float timeToWalkPath = timePerOneTile * length;
+        float timeToWalkPathMinutes = timePerOneTile * length;
 
-        return (int)timeToWalkPath;
+        return new InGameTime((int)timeToWalkPathMinutes);
     }
 
     /*
@@ -130,7 +131,7 @@ public static class AStar
             openNodes = new FastPriorityQueue<AStarNode>(TileInformationManager.totalTilesCount);
             closedNodes = new HashSet<AStarNode>();
 
-            TileInformation startTileInfo = TileInformationManager.Instance.GetTileInformation(pathStart);
+            TileInformationManager.Instance.TryGetTileInformation(pathStart, out TileInformation startTileInfo);
             AStarNode startNode = new AStarNode(pathStart, null, pathEnd, startTileInfo.layerNum, null);
             openNodes.Enqueue(startNode, startNode.FCost);
             OnNodeUpdated?.Invoke(startNode, AStarNodeUpdateType.NewlyOpen);
@@ -190,7 +191,7 @@ public static class AStar
                             (directionVector.x > 0 ? Direction.Right : Direction.Left) :
                             (directionVector.y > 0 ? Direction.Up : Direction.Down);
 
-                        TileInformation currentTileInfo = TileInformationManager.Instance.GetTileInformation(currentNode.Position);
+                        TileInformationManager.Instance.TryGetTileInformation(currentNode.Position, out TileInformation currentTileInfo);
                         if (!currentTileInfo.StairsStartPositionWithDirectionExists(stairsDirection, out stairsStartPosition))
                             continue;
                     }
@@ -266,7 +267,7 @@ public static class AStar
                      */
                     else
                     {
-                        TileInformation successorTile = TileInformationManager.Instance.GetTileInformation(successorPos);
+                        TileInformationManager.Instance.TryGetTileInformation(successorPos, out TileInformation successorTile);
                         AStarNode successorNode = new AStarNode(successorPos, currentNode, pathEnd, successorLayerNum, stairsStartPosition?.stairsPosition);
                         openNodes.Enqueue(successorNode, successorNode.FCost);
                         OnNodeUpdated?.Invoke(successorNode, AStarNodeUpdateType.NewlyOpen);

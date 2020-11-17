@@ -26,8 +26,8 @@ public class FlooringManager
 
     public static bool FlooringPlaceable(FlooringVariantBase flooringVariant, Vector2Int position)
     {
-        TileInformation info = TileInformationManager.Instance.GetTileInformation(position);
-        TileInformation belowInfo = TileInformationManager.Instance.GetTileInformation(new Vector2Int(position.x, position.y -1));
+        TileInformationManager.Instance.TryGetTileInformation(position, out TileInformation info);
+        TileInformationManager.Instance.TryGetTileInformation(new Vector2Int(position.x, position.y -1), out TileInformation belowInfo);
 
         if (info == null || belowInfo == null)
             return false;
@@ -134,7 +134,7 @@ public class FlooringManager
         }
 
         //Set tiles through tileInformation script
-        TileInformation mainTileInfo = TileInformationManager.Instance.GetTileInformation(new Vector2Int(minX, minY));
+        TileInformationManager.Instance.TryGetTileInformation(new Vector2Int(minX, minY), out TileInformation mainTileInfo);
         mainTileInfo.CreateFlooringGroup(floorings, supportPositions, new Vector2Int(maxX, maxY), supportObjects, flooringVariant, rotation);
 
         //The support object
@@ -180,7 +180,7 @@ public class FlooringManager
                 renderer.sortingLayerName = "Flooring";
                 renderer.sprite = GetSprite(flooringVariant, positions, true, position, rotation);
 
-                TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(position);
+                TileInformationManager.Instance.TryGetTileInformation(position, out TileInformation tileInfo);
 
                 newFlooring = new FlooringNormalPartOnTile(obj);
             }
@@ -188,7 +188,7 @@ public class FlooringManager
             //Set neighbour sprites
             foreach (Vector2Int neighbour in neighbours)
             {
-                TileInformation info = TileInformationManager.Instance.GetTileInformation(neighbour);
+                TileInformationManager.Instance.TryGetTileInformation(neighbour, out TileInformation info);
 
                 if (PositionHasFlooringVariant(flooringVariant, neighbour, out FlooringNormalPartOnTile neighbourFlooring)
                     && info.NormalFlooringGroup.Rotation == rotation)
@@ -244,7 +244,7 @@ public class FlooringManager
         //Add code from neighbours
         foreach (Tuple<Vector2Int, int> t in codeToAddFromNeighbours)
         {
-            TileInformation info = TileInformationManager.Instance.GetTileInformation(t.Item1);
+            TileInformationManager.Instance.TryGetTileInformation(t.Item1, out TileInformation info);
 
             if (addingPositions)
             {
@@ -263,7 +263,7 @@ public class FlooringManager
         //Add code from stairs
         foreach (Tuple<Vector2Int, int> t in codeToAddFromStairs)
         {
-            TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(t.Item1);
+            TileInformationManager.Instance.TryGetTileInformation(t.Item1, out TileInformation tileInfo);
             if (tileInfo?.TopMostBuild?.BuildInfo is StairsVariant stairs)
             {
                 resultCode = resultCode | t.Item2;
@@ -276,9 +276,7 @@ public class FlooringManager
     private static bool PositionHasFlooringVariant(FlooringVariantBase flooringVariant, Vector2Int p, out FlooringNormalPartOnTile flooring)
     {
         flooring = null;
-        TileInformation info = TileInformationManager.Instance.GetTileInformation(p);
-
-        if (info == null)
+        if (!TileInformationManager.Instance.TryGetTileInformation(p, out TileInformation info)) 
             return false;
 
         if (info.NormalFlooringGroup == null)

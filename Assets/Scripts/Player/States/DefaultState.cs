@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[CreateAssetMenu(menuName = "States/Default")]
+[CreateAssetMenu(menuName = "States/Player/Default")]
 public class DefaultState : PlayerState
 {
     private Transform playerTransform;
@@ -117,8 +117,7 @@ public class DefaultState : PlayerState
                     if (nonTileClickableFound == false)
                     {
                         Vector2Int mouseTilePos = TileInformationManager.Instance.GetMouseTile();
-                        TileInformation mouseTileInfo = TileInformationManager.Instance.GetTileInformation(mouseTilePos);
-                        if (mouseTileInfo != null)
+                        if (TileInformationManager.Instance.TryGetTileInformation(mouseTilePos, out TileInformation mouseTileInfo))
                         {
                             mouseTileInfo.ClickInteract();
                         }

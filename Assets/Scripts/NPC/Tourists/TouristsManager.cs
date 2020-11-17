@@ -2,17 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NPCManager : MonoBehaviour
+public class TouristsManager : MonoBehaviour
 {
     [SerializeField] private TouristScriptableObject[] touristsTemp = null;
 
     private List<TouristMonoBehaviour> tourists = new List<TouristMonoBehaviour>();
+    public int touristsCount => tourists.Count;
 
     public delegate void TouristAdded(TouristMonoBehaviour touristMono);
     public static event TouristAdded OnTouristAdded;
 
-    private static NPCManager _instance;
-    public static NPCManager Instance { get { return _instance; } }
+    public delegate void TouristRemoved(TouristMonoBehaviour touristMono);
+    public static event TouristRemoved OnTouristRemoved;
+
+    public int NumberOfTouristsThatCanBeSpawned => HotelsManager.AvailableRoomsCount;
+
+    private static TouristsManager _instance;
+    public static TouristsManager Instance { get { return _instance; } }
     private void Awake()
     {
         //Singleton
@@ -27,10 +33,10 @@ public class NPCManager : MonoBehaviour
             }
         }
 
-        IslandGenerationPipeline.IslandCompleted += CreateStarterNPCs;
+        IslandGenerationPipeline.IslandCompleted += CreateStarterTourists;
     }
 
-    private void CreateStarterNPCs(Vector2Int playerStartingPosition)
+    private void CreateStarterTourists(Vector2Int playerStartingPosition)
     {
         //TODO remove
         foreach(TouristScriptableObject tourist in touristsTemp)
@@ -47,8 +53,17 @@ public class NPCManager : MonoBehaviour
 
     public void CreateTourist(TouristInformation touristInfo, Vector2 position)
     {
-        TouristMonoBehaviour t = (TouristMonoBehaviour)touristInfo.CreateInScene(position);
-        tourists.Add(t);
-        OnTouristAdded?.Invoke(t);
+        TouristMonoBehaviour mono = (TouristMonoBehaviour)touristInfo.CreateInScene(position);
+        tourists.Add(mono);
+        OnTouristAdded?.Invoke(mono);
+
+        mono.OnTouristDeleting += RemoveTourist;
+    }
+
+    public void RemoveTourist(TouristMonoBehaviour mono)
+    {
+        mono.OnTouristDeleting -= RemoveTourist;
+        tourists.Remove(mono);
+        OnTouristRemoved?.Invoke(mono);
     }
 }

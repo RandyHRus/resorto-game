@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Tourist States/Idle")]
+[CreateAssetMenu(menuName = "States/Tourist/Idle")]
 public class TouristIdleState : NPCIdleState
 {
     private readonly float minActivityTimer = 3f;

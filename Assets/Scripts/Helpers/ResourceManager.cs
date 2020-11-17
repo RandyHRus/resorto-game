@@ -50,8 +50,11 @@ public class ResourceManager : MonoBehaviour
     [SerializeField] private GameObject structureVariantComponentUI = null;
     public GameObject StructureVariantComponentUI => structureVariantComponentUI;
 
-    [SerializeField] private GameObject regionComponent = null;
-    public GameObject RegionComponent => regionComponent;
+    [SerializeField] private GameObject createRegionComponent = null;
+    public GameObject CreateRegionComponent => createRegionComponent;
+
+    [SerializeField] private GameObject manageRegionComponent = null;
+    public GameObject ManageRegionComponent => manageRegionComponent;
 
     [SerializeField] private GameObject subtaskInstanceUI = null;
     public GameObject SubtaskInstanceUI => subtaskInstanceUI;
@@ -80,6 +83,9 @@ public class ResourceManager : MonoBehaviour
     [SerializeField] private GameObject mapVisualizerComponentUI = null;
     public GameObject MapVisualizerComponentUI => mapVisualizerComponentUI;
 
+    [SerializeField] private GameObject textListComponentUI = null;
+    public GameObject TextListComponentUI => textListComponentUI;
+
     [Header("Colors")]
 
     [SerializeField] private Color32 red = Color.white;
@@ -103,6 +109,11 @@ public class ResourceManager : MonoBehaviour
 
     [SerializeField] private Color32 uiHighlightColor = Color.white;
     public Color32 UIHighlightColor => uiHighlightColor;
+
+    [Header("Builds")]
+
+    [SerializeField] private ObjectInformation bedObjectInfo = null;
+    public ObjectInformation BedObjectInfo => bedObjectInfo;
 
     [Header("Others")]
 
@@ -144,6 +155,9 @@ public class ResourceManager : MonoBehaviour
 
     [SerializeField] private Tile mapVisualizerColorTile = null;
     public Tile MapVisualizerColorTile => mapVisualizerColorTile;
+
+    [SerializeField] private RegionInformation boatUnloadingRegion = null;
+    public RegionInformation BoatUnloadingRegion => boatUnloadingRegion;
 
     [EnumNamedArray(typeof(TouristHappinessEnum)), SerializeField]
     private Sprite[] touristHappinessIcons = new Sprite[Enum.GetNames(typeof(TouristHappinessEnum)).Length];

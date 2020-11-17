@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[CreateAssetMenu(menuName = "States/Player talking")]
+[CreateAssetMenu(menuName = "States/Player/Player talking")]
 public class PlayerTalkingState : PlayerState
 {
     private GameObject dialogueBox = null;

@@ -12,18 +12,22 @@ public class TouristBoat : Boat
         base.Initialize();
 
         OnBoatUnloadingPointReached += SpawnTourists;
-        touristSpawnPosition = boatUnloadingRegionInstance.GetRegionPositions()[0];
+        touristSpawnPosition = boatUnloadingRegionInstance.GetRegionPositionsAsList()[0];
     }
 
     private void SpawnTourists()
     {
         for (int i = 0; i < touristCount; i++)
-            NPCManager.Instance.CreateTourist(TouristInformation.CreateRandomTouristInformation(), touristSpawnPosition);
+            TouristsManager.Instance.CreateTourist(TouristInformation.CreateRandomTouristInformation(), touristSpawnPosition);
     }
 
     public override void ResetBoat()
     {
         base.ResetBoat();
-        touristCount = Random.Range(1, 5);
+
+        touristCount = TouristsManager.Instance.NumberOfTouristsThatCanBeSpawned > 0 ? 
+            Random.Range(1, 
+                         TouristsManager.Instance.NumberOfTouristsThatCanBeSpawned + 1):
+            0;
     }
 }

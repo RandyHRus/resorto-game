@@ -61,7 +61,8 @@ public class IslandObjectsGenerator : MonoBehaviour
         {
             for (int j = 0; j < mapSize; j++)
             {
-                TileInformationManager.Instance.GetTileInformation(new Vector2Int(i, j)).RemoveAllBuilds();
+                TileInformationManager.Instance.TryGetTileInformation(new Vector2Int(i, j), out TileInformation tileInfo);
+                tileInfo.RemoveAllBuilds();
             }
         }
     }
@@ -118,7 +119,8 @@ public class IslandObjectsGenerator : MonoBehaviour
             int randomY = Random.Range(0, mapSize);
             Vector2Int proposedPos = new Vector2Int(randomX, randomY);
 
-            if (TileInformationManager.Instance.GetTileInformation(proposedPos).tileLocation != TileLocation.Grass)
+            TileInformationManager.Instance.TryGetTileInformation(proposedPos, out TileInformation tileInfo);
+            if (tileInfo.tileLocation != TileLocation.Grass)
                 continue;
 
             TileObjectsManager.TryCreateObject(bushObjectInfo, proposedPos, out BuildOnTile buildOnTile);
@@ -141,7 +143,8 @@ public class IslandObjectsGenerator : MonoBehaviour
             int randomY = Random.Range(0, mapSize);
             Vector2Int proposedPos = new Vector2Int(randomX, randomY);
 
-            if (TileInformationManager.Instance.GetTileInformation(proposedPos).tileLocation != TileLocation.Sand)
+            TileInformationManager.Instance.TryGetTileInformation(proposedPos, out TileInformation tileInfo);
+            if (tileInfo.tileLocation != TileLocation.Sand)
                 continue;
 
             TileObjectsManager.TryCreateObject(seashellObjectInfo, proposedPos, out BuildOnTile buildOnTile);
@@ -164,7 +167,8 @@ public class IslandObjectsGenerator : MonoBehaviour
             int randomY = Random.Range(0, mapSize);
             Vector2Int proposedPos = new Vector2Int(randomX, randomY);
 
-            if (TileInformationManager.Instance.GetTileInformation(proposedPos).tileLocation != TileLocation.Sand)
+            TileInformationManager.Instance.TryGetTileInformation(proposedPos, out TileInformation tileInfo);
+            if (tileInfo.tileLocation != TileLocation.Sand)
                 continue;
 
             TileObjectsManager.TryCreateObject(palmTreeObjectInfo, proposedPos, out BuildOnTile buildOnTile);
@@ -196,7 +200,7 @@ public class IslandObjectsGenerator : MonoBehaviour
                 for (int j = 0; j < driftwoodObjectInfo.GetSizeOnTile(0).y; j++)
                 {
                     Vector2Int thisLocation = proposedPos + new Vector2Int(i, j);
-                    TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(thisLocation);
+                    TileInformationManager.Instance.TryGetTileInformation(thisLocation, out TileInformation tileInfo);
                     if (!(tileInfo.tileLocation == TileLocation.Sand || tileInfo.tileLocation == TileLocation.WaterEdge))
                         placeable = false;
                 }

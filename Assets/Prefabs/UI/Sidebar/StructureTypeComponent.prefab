@@ -259,7 +259,7 @@ PrefabInstance:
     - target: {fileID: 5695362589855464088, guid: 7097f1d59cba03b4b936206d7eaab9c3,
         type: 3}
       propertyPath: m_TagString
-      value: List Field
+      value: Collapsible Field
       objectReference: {fileID: 0}
     - target: {fileID: 5695362589855464088, guid: 7097f1d59cba03b4b936206d7eaab9c3,
         type: 3}

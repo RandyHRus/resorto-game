@@ -14,13 +14,13 @@ public class LerpEffect
 
         while (timer < time)
         {
+            yield return 0;
+
             timer += (stopOnPause ? Time.deltaTime : Time.unscaledDeltaTime);
             if (timer > time)
                 timer = time;
 
             valueChangedCallback(Mathf.Lerp(startValue, endValue, timer / time));
-
-            yield return 0;
         }
 
         endCallback?.Invoke();
@@ -33,13 +33,14 @@ public class LerpEffect
 
         while (valueChanged < valueToChange)
         {
+            yield return 0;
+
             valueChanged += (stopOnPause ? Time.deltaTime : Time.unscaledDeltaTime) * speed;
             if (valueChanged >= valueToChange)
                 valueChanged = valueToChange;
 
             float proposedValue = Mathf.Lerp(startValue, endValue, valueChanged / valueToChange);
             valueChangedCallback(proposedValue);
-            yield return 0;
         }
 
         endCallback?.Invoke();
@@ -52,14 +53,14 @@ public class LerpEffect
 
         while (distanceTravelled < distanceToTravel)
         {
+            yield return 0;
+
             distanceTravelled += (stopOnPause ? Time.deltaTime : Time.unscaledDeltaTime) * speed;
             if (distanceTravelled >= distanceToTravel)
                 distanceTravelled = distanceToTravel;
 
             Vector2 proposedPos = Vector2.Lerp(startPos, targetPos, distanceTravelled / distanceToTravel);
             valueChangedCallback(proposedPos);
-
-            yield return 0;
         }
 
         endCallback?.Invoke();
@@ -71,13 +72,13 @@ public class LerpEffect
 
         while (timer < time)
         {
+            yield return 0;
+
             timer += (stopOnPause ? Time.deltaTime : Time.unscaledDeltaTime);
             if (timer > time)
                 timer = time;
 
             valueChangedCallback(Vector2.Lerp(startPos, targetPos, timer / time));
-
-            yield return 0;
         }
 
         endCallback?.Invoke();

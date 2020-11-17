@@ -49,7 +49,7 @@ public class StateMachine<T> where T: IStateMachineState
         SwitchState(typeof(T2), args);
     }
 
-    public void SwitchDefaultPhase()
+    public void SwitchDefaultState()
     {
         SwitchState(defaultStateType);
     }
@@ -59,7 +59,7 @@ public class StateMachine<T> where T: IStateMachineState
         if (CurrentState != null)
         {
             CurrentState.OnChangeState -= SwitchState;
-            CurrentState.OnEndState -= SwitchDefaultPhase;
+            CurrentState.OnEndState -= SwitchDefaultState;
 
             CurrentState.EndState();
         }
@@ -69,7 +69,7 @@ public class StateMachine<T> where T: IStateMachineState
         CurrentState = typeToStateInstance[type];
 
         CurrentState.OnChangeState += SwitchState;
-        CurrentState.OnEndState += SwitchDefaultPhase;
+        CurrentState.OnEndState += SwitchDefaultState;
 
         CurrentState.StartState(args);
 

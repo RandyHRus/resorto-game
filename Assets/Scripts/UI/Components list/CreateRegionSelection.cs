@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RegionSelection : ListComponentUI
+public class CreateRegionSelection : ListComponentUI
 {
     private readonly RegionInformation info;
 
-    public RegionSelection(RegionInformation info, SelectionPanel<RegionSelection> parentPanel): base(ResourceManager.Instance.RegionComponent, parentPanel.ObjectTransform)
+    public CreateRegionSelection(RegionInformation info, SelectionPanel<CreateRegionSelection> parentPanel): base(ResourceManager.Instance.CreateRegionComponent, parentPanel.ObjectTransform)
     {
         this.info = info;
 

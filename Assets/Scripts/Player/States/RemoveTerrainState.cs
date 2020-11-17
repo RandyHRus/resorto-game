@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "States/Remove Terrain")]
+[CreateAssetMenu(menuName = "States/Player/Remove Terrain")]
 public class RemoveTerrainState : PlayerState
 {
     public override bool AllowMovement => false;

@@ -11,6 +11,7 @@ public class BuildOnTile: IRemovable
     public GameObject GameObjectOnTile { get; private set; }
     public BuildRotation Rotation { get; private set; }
     public ObjectType ModifiedType { get; private set; }
+    public readonly HashSet<Vector2Int> neighbours;
 
     private HashSet<TileInformation> transparencySubscriptions;
     private int currentSteppedOnTilesCount;
@@ -43,14 +44,37 @@ public class BuildOnTile: IRemovable
         {
             for (int j = transparencySubscribeBottomLeft.y; j < transparencySubscribeBottomLeft.y + buildInfo.TransparencyCapableYSize; j++)
             {
-                TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(new Vector2Int(i, j));
-                if (tileInfo == null)
+                if (!TileInformationManager.Instance.TryGetTileInformation(new Vector2Int(i, j), out TileInformation tileInfo))
                     continue;
 
                 transparencySubscriptions.Add(tileInfo);
 
                 tileInfo.TileSteppedOnPlayer += TileSteppedOnPlayerHandler;
                 tileInfo.TileSteppedOffPlayer += TileSteppedOffPlayerHandler;
+            }
+        }
+
+        //Initialize neighbours
+        {
+            neighbours = new HashSet<Vector2Int>();
+            foreach (Vector2Int buildPos in tilesToOccupy)
+            {
+                Vector2Int[] checkNeighbours = new Vector2Int[]
+                {
+                new Vector2Int(buildPos.x + 1,  buildPos.y),
+                new Vector2Int(buildPos.x - 1,  buildPos.y),
+                new Vector2Int(buildPos.x,      buildPos.y + 1),
+                new Vector2Int(buildPos.x,      buildPos.y - 1)
+                };
+
+                foreach (Vector2Int n in checkNeighbours)
+                {
+                    if (TileInformationManager.Instance.TryGetTileInformation(n, out TileInformation tileInfo))
+                    {
+                        if (!tilesToOccupy.Contains(n) && !neighbours.Contains(n))
+                            neighbours.Add(n);
+                    }
+                }
             }
         }
     }

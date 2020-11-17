@@ -10,8 +10,7 @@ public static class TileObjectsManager
         yOffset = 0;
         ObjectType proposedType = info.Type;
 
-        TileInformation mainTile = TileInformationManager.Instance.GetTileInformation(mainPos);
-        if (mainTile == null)
+        if (!TileInformationManager.Instance.TryGetTileInformation(mainPos, out TileInformation mainTile))
             return false;
 
         //So that you can lay ontop objects also in standard position
@@ -62,8 +61,7 @@ public static class TileObjectsManager
 
         bool ObjectPlaceableOnTile(Vector2Int pos)
         {
-            TileInformation checkTile = TileInformationManager.Instance.GetTileInformation(pos);
-            if (checkTile == null)
+            if (!TileInformationManager.Instance.TryGetTileInformation(pos, out TileInformation checkTile))
                 return false;
 
             int layer = checkTile.layerNum;
@@ -115,7 +113,7 @@ public static class TileObjectsManager
             return false;
         }
 
-        TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(mainPos);
+        TileInformationManager.Instance.TryGetTileInformation(mainPos, out TileInformation tileInfo);
 
         //Create gameObject
         GameObject obj;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "States/Create Terrain")]
+[CreateAssetMenu(menuName = "States/Player/Create Terrain")]
 public class CreateTerrainState : PlayerState
 {
     [SerializeField] private Sprite landIndicatorSprite = null;

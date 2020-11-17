@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "States/Create Buildings")]
+[CreateAssetMenu(menuName = "States/Player/Create Buildings")]
 public class CreateBuildingsState : PlayerState
 {
     [SerializeField] private Sprite indicatorSprite = null;

@@ -5,8 +5,6 @@ using System;
 
 public abstract class NPCState : ScriptableObject, IStateMachineState
 {
-    protected static readonly float moveSpeed = 1f;
-
     protected GameObject npcGameObject;
     protected NPCInstance npcInstance;
 

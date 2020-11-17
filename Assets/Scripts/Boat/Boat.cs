@@ -25,7 +25,7 @@ public class Boat : MonoBehaviour
     public virtual void Initialize()
     {
         boatUnloadingRegionInstance = RegionManager.GetRandomRegionInstanceOfType(boatUnloadingRegionInfo);
-        List<Vector2Int> regionPositions = boatUnloadingRegionInstance.GetRegionPositions();
+        List<Vector2Int> regionPositions = boatUnloadingRegionInstance.GetRegionPositionsAsList();
         int boatTargetXPosition = regionPositions[0].x;
 
         //Initialize stateMachine
@@ -53,7 +53,7 @@ public class Boat : MonoBehaviour
 
     public virtual void ResetBoat()
     {
-        stateMachine.SwitchDefaultPhase();
+        stateMachine.SwitchDefaultState();
     }
 
     private void OnStateChanged(BoatState previousState, BoatState newState)
@@ -87,7 +87,7 @@ public abstract class BoatState : IStateMachineState
     public delegate void BoatUnloadingPointReached();
     public event BoatUnloadingPointReached OnBoatUnloadingPointReached;
 
-    protected readonly float maxSpeed = 3f;
+    protected readonly float maxSpeed = 10f;
     protected readonly int boatAccelerationDistance = 5;
 
     protected Vector3 boatSpawnPosition = new Vector2(-5, TileInformationManager.mapSize + 2);
@@ -178,7 +178,7 @@ public class BoatStoppedState : BoatState
 
     public override void StartState(object[] args)
     {
-        TimeManager.OnTurnedEvening += OnTurnedEvening;
+        TimeManager.Instance.SubscribeToTime(BoatManager.Instance.BoatLeaveTime, OnBoatLeaveTime);
     }
 
     public override void Execute()
@@ -188,10 +188,10 @@ public class BoatStoppedState : BoatState
 
     public override void EndState()
     {
-        TimeManager.OnTurnedEvening -= OnTurnedEvening;
+        TimeManager.Instance.UnsubscribeFromTime(BoatManager.Instance.BoatLeaveTime, OnBoatLeaveTime);
     }
 
-    private void OnTurnedEvening()
+    private void OnBoatLeaveTime(object[] args)
     {
         InvokeChangeState(typeof(BoatLeavingState), null);
     }

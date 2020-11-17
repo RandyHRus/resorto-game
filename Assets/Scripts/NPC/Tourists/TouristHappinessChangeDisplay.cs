@@ -12,13 +12,14 @@ public class TouristHappinessChangeDisplay
 
     private readonly TouristInstance touristInstance;
 
-    private Queue<OutlinedText> displayPool; //REMEMBER TO DESTROY when I implement destroying on NPC
+    private Queue<OutlinedText> displayPool;
 
     public TouristHappinessChangeDisplay(TouristInstance touristInstance)
     {
         this.touristInstance = touristInstance;
 
-        touristInstance.happiness.OnHappinessChanged += OnHappinessChangedHandler; //Remember to unsub when I implement destroying
+        touristInstance.happiness.OnHappinessChanged += OnHappinessChangedHandler;
+        touristInstance.OnNPCDelete += OnDelete;
 
         displayPool = new Queue<OutlinedText>();
         for (int i = 0; i < initialPoolCount; i++)
@@ -49,6 +50,8 @@ public class TouristHappinessChangeDisplay
         float alpha = 1;
         float currentYOffset = 0;
 
+        outlinedText.ObjectInScene.SetActive(true);
+
         while (alpha >= 0)
         {
             //Change alpha
@@ -62,13 +65,33 @@ public class TouristHappinessChangeDisplay
             yield return 0;
         }
 
-        displayPool.Enqueue(outlinedText);
+        outlinedText.ObjectInScene.SetActive(false);
+
+        //If npc is deleted, displayPool will be set to null
+        if (displayPool == null)
+            outlinedText.Destroy(); 
+        else
+            displayPool.Enqueue(outlinedText);
+    }
+
+    private void OnDelete()
+    {
+        touristInstance.happiness.OnHappinessChanged -= OnHappinessChangedHandler;
+        touristInstance.OnNPCDelete -= OnDelete;
+
+        while (displayPool.Count > 0)
+        {
+            OutlinedText text = displayPool.Dequeue();
+            text.Destroy();
+        }
+        displayPool = null;
     }
 
     private OutlinedText CreateNewOutlinedText()
     {
         OutlinedText newText = new OutlinedText(ResourceManager.Instance.IndicatorsCanvas.transform);
         newText.ObjectTransform.localScale = new Vector3Int(2, 2, 2);
+        newText.ObjectInScene.SetActive(false);
         return newText;
     }
 } 

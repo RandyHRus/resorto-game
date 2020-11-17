@@ -8,7 +8,7 @@ public class UIObject
     public RectTransform RectTransform { get; }
     public Transform ObjectTransform { get; }
 
-    public delegate void Destroyed();
+    public delegate void Destroyed(UIObject sender);
     public event Destroyed OnDestroy;
 
     //Instantiates a object
@@ -33,9 +33,9 @@ public class UIObject
         ObjectInScene.SetActive(show);
     }
 
-    public void Destroy()
+    public virtual void Destroy()
     {
         GameObject.Destroy(ObjectInScene);
-        OnDestroy?.Invoke();
+        OnDestroy?.Invoke(this);
     }
 }

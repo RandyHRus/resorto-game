@@ -17,6 +17,12 @@ public class MessageManager : MonoBehaviour
     [SerializeField] private GameObject cosmeticGainMessageBox = null;
     public GameObject CosmeticGainMessageBox => cosmeticGainMessageBox;
 
+    [SerializeField] private GameObject touristArrivedMessage = null;
+    public GameObject TouristArrivedMessage => touristArrivedMessage;
+
+    [SerializeField] private GameObject touristLeftMessage = null;
+    public GameObject TouristLeftMessage => touristLeftMessage;
+
     [SerializeField] private Canvas canvas = null;
     public Canvas Canvas => canvas;
 
@@ -53,6 +59,9 @@ public class MessageManager : MonoBehaviour
 
         Sidebar.OnSidebarOpened += MoveOutMessages;
         Sidebar.OnSidebarClosed += MoveInMessages;
+
+        TouristsManager.OnTouristAdded += (TouristMonoBehaviour mono) => { new TouristArrivedMessage(mono.TouristInstance); };
+        TouristsManager.OnTouristRemoved += (TouristMonoBehaviour mono) => { new TouristLeftMessage(mono.TouristInstance); };
     }
 
     public void ShowMessage(MessageBox newMessageBox)

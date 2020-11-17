@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using System;
 
-[CreateAssetMenu(menuName = "States/Create Objects")]
+[CreateAssetMenu(menuName = "States/Player/Create Objects")]
 public class CreateObjectsState : PlayerState
 {
     [SerializeField] private Sprite defaultIndicatorSprite = null;

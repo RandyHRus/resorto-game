@@ -8,6 +8,8 @@ public abstract class NPCMonoBehaviour : MonoBehaviour
     [SerializeField] private NPCState defaultState = null;
     [SerializeField] private NPCState[] states = null;
 
+    public NPCSchedule Schedule { get; private set; }
+
     public NPCStateMachine stateMachine;
     public NPCState CurrentState => stateMachine.CurrentState;
 
@@ -24,7 +26,9 @@ public abstract class NPCMonoBehaviour : MonoBehaviour
     public virtual void Initialize(NPCInformation npcInfo)
     {
         this.NpcInformation = npcInfo;
+
         NpcInstance = CreateNPCInstance(npcInfo, transform);
+        Schedule = npcInfo.CreateSchedule(NpcInstance);
 
         NPCState[] stateInstancesCopy = new NPCState[states.Length];
         for (int i = 0; i < states.Length; i++)
@@ -34,15 +38,17 @@ public abstract class NPCMonoBehaviour : MonoBehaviour
             stateInstancesCopy[i] = copy;
         }
 
-        stateMachine = new NPCStateMachine(defaultState.GetType(), stateInstancesCopy);
-        stateMachine.OnStateChanged += InvokeStateChanged; //Remember to unsubscribe if I ever implement destroying     
+        stateMachine = new NPCStateMachine(NpcInstance, Schedule, defaultState.GetType(), stateInstancesCopy);
+        stateMachine.OnStateChanged += InvokeStateChanged; 
 
         NPCClickOn c = gameObject.GetComponent<NPCClickOn>();
-        c.OnClick += FollowNPC; //Remember to unsubscribe if I ever implement destroying     
+        c.OnClick += FollowNPC; 
 
         stateMachine.SwitchState(defaultState.GetType());
 
         ObjectTransform = transform;
+
+        stateMachine.GetStateInstance<NPCLeaveAndDeleteState>().OnNPCDeleting += OnDelete;
     }
 
     public abstract Dialogue GetDialogue();
@@ -65,6 +71,7 @@ public abstract class NPCMonoBehaviour : MonoBehaviour
     private void InvokeStateChanged(NPCState previousState, NPCState newState)
     {
         OnStateChanged?.Invoke(previousState, newState);
+        NpcInstance.InvokeOnNPCStateChanged(previousState, newState);
     }
 
     public void SwitchState<T>(object[] args = null) where T : NPCState => stateMachine.SwitchState<T>(args);
@@ -72,6 +79,19 @@ public abstract class NPCMonoBehaviour : MonoBehaviour
     public void SwitchState(Type type, object[] args = null) => stateMachine.SwitchState(type, args);
 
     public T GetStateInstance<T>() where T : NPCState => stateMachine.GetStateInstance<T>();
+
+    public virtual void OnDelete()
+    {
+        Destroy(gameObject);
+        stateMachine.OnStateChanged -= InvokeStateChanged;
+
+        NPCClickOn c = gameObject.GetComponent<NPCClickOn>();
+        c.OnClick -= FollowNPC;
+
+        stateMachine.GetStateInstance<NPCLeaveAndDeleteState>().OnNPCDeleting -= OnDelete;
+
+        NpcInstance.InvokeOnDelete();
+    }
 }
 
 public class NPCStateMachine : StateMachine<NPCState>
@@ -79,37 +99,51 @@ public class NPCStateMachine : StateMachine<NPCState>
     public delegate void ActivityCompleted(Activity activity, float completenessFrac);
     public event ActivityCompleted OnActivityCompleted;
 
-    public NPCStateMachine(Type defaultStateType, NPCState[] stateInstances) : base(defaultStateType, stateInstances)
+    private NPCSchedule schedule;
+    private NPCInstance npcInstance;
+
+    public NPCStateMachine(NPCInstance npcInstance, NPCSchedule schedule, Type defaultStateType, NPCState[] stateInstances) : base(defaultStateType, stateInstances)
     {
-        OnStateChanged += SubscribeEvents;  //Remember to unsubscribe if I ever implement destroying     
+        this.npcInstance = npcInstance;
+        this.schedule = schedule;
+        OnStateChanged += SubscribeEvents;  
+        npcInstance.OnNPCDelete += OnDelete;
     }
 
     private void SubscribeEvents(NPCState previousState, NPCState currentState)
     {
         if (previousState != null)
         {
-            previousState.StartActivity -= TryStartActivity;
+            previousState.StartActivity -= GoToActivityLocationAndStartActivity;
 
             if (previousState is NPCActivityState previousActivityState)
                 previousActivityState.OnActivityCompleted -= InvokeActivityCompleted;
         }
 
-        currentState.StartActivity += TryStartActivity;
+        currentState.StartActivity += GoToActivityLocationAndStartActivity;
 
         if (currentState is NPCActivityState currentActivityState)
             currentActivityState.OnActivityCompleted += InvokeActivityCompleted;
     }
 
-    private void TryStartActivity(Activity activity)
+    private void GoToActivityLocationAndStartActivity(Activity activity)
     {
-        if (activity.CanStartActivity(out Type switchToState, out object[] switchToStateArgs))
-        {
-            SwitchState(switchToState, switchToStateArgs);
-        }
+        bool canGoToLocation = activity.GetActivityLocationAndStateToSwitchTo(out Vector2Int? location, out Type switchToState, out object[] switchToStateArgs, out string goingToLocationMessage);
+
+        if (!canGoToLocation)
+            return;
+
+        SwitchState<NPCWalkToPositionState>(new object[] { location, switchToState, switchToStateArgs, goingToLocationMessage });
     }
 
     private void InvokeActivityCompleted(Activity activity, float completenessFrac)
     {
         OnActivityCompleted?.Invoke(activity, completenessFrac);
+    }
+
+    private void OnDelete()
+    {
+        OnStateChanged -= SubscribeEvents;
+        npcInstance.OnNPCDelete -= OnDelete;
     }
 }

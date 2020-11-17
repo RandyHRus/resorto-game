@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public abstract class ListComponentUI : UIObject
 {
     public delegate void Selected(ListComponentUI selection);
-    public event Selected OnSelect;
+    public event Selected OnSelected;
 
     private Image buttonImage;
     protected Button button;
@@ -20,7 +20,12 @@ public abstract class ListComponentUI : UIObject
 
     public virtual void OnClick()
     {
-        OnSelect?.Invoke(this);
+        OnSelect();
+    }
+
+    public virtual void OnSelect()
+    {
+        OnSelected?.Invoke(this);
     }
 
     public ListComponentUI(GameObject prefab, Transform parent) : base(prefab, parent)
@@ -52,6 +57,7 @@ public abstract class ListComponentUI : UIObject
         }
 
         startPos = RectTransform.anchoredPosition;
+
         Coroutines.Instance.StartCoroutine(LerpEffect.LerpSpeed(startPos.y, startPos.y + change, speed, ShiftProgress, null, false));
     }
 
@@ -63,7 +69,7 @@ public abstract class ListComponentUI : UIObject
     }
     */
 
-    private void UnSub()
+    private void UnSub(UIObject sender)
     {
         OnDestroy -= UnSub;
         button.onClick.RemoveListener(OnClick);

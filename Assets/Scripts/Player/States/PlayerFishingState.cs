@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "States/Fishing")]
+[CreateAssetMenu(menuName = "States/Player/Fishing")]
 public class PlayerFishingState : PlayerState
 {
     private static FishingStateController controller;

@@ -64,7 +64,7 @@ public class ChestStorage : MonoBehaviour, ITileObjectFunctions
         }
     }
 
-    private void UIDestroyed()
+    private void UIDestroyed(UIObject sender)
     {
         ui.OnDestroy -= UIDestroyed;
         ui = null;

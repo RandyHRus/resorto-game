@@ -22,5 +22,10 @@ public class TouristInformation : NPCInformation
         return new TouristInformation(randomPersonality, randomName, randomCustomization);
     }
 
+    public override NPCSchedule CreateSchedule(NPCInstance instance)
+    {
+        return TouristsGenerator.Instance.GetRandomSchedule((TouristInstance)instance);
+    }
+
     protected override GameObject ObjectToInitialize => ResourceManager.Instance.TouristNpc;
 }

@@ -28,6 +28,8 @@ public class BounceEffect
         float timeScale = stopOnPause ? Time.deltaTime : Time.unscaledDeltaTime;
 
         while (hmax > hStop) {
+            yield return 0;
+
             if (freefall) {
                 float hnew = (float)(h + (v * timeScale) - (0.5 * g * timeScale * timeScale));
                 if (hnew < 0) {
@@ -52,8 +54,6 @@ public class BounceEffect
             hmax = 0.5f * vmax * vmax / g;
 
             moveCallback(h, xSpeed * timeScale);
-
-            yield return 0;
         }
 
         endCallback?.Invoke();

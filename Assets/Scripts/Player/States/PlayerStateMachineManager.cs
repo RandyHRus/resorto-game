@@ -51,7 +51,7 @@ public class PlayerStateMachineManager : MonoBehaviour
         {
             if (!(stateMachine.CurrentState is DefaultState))
             {
-                SwitchState<DefaultState>();
+                stateMachine.CurrentState.OnCancelButtonPressed();
             }
             else
             {
@@ -107,6 +107,8 @@ public class PlayerStateMachineManager : MonoBehaviour
     public void SwitchState<T>(object[] args = null) where T: PlayerState => stateMachine.SwitchState<T>(args);
 
     public void SwitchState(Type type, object[] args = null) => stateMachine.SwitchState(type, args);
+
+    public void SwitchDefaultState() => stateMachine.SwitchDefaultState();
 
 
     private void OnStateChanged(PlayerState previousState, PlayerState newState)

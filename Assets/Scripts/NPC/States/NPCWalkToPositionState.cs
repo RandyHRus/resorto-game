@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-[CreateAssetMenu(menuName = "NPCStates/WalkToPosition")]
+[CreateAssetMenu(menuName = "States/NPC/WalkToPosition")]
 public class NPCWalkToPositionState : NPCState
 {
     public delegate void pathChanged(LinkedList<Tuple<Vector2Int, Vector2Int?>> newPath);
@@ -51,7 +51,7 @@ public class NPCWalkToPositionState : NPCState
 
         if (distanceToNextPositionTravelled < distanceToNextPosition)
         {
-            distanceToNextPositionTravelled += Time.deltaTime * moveSpeed;
+            distanceToNextPositionTravelled += Time.deltaTime * npcInstance.moveSpeed;
             if (distanceToNextPositionTravelled >= distanceToNextPosition)
                 distanceToNextPositionTravelled = distanceToNextPosition;
 

@@ -19,9 +19,7 @@ public class BuildingsManager
 
         foreach (Vector2Int t in tilesToOccupy)
         {
-            TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(t);
-
-            if (tileInfo == null)
+            if (!TileInformationManager.Instance.TryGetTileInformation(t, out TileInformation tileInfo))
                 return false;
 
             if (tileInfo.TopMostBuild != null)
@@ -41,7 +39,7 @@ public class BuildingsManager
 
         GameObject obj = GameObject.Instantiate(variant.Prefab, new Vector3(pos.x, pos.y, DynamicZDepth.GetDynamicZDepth(pos.y, DynamicZDepth.OBJECTS_STANDARD_OFFSET)), Quaternion.identity);
 
-        TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(pos);
+        TileInformationManager.Instance.TryGetTileInformation(pos, out TileInformation tileInfo);
         tileInfo.CreateBuild(obj, variant, tilesToOccupy, BuildRotation.Front, ObjectType.Ground);
 
         //Load customization here

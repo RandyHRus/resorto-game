@@ -27,7 +27,7 @@ public class InventoryExternalUI : UIObject
             InventoryManager.OnInventoryClosed -= Hide;
     }
 
-    public void UnSub()
+    public void UnSub(UIObject sender)
     {
         InventoryManager.OnInventoryClosed -= Hide;
         OnDestroy -= UnSub;

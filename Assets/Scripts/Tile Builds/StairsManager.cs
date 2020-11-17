@@ -9,8 +9,8 @@ public class StairsManager: MonoBehaviour
     {       
         rot = 0;
 
-        TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(pos);
-        TileInformation aboveTileInfo = TileInformationManager.Instance.GetTileInformation(new Vector2Int(pos.x, pos.y + 1));
+        TileInformationManager.Instance.TryGetTileInformation(pos, out TileInformation tileInfo);
+        TileInformationManager.Instance.TryGetTileInformation(new Vector2Int(pos.x, pos.y + 1), out TileInformation aboveTileInfo);
 
         if (tileInfo == null || aboveTileInfo == null)
             return false;
@@ -78,8 +78,8 @@ public class StairsManager: MonoBehaviour
 
             foreach (Tuple<Vector2Int, BuildRotation> t in positionToBuildRotation)
             {
-                TileInformation checkForDockInfo = TileInformationManager.Instance.GetTileInformation(GetStairsConnectedDockPosition(pos, t.Item2));
-                TileInformation checkForSandInfo = TileInformationManager.Instance.GetTileInformation(t.Item1);
+                TileInformationManager.Instance.TryGetTileInformation(GetStairsConnectedDockPosition(pos, t.Item2), out TileInformation checkForDockInfo);
+                TileInformationManager.Instance.TryGetTileInformation(t.Item1, out TileInformation checkForSandInfo);
                 if (checkForDockInfo?.NormalFlooringGroup?.FlooringVariant.GetType() == typeof(DockFlooringVariant) &&
                     checkForSandInfo?.tileLocation == TileLocation.Sand && checkForSandInfo?.layerNum == 0)
                 {
@@ -101,7 +101,7 @@ public class StairsManager: MonoBehaviour
         if (!StairsPlaceable(pos, out BuildRotation rot))
             return false;
 
-        TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(pos);
+        TileInformationManager.Instance.TryGetTileInformation(pos, out TileInformation tileInfo);
 
         GameObject obj = new GameObject("Stairs");
         SpriteRenderer renderer = obj.AddComponent<SpriteRenderer>();

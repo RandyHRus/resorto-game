@@ -40,7 +40,6 @@ public class OutlineIndicatorManager {
         outlineIndicator.Transform.position = new Vector2(bottomLeft.x + (xSize / 2f) - 0.5f, bottomLeft.y + (ySize / 2f) - 0.5f);
     }
 
-    //Remember to toggle false before destruction
     public void Toggle(bool show)
     {
         outlineIndicator.Object.SetActive(show);

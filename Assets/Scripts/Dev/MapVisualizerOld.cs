@@ -100,7 +100,7 @@ public class MapVisualizerOld : MonoBehaviour
             for (int y = 0; y < mapSize; y++)
             {
                 Vector2Int pos = new Vector2Int(x, y);
-                TileInformation info = TileInformationManager.Instance.GetTileInformation(pos);
+                TileInformationManager.Instance.TryGetTileInformation(pos, out TileInformation info);
 
                 Color32 proposedColor;
 
@@ -154,7 +154,7 @@ public class MapVisualizerOld : MonoBehaviour
             for (int y = 0; y < mapSize; y++)
             {
                 Vector2Int pos = new Vector2Int(x, y);
-                TileInformation info = TileInformationManager.Instance.GetTileInformation(pos);
+                TileInformationManager.Instance.TryGetTileInformation(pos, out TileInformation info);
 
                 int devVisualizationIndex = Array.IndexOf(Enum.GetValues(info.tileLocation.GetType()), info.tileLocation);
 
@@ -177,7 +177,7 @@ public class MapVisualizerOld : MonoBehaviour
             for (int y = 0; y < mapSize; y++)
             {
                 Vector2Int pos = new Vector2Int(x, y);
-                TileInformation info = TileInformationManager.Instance.GetTileInformation(pos);
+                TileInformationManager.Instance.TryGetTileInformation(pos, out TileInformation info);
 
                 int stairsConnectionsCount = info.StairsStartPositions.Count;
 
@@ -200,12 +200,12 @@ public class MapVisualizerOld : MonoBehaviour
             for (int y = 0; y < mapSize; y++)
             {
                 Vector2Int pos = new Vector2Int(x, y);
-                TileInformation info = TileInformationManager.Instance.GetTileInformation(pos);
+                TileInformationManager.Instance.TryGetTileInformation(pos, out TileInformation info);
 
                 Color32 color;
-                if (info.region?.regionInformation.GetType() == typeof(FishingRegionInformation))
+                if (info.Region?.regionInformation.GetType() == typeof(FishingRegionInformation))
                 {
-                    if (((FishingRegionInstance)info.region).IsValidFishingPositionInThisRegion(pos))
+                    if (((FishingRegionInstance)info.Region).IsValidFishingPositionInThisRegion(pos))
                     {
                         color = objectsAndFlooringsColors[0];
                     }

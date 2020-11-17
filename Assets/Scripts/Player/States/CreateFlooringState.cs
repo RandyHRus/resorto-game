@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "States/Create flooring")]
+[CreateAssetMenu(menuName = "States/Player/Create flooring")]
 public class CreateFlooringState : PlayerState
 {
     private FlooringVariantBase flooringVariant;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-[CreateAssetMenu(menuName = "NPCStates/Fishing")]
+[CreateAssetMenu(menuName = "States/NPC/Fishing")]
 public class NPCFishingState : NPCActivityState, ITouristStateDialogue
 {
     private FishingStateController controller;
@@ -36,7 +36,9 @@ public class NPCFishingState : NPCActivityState, ITouristStateDialogue
             base.StartState(args);
 
             Vector2Int currentPosition = new Vector2Int(Mathf.RoundToInt(resources.characterTransform.position.x), Mathf.RoundToInt(resources.characterTransform.position.y));
-            RegionInstance region = TileInformationManager.Instance.GetTileInformation(currentPosition).region;
+
+            TileInformationManager.Instance.TryGetTileInformation(currentPosition, out TileInformation tileInfo);
+            RegionInstance region = tileInfo.Region;
 
             if (region is FishingRegionInstance fishingRegion)
             {

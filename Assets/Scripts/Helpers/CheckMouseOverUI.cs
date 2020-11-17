@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 
 public class CheckMouseOverUI
 {
+    //TODO make it so IsMouseOverUI() only runs ONCE per frame and not everytime you call it!!!
     public static bool GetButtonDownAndNotOnUI(string input)
     {
         return (Input.GetButtonDown(input) && !IsMouseOverUI());

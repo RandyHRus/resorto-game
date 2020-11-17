@@ -11,7 +11,7 @@ public class ElevationMapVisualizer : ColorMapVisualizer
 
     public override Color32 GetColor(Vector2Int position)
     {
-        TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(position);
+        TileInformationManager.Instance.TryGetTileInformation(position, out TileInformation tileInfo);
 
         bool isDeepWater = tileInfo.tileLocation == TileLocation.DeepWater;
 

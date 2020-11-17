@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName="States/Map Visualizer")]
+[CreateAssetMenu(menuName="States/Player/Map Visualizer")]
 public class MapVisualizerState : PlayerState
 {
     public override bool AllowMovement => false;

@@ -35,7 +35,7 @@ public class StatisticComponentUI : ListComponentUI
         valueText.SetText(value.ToString());
     }
 
-    public void UnSub()
+    public void UnSub(UIObject sender)
     {
         statistic.OnValueChanged -= RefreshDisplayValue;
         OnDestroy -= UnSub;

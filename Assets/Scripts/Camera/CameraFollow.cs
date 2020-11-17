@@ -6,10 +6,7 @@ public static class CameraFollow
 {
     public static Transform Following { get; private set; }
 
-    private static readonly float targetShiftTime = 0.3f;
-
     private static bool changingTarget;
-    private static Coroutine targetShiftingCoroutine = null;
 
     private static readonly Transform cameraTransform;
 
@@ -43,17 +40,18 @@ public static class CameraFollow
             changingTarget = false;
         }
 
-        void RestartCoroutine() {
+        void RestartCoroutine()
+        {
             previousTargetPosition = t.position;
 
-            if (targetShiftingCoroutine != null)
-                Coroutines.Instance.StopCoroutine(targetShiftingCoroutine);
+            if (CameraFunctions.lerpingCoroutine != null)
+                Coroutines.Instance.StopCoroutine(CameraFunctions.lerpingCoroutine);
 
-            targetShiftingCoroutine = Coroutines.Instance.StartCoroutine(LerpEffect.LerpVectorTime(cameraTransform.position, t.position, targetShiftTime, OnProgress, OnEnd, false));
+            CameraFunctions.lerpingCoroutine = Coroutines.Instance.StartCoroutine(LerpEffect.LerpVectorTime(cameraTransform.position, t.position, CameraFunctions.targetShiftTime, OnProgress, OnEnd, false));
         }
 
-        if (targetShiftingCoroutine != null)
-            Coroutines.Instance.StopCoroutine(targetShiftingCoroutine);
+        if (CameraFunctions.lerpingCoroutine != null)
+            Coroutines.Instance.StopCoroutine(CameraFunctions.lerpingCoroutine);
 
         changingTarget = true;
 

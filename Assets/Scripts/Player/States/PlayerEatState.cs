@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "States/Eat")]
+[CreateAssetMenu(menuName = "States/Player/Eat")]
 public class PlayerEatState : PlayerState
 {
     public override bool AllowMovement => (eatingCoroutine == null);

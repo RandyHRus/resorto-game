@@ -66,9 +66,10 @@ public class FlooringGroup: IRemovable
 
             foreach (Vector2Int n in neighbourTiles)
             {
-                TileInformation neighbourTileInfo = TileInformationManager.Instance.GetTileInformation(n);
+                if (!TileInformationManager.Instance.TryGetTileInformation(n, out TileInformation neighbourTileInfo))
+                    continue;
 
-                if (neighbourTileInfo == null || neighbourTileInfo.NormalFlooringGroup == null)
+                if (neighbourTileInfo.NormalFlooringGroup == null)
                     continue;
 
                 FlooringGroup group = neighbourTileInfo.NormalFlooringGroup;

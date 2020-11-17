@@ -16,14 +16,14 @@ public class OvershootEffect
 
         while (h > hStop)
         {
+            yield return 0;
+
             timer += (stopOnPause ? Time.deltaTime : Time.unscaledDeltaTime);
             h -= hDecaySpeed * (stopOnPause ? Time.deltaTime : Time.unscaledDeltaTime);
 
             float value = Mathf.Sin(frequency * timer) * h;
 
             moveCallback(value);
-
-            yield return 0;
         }
        
         endCallback?.Invoke();

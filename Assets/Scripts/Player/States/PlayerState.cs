@@ -54,6 +54,11 @@ public abstract class PlayerState : ScriptableObject, IStateMachineState
     public abstract void Execute();
 
     public virtual void LateExecute() { }
+
+    public virtual void OnCancelButtonPressed()
+    {
+        InvokeEndState();
+    }
 }
 
 public enum CameraMode

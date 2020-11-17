@@ -26,7 +26,11 @@ public class IslandStatisticsManager: MonoBehaviour
             statistics[(StatisticInstance)i] = new Statistic(statisticsToCreateToName[i]);
         }
 
-        NPCManager.OnTouristAdded += (TouristMonoBehaviour touristMono) => GetStatistic(StatisticInstance.NumberOfTourists).Add(1);
+        TouristsManager.OnTouristAdded += (TouristMonoBehaviour touristMono) => GetStatistic(StatisticInstance.NumberOfTourists).Set(TouristsManager.Instance.touristsCount);
+        TouristsManager.OnTouristRemoved += (TouristMonoBehaviour touristMono) => GetStatistic(StatisticInstance.NumberOfTourists).Set(TouristsManager.Instance.touristsCount);
+
+        HotelsManager.OnValidRoomsCountChanged += (int newCount) => GetStatistic(StatisticInstance.NumberOfValidRooms).Set(newCount);
+        HotelsManager.OnAvailableRoomsCountChanged += (int newCount) => GetStatistic(StatisticInstance.NumberOfAvailableRooms).Set(newCount);
     }
 
     public Statistic GetStatistic(StatisticInstance type)
@@ -38,5 +42,7 @@ public class IslandStatisticsManager: MonoBehaviour
 public enum StatisticInstance
 {
     NumberOfTourists,
-    IslandRating
+    IslandRating,
+    NumberOfValidRooms,
+    NumberOfAvailableRooms
 }

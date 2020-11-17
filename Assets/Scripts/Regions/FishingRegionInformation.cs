@@ -5,8 +5,8 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Regions/Fishing")]
 public class FishingRegionInformation : RegionInformation
 {
-    public override RegionInstance CreateInstance(HashSet<Vector2Int> positions)
+    public override RegionInstance CreateInstance(string instanceName, HashSet<Vector2Int> positions)
     {
-        return new FishingRegionInstance(this, positions);
+        return new FishingRegionInstance(instanceName, this, positions);
     }
 }

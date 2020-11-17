@@ -39,15 +39,17 @@ public class TileInformationManager : MonoBehaviour
         }
     }
 
-    public TileInformation GetTileInformation(Vector2Int position)
+    public bool TryGetTileInformation(Vector2Int position, out TileInformation tileInfo)
     {
         if (!PositionInMap(position))
         {
-            return null;
+            tileInfo = null;
+            return false;
         }
         else
         {
-            return tileInformationMap[position.x, position.y];
+            tileInfo = tileInformationMap[position.x, position.y];
+            return true;
         }
     }
 

@@ -41,7 +41,7 @@ public class IslandStartingDockGenerator: MonoBehaviour
                 Vector2Int stairsPos = new Vector2Int(x, y - 2);
                 Vector2Int belowStairsPos = new Vector2Int(x, y - 3); //Need to check this for SAND
 
-                TileInformation belowStairsInfo = TileInformationManager.Instance.GetTileInformation(belowStairsPos);
+                TileInformationManager.Instance.TryGetTileInformation(belowStairsPos, out TileInformation belowStairsInfo);
 
                 if (belowStairsInfo?.tileLocation == TileLocation.Sand)
                 {

@@ -3,7 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ComponentsListPanel<T> : UIObject where T: ListComponentUI
+public abstract class ComponentsListPanel : UIObject
+{
+    public ComponentsListPanel(Transform parent): base(ResourceManager.Instance.ComponentsListPanel, parent)
+    {
+
+    }
+
+    public ComponentsListPanel(GameObject instance): base(instance)
+    {
+
+    }
+
+    public abstract void OnContentSizeChange(ListComponentUI comp, float change, float speed);
+}
+
+public class ComponentsListPanel<T> : ComponentsListPanel where T: ListComponentUI
 {
     private RectTransform contentTransform;
     private ScrollRect scrollRect;
@@ -21,7 +36,7 @@ public class ComponentsListPanel<T> : UIObject where T: ListComponentUI
 
     // If IsFixed is set to true, you get a scroll bar when content gets too large
     // If IsFixed is set to false, the whole thing gets larger
-    public ComponentsListPanel(Transform parent, Vector2 position, float xSize, bool isFixed): base (ResourceManager.Instance.ComponentsListPanel, parent)
+    public ComponentsListPanel(Transform parent, Vector2 position, float xSize, bool isFixed): base (parent)
     {
         this.isFixed = isFixed;
 
@@ -63,46 +78,79 @@ public class ComponentsListPanel<T> : UIObject where T: ListComponentUI
 
         float objectHeight = comp.RectTransform.sizeDelta.y;
 
+        //Debug.Log(-((FIXED_PADDING * components.Count) + (objectHeight * (components.Count - 1))));
+
+        Vector2 pos = new Vector2(0, -panelContentHeight);
+
         panelContentHeight += objectHeight + FIXED_PADDING;
+        UpdateContentRectTransformSize();
 
-        UpdateRectTransformSize();
-
-        Vector2 pos = new Vector2(0, -((FIXED_PADDING * components.Count) + (objectHeight * (components.Count - 1))));
         comp.RectTransform.anchoredPosition = pos;
         comp.ObjectTransform.SetParent(contentTransform, false);
 
-        comp.OnSelect += InvokeSelected;
+        comp.OnSelected += InvokeSelected;
+        comp.OnDestroy += OnComponentDestroyed;
+
+        if (comp is CollapsibleComponentUI collapsible)
+        {
+            collapsible.OnCallapseStart += OnContentSizeChange;
+        }
+
+        comp.OnSelected += OnComponentSelectedHandler;
     }
 
-    public virtual void RemoveListComponent(T comp)
+    public void RemoveListComponent(T comp)
+    {
+        //This will trigger OnComponentDestroyed through events
+        comp.Destroy(); 
+    }
+
+    public virtual void OnComponentDestroyed(UIObject sender)
+    {
+        RemoveListComponentOnDestroy((T)sender);
+    }
+
+    private void RemoveListComponentOnDestroy(T comp)
     {
         //Resize panel content
         float objectHeight = comp.RectTransform.sizeDelta.y;
         float contentHeightToRemove = objectHeight + FIXED_PADDING;
+        {
+            if (comp is CollapsibleComponentUI collapsible)
+                if (!collapsible.Collapsed)
+                    contentHeightToRemove += collapsible.CollapsibleTargetSize;
+        }
+
         panelContentHeight -= contentHeightToRemove;
 
-        UpdateRectTransformSize();
+        UpdateContentRectTransformSize();
 
         //We need to change the position of every component that comes after this component
         for (int i = components.IndexOf(comp) + 1; i < components.Count; i++)
         {
-            components[i].RectTransform.anchoredPosition -= new Vector2(0, contentHeightToRemove);
+            components[i].RectTransform.anchoredPosition += new Vector2(0, contentHeightToRemove);
         }
 
-        comp.OnSelect -= InvokeSelected;
+        comp.OnSelected -= InvokeSelected;
+        {
+            if (comp is CollapsibleComponentUI collapsible)
+            {
+                collapsible.OnCallapseStart -= OnContentSizeChange;
+            }
+        }
+        comp.OnDestroy -= OnComponentDestroyed;
+        comp.OnSelected -= OnComponentSelectedHandler;
 
-        //Remove actual component
-        comp.Destroy();
         components.Remove(comp);
     }
 
-
-    public void OnContentSizeChange(T comp, float change, float speed)
+    public override void OnContentSizeChange(ListComponentUI comp, float change, float speed)
     {
-        int componentIndex = components.IndexOf(comp);
+        int componentIndex = components.IndexOf((T)comp);
 
         //Change content size;
-        contentTransform.sizeDelta += new Vector2(0, change);
+        panelContentHeight += change;
+        UpdateContentRectTransformSize();
 
         //Shift below components
         for (int i = componentIndex + 1; i < components.Count; i++)
@@ -120,7 +168,7 @@ public class ComponentsListPanel<T> : UIObject where T: ListComponentUI
             - (Vector2)scrollRect.transform.InverseTransformPoint(listComponent.ObjectTransform.position);
     }
 
-    private void UpdateRectTransformSize()
+    private void UpdateContentRectTransformSize()
     {
         Vector2 contentSize = new Vector2(RectTransform.sizeDelta.x, panelContentHeight);
         contentTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, contentSize.y);
@@ -136,21 +184,31 @@ public class ComponentsListPanel<T> : UIObject where T: ListComponentUI
         }
     }
 
-    private void OnDestroyHandler()
+    private void OnDestroyHandler(UIObject sender)
     {
         //To make sure everything is destroyed and unsubbed
-        while(components.Count > 0)
-        {
-            RemoveListComponent(components[components.Count - 1]);
-        }
+        ClearComponents();
 
         //Unsub
         OnDestroy -= OnDestroyHandler;
+    }
 
+    public void ClearComponents()
+    {
+        while (components.Count > 0)
+        {
+            RemoveListComponent(components[components.Count - 1]);
+        }
     }
 
     private void InvokeSelected(ListComponentUI component)
     {
         OnSelected?.Invoke(component);
+    }
+
+    public virtual void OnComponentSelectedHandler(ListComponentUI selection)
+    {
+        if (selection is CollapsibleComponentUI collapsible)
+            collapsible.Collapse(!collapsible.Collapsed);
     }
 }

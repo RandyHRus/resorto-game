@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "States/Create Stairs")]
+[CreateAssetMenu(menuName = "States/Player/Create Stairs")]
 public class CreateStairsState : PlayerState
 {
     private TilesIndicatorManager indicatorManager;

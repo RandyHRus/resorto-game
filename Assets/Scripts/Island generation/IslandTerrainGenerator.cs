@@ -49,8 +49,7 @@ public class IslandTerrainGenerator : MonoBehaviour
                     waterTilemap.SetTile((Vector3Int)pos, waterTile);
                     waterBGTilemap.SetTile((Vector3Int)pos, waterBGFullDarkTile);
 
-                    TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(pos);
-                    if (tileInfo != null)
+                    if (TileInformationManager.Instance.TryGetTileInformation(pos, out TileInformation tileInfo))
                         tileInfo.tileLocation = TileLocation.DeepWater;
                 }
             }

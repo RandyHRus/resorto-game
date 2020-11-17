@@ -10,4 +10,9 @@ public class WorkerInformation : NPCInformation
     }
 
     protected override GameObject ObjectToInitialize => ResourceManager.Instance.WorkerNpc;
+
+    public override NPCSchedule CreateSchedule(NPCInstance instance)
+    {
+        throw new System.NotImplementedException();
+    }
 }

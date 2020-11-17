@@ -28,13 +28,13 @@ public class StairsVariant : StructureInformation, IBuildable
 
     public void OnCreate(BuildOnTile build)
     {
-        TileInformation buildTileInfo = TileInformationManager.Instance.GetTileInformation(build.BottomLeft);
+        TileInformationManager.Instance.TryGetTileInformation(build.BottomLeft, out TileInformation buildTileInfo);
 
         //Refresh connected docks
         if (buildTileInfo.tileLocation == TileLocation.WaterEdge)
         {
             Vector2Int dockTilePosition = StairsManager.GetStairsConnectedDockPosition(build.BottomLeft, build.Rotation);
-            TileInformation dockTileInformation = TileInformationManager.Instance.GetTileInformation(dockTilePosition);
+            TileInformationManager.Instance.TryGetTileInformation(dockTilePosition, out TileInformation dockTileInformation);
 
             dockTileInformation.NormalFlooringGroup.NormalFloorings[dockTilePosition].Renderer.sprite =
                 FlooringManager.GetSprite(dockTileInformation.NormalFlooringGroup.FlooringVariant, null, false, dockTilePosition, dockTileInformation.NormalFlooringGroup.Rotation);
@@ -56,12 +56,12 @@ public class StairsVariant : StructureInformation, IBuildable
 
     public void OnRemove(BuildOnTile build)
     {
-        TileInformation buildTileInfo = TileInformationManager.Instance.GetTileInformation(build.BottomLeft);
+        TileInformationManager.Instance.TryGetTileInformation(build.BottomLeft, out TileInformation buildTileInfo);
 
         //Change connected dock sprite
         {
             Vector2Int checkForDockPos = StairsManager.GetStairsConnectedDockPosition(build.BottomLeft, build.Rotation);
-            TileInformation checkForDockTileInfo = TileInformationManager.Instance.GetTileInformation(checkForDockPos);
+            TileInformationManager.Instance.TryGetTileInformation(checkForDockPos, out TileInformation checkForDockTileInfo);
             if (checkForDockTileInfo?.NormalFlooringGroup != null)
             {
                 checkForDockTileInfo.NormalFlooringGroup.NormalFloorings[checkForDockPos].Renderer.sprite =

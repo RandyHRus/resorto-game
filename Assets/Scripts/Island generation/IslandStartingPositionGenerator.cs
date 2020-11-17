@@ -62,12 +62,11 @@ public class IslandStartingPositionGenerator : MonoBehaviour
 
             visitedPositions.Add(thisPosition);
 
-            TileInformation thisTileInfo = TileInformationManager.Instance.GetTileInformation(thisPosition);
-            if (thisTileInfo == null || !TileLocation.Water.HasFlag(thisTileInfo.tileLocation))
-            {
-                //Not water
+            if (!TileInformationManager.Instance.TryGetTileInformation(thisPosition, out TileInformation thisTileInfo))
                 continue;
-            }
+
+            if (!TileLocation.Water.HasFlag(thisTileInfo.tileLocation))
+                continue;
 
             Vector2Int[] positionsToAdd = new Vector2Int[]
             {
@@ -106,8 +105,10 @@ public class IslandStartingPositionGenerator : MonoBehaviour
 
             foreach (Vector2Int neighbour in neighboursToCheckForSand)
             {
-                TileInformation neighbourInfo = TileInformationManager.Instance.GetTileInformation(neighbour);
-                if (neighbourInfo?.tileLocation == TileLocation.Sand)
+                if (!TileInformationManager.Instance.TryGetTileInformation(neighbour, out TileInformation neighbourInfo))
+                    continue;
+
+                if (neighbourInfo.tileLocation == TileLocation.Sand)
                     sandPositionsNextToOcean.Add(neighbour);
             }
 
@@ -135,7 +136,7 @@ public class IslandStartingPositionGenerator : MonoBehaviour
                     if (checkPosition == pos)
                         continue;
 
-                    TileInformation checkPositionInfo = TileInformationManager.Instance.GetTileInformation(checkPosition);
+                    TileInformationManager.Instance.TryGetTileInformation(checkPosition, out TileInformation checkPositionInfo);
 
                     if (checkPositionInfo?.tileLocation == TileLocation.Sand)
                     {

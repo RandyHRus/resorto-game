@@ -10,4 +10,9 @@ public class VisitorInformation : NPCInformation
     {
         throw new System.NotImplementedException();
     }
+
+    public override NPCSchedule CreateSchedule(NPCInstance instance)
+    {
+        throw new System.NotImplementedException();
+    }
 }

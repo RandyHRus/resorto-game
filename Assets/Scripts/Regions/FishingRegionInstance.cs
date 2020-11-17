@@ -7,16 +7,17 @@ public class FishingRegionInstance : RegionInstance
 {
     private ArrayHashSet<Vector2Int> validFishingPositions = new ArrayHashSet<Vector2Int>();
 
-    public FishingRegionInstance(RegionInformation info, HashSet<Vector2Int> positions): base (info, positions)
+    public FishingRegionInstance(string instanceName, RegionInformation info, HashSet<Vector2Int> positions): base (instanceName, info, positions)
+    {      
+    }
+
+    public override void AddPositions(HashSet<Vector2Int> positions)
     {
+        base.AddPositions(positions);
+
         foreach (Vector2Int pos in positions)
         {
             UpdateValidFishingPosition(pos);
-
-            TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(pos);
-
-            //Remember to unsub when I implement removing regions.
-            tileInfo.OnTileModified += OnTileModified;
         }
     }
 
@@ -39,14 +40,14 @@ public class FishingRegionInstance : RegionInstance
         if (!regionPositions.Contains(pos))
             return false;
 
-        TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(pos);
+        TileInformationManager.Instance.TryGetTileInformation(pos, out TileInformation tileInfo);
 
         return (tileInfo.tileLocation == TileLocation.DeepWater && tileInfo.NormalFlooringGroup == null);
     }
 
     private void UpdateValidFishingPosition(Vector2Int pos)
     {
-        TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(pos);
+        TileInformationManager.Instance.TryGetTileInformation(pos, out TileInformation tileInfo);
 
         bool isValid = true;
 
@@ -97,8 +98,7 @@ public class FishingRegionInstance : RegionInstance
 
         foreach (Vector2Int n in directionsToCheckForWater)
         {          
-            TileInformation nTileInfo = TileInformationManager.Instance.GetTileInformation(pos + n);
-            if (nTileInfo == null)
+            if (!TileInformationManager.Instance.TryGetTileInformation(pos + n, out TileInformation nTileInfo))
                 continue;
 
             if (nTileInfo.tileLocation != TileLocation.DeepWater)
@@ -117,13 +117,14 @@ public class FishingRegionInstance : RegionInstance
         return directionsWithWater;
     }
 
-    private void OnTileModified(TileInformation tileInfo)
+    public override void OnRegionTileModifiedHandler(TileInformation tileInfo)
     {
+        base.OnRegionTileModifiedHandler(tileInfo);
+
         void UpdateValididity(Vector2Int pos)
         {
-            TileInformation thisTileInfo = TileInformationManager.Instance.GetTileInformation(pos);
-
-            UpdateValidFishingPosition(thisTileInfo.position);
+            if (TileInformationManager.Instance.TryGetTileInformation(pos, out TileInformation thisTileInfo))
+                UpdateValidFishingPosition(thisTileInfo.position);
         }
 
         //Update self
@@ -136,5 +137,15 @@ public class FishingRegionInstance : RegionInstance
         {
             UpdateValididity(n);
         }
+    }
+
+    public override List<string> GetWarnings()
+    {
+        List<string> warnings = base.GetWarnings();
+
+        if (validFishingPositions.Count == 0)
+            warnings.Add("No fishing positions!");
+
+        return warnings;
     }
 }

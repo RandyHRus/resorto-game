@@ -291,15 +291,15 @@ public class FishBehaviour : WildlifeBehaviour
         int signY = (int)Mathf.Sign(headingVector.y);
         if (headingVector.x != 0)
         {
-            tile_h = TileInformationManager.Instance.GetTileInformation(new Vector2Int(tile.x + signX, tile.y));
+            TileInformationManager.Instance.TryGetTileInformation(new Vector2Int(tile.x + signX, tile.y), out tile_h);
         }
         if (headingVector.y != 0)
         {
-            tile_v = TileInformationManager.Instance.GetTileInformation(new Vector2Int(tile.x, tile.y + signY));
+            TileInformationManager.Instance.TryGetTileInformation(new Vector2Int(tile.x, tile.y + signY), out tile_v);
         }
         if (headingVector.x != 0 && headingVector.y != 0)
         {
-            tile_hv = TileInformationManager.Instance.GetTileInformation(new Vector2Int(tile.x + signX, tile.y + signY));
+            TileInformationManager.Instance.TryGetTileInformation(new Vector2Int(tile.x + signX, tile.y + signY), out tile_hv);
         }
 
         tile_h_collision = (tile_h == null || tile_h.tileLocation != TileLocation.DeepWater);

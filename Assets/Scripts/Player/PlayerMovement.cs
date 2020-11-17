@@ -49,7 +49,10 @@ public class PlayerMovement : MonoBehaviour
     public void InitializeLayerAndDepth()
     {
         Vector2Int tilePos = new Vector2Int(Mathf.RoundToInt(playerTransform.position.x), Mathf.RoundToInt(playerTransform.position.y));
-        int layerNum = TileInformationManager.Instance.GetTileInformation(tilePos).layerNum;
+
+        TileInformationManager.Instance.TryGetTileInformation(tilePos, out TileInformation tileInfo);
+        int layerNum = tileInfo.layerNum;
+
         currentTileLayer = layerNum;
 
         //Set depth
@@ -153,7 +156,7 @@ public class PlayerMovement : MonoBehaviour
                 }
                 if (!foundTile)
                 {
-                    TileInformation t = TileInformationManager.Instance.GetTileInformation(beforeTile);
+                    TileInformationManager.Instance.TryGetTileInformation(beforeTile, out TileInformation t);
                     t.StepOff();
                 }
                 else
@@ -162,7 +165,7 @@ public class PlayerMovement : MonoBehaviour
             foreach (Vector2Int afterTile in afterTiles)
             {
                 //We removed all duplicates in last loop so we can directly call step on function
-                TileInformation t = TileInformationManager.Instance.GetTileInformation(afterTile);
+                TileInformationManager.Instance.TryGetTileInformation(afterTile, out TileInformation t);
                 t.StepOn();
             }
         }

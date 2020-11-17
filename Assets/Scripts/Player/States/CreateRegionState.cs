@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-[CreateAssetMenu(menuName = "States/Region")]
+[CreateAssetMenu(menuName = "States/Player/CreateRegion")]
 public class CreateRegionState : PlayerState
 {
     [SerializeField] MapVisualizer regionVisualizer = null;
@@ -42,7 +42,6 @@ public class CreateRegionState : PlayerState
 
         indicatorManager.Toggle(false);
         regionVisualizer.HideVisualizer();
-        regionVisualizer.HideVisualizer();
     }
 
     public override void Execute()
@@ -50,17 +49,11 @@ public class CreateRegionState : PlayerState
         if (coroutineRunning)
             return;
 
-        if (selectedRegion == null)
-        {
-            Debug.Log("No region selected.");
-            return;
-        }
-
         Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
-        TileInformation mouseTile = TileInformationManager.Instance.GetTileInformation(mouseTilePosition);
+        TileInformationManager.Instance.TryGetTileInformation(mouseTilePosition, out TileInformation mouseTile);
 
         bool regionPlaceable = RegionManager.RegionPlaceable(selectedRegion, mouseTilePosition);
-        bool regionRemoveable = (mouseTile != null && mouseTile.region != null);
+        bool regionRemoveable = (mouseTile != null && mouseTile.Region != null);
 
         //Indicator things
         {
@@ -146,11 +139,7 @@ public class CreateRegionState : PlayerState
 
         if (placeable)
         {
-            if (RegionManager.TryCreateRegion(info, currentPositions))
-            {
-                //Refresh visualizer
-                regionVisualizer.ShowVisualizer();
-            }
+            RegionManager.TryCreateRegion(info, currentPositions);
         }
     }
 
@@ -177,4 +166,13 @@ public class CreateRegionState : PlayerState
         yield return 0;
     }
 
+    public override void OnCancelButtonPressed()
+    {
+        if (selectedRegion != null)
+        {
+            InvokeChangeState(typeof(SelectRegionState), null);
+        }
+        else
+            base.OnCancelButtonPressed();
+    }
 }

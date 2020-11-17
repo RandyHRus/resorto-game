@@ -10,6 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 71493fa7b9215ac4fadf37f031945035, type: 3}
-  m_Name: Base_Region
+  m_Name: Base_CreateRegion
   m_EditorClassIdentifier: 
   regionVisualizer: {fileID: 11400000, guid: a15cb62d6b773814594010b29018f788, type: 2}

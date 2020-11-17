@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "States/FollowNPC")]
+[CreateAssetMenu(menuName = "States/Player/FollowNPC")]
 public class FollowNPCState : PlayerState
 {
     public override bool AllowMovement => false;
@@ -22,6 +22,8 @@ public class FollowNPCState : PlayerState
         CameraFollow.ChangeFollowTarget(npcMono.ObjectTransform);
 
         walkToPositionState.OnPathChanged += PathFindingVisualizer.VisualizePath;
+
+        npcMono.NpcInstance.OnNPCDelete += OnNPCDeletedHandler;
     }
 
     public override void Execute()
@@ -29,8 +31,7 @@ public class FollowNPCState : PlayerState
         if (CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
         {
             Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
-            TileInformation mouseTileInfo = TileInformationManager.Instance.GetTileInformation(mouseTilePosition);
-            if (mouseTileInfo != null) {
+            if (TileInformationManager.Instance.TryGetTileInformation(mouseTilePosition, out TileInformation mouseTileInfo)) {
                 npcMono.SwitchState<NPCWalkToPositionState>(new object[] { (Vector2Int)mouseTilePosition, null, null, "Going to target location" });
             }
         }
@@ -41,5 +42,10 @@ public class FollowNPCState : PlayerState
         walkToPositionState.OnPathChanged -= PathFindingVisualizer.VisualizePath;
         PathFindingVisualizer.Hide();
         CameraFollow.ChangeFollowTarget(previousFollowing);
+    }
+
+    private void OnNPCDeletedHandler()
+    {
+        InvokeEndState();
     }
 }

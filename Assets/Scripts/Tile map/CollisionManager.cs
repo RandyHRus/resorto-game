@@ -47,8 +47,7 @@ public class CollisionManager
 
     public static bool CheckForCollisionOnTile(Vector2Int tilePosition, int tileLayer)
     {
-        TileInformation tile = TileInformationManager.Instance.GetTileInformation(tilePosition);
-        if (tile == null)
+        if (!TileInformationManager.Instance.TryGetTileInformation(tilePosition, out TileInformation tile))
             return true;
 
         if (tile.BuildCollision) //TODO could be changed to precise collision checking?
@@ -75,17 +74,17 @@ public class CollisionManager
         float xChange = proposedPosition.x - currentPosition.x;
         float yChange = proposedPosition.y - currentPosition.y;
 
-        TileInformation currentTilePosition = TileInformationManager.Instance.GetTileInformation(
-            new Vector2Int(Mathf.RoundToInt(currentPosition.x), Mathf.RoundToInt(currentPosition.y)));
+        TileInformationManager.Instance.TryGetTileInformation(
+            new Vector2Int(Mathf.RoundToInt(currentPosition.x), Mathf.RoundToInt(currentPosition.y)), out TileInformation currentTilePosition);
 
         if (xChange != 0)
         {
             int xDir = Mathf.RoundToInt(Mathf.Sign(xChange));
 
-            TileInformation currentTilePositionToCheckUp = TileInformationManager.Instance.GetTileInformation(
-                new Vector2Int(Mathf.RoundToInt(currentPosition.x + (xDir * (boxColliderSizeX / 2f + BUFFER))), Mathf.RoundToInt(currentPosition.y + boxColliderSizeY / 2f)));
-            TileInformation currentTilePositionCheckDown = TileInformationManager.Instance.GetTileInformation(
-                new Vector2Int(Mathf.RoundToInt(currentPosition.x + (xDir * (boxColliderSizeX / 2f + BUFFER))), Mathf.RoundToInt(currentPosition.y - boxColliderSizeY / 2f)));
+            TileInformationManager.Instance.TryGetTileInformation(
+                new Vector2Int(Mathf.RoundToInt(currentPosition.x + (xDir * (boxColliderSizeX / 2f + BUFFER))), Mathf.RoundToInt(currentPosition.y + boxColliderSizeY / 2f)), out TileInformation currentTilePositionToCheckUp);
+            TileInformationManager.Instance.TryGetTileInformation(
+                new Vector2Int(Mathf.RoundToInt(currentPosition.x + (xDir * (boxColliderSizeX / 2f + BUFFER))), Mathf.RoundToInt(currentPosition.y - boxColliderSizeY / 2f)), out TileInformation currentTilePositionCheckDown);
 
             if (currentTilePositionToCheckUp?.StairsStartPositions.Count > 0 &&
                 currentTilePositionCheckDown?.StairsStartPositions.Count > 0)
@@ -109,10 +108,10 @@ public class CollisionManager
         if (yChange != 0)
         {
             int yDir = Mathf.RoundToInt(Mathf.Sign(yChange));
-            TileInformation currentTilePositionToCheckLeft = TileInformationManager.Instance.GetTileInformation(
-                new Vector2Int(Mathf.RoundToInt(currentPosition.x - boxColliderSizeX / 2f), Mathf.RoundToInt(currentPosition.y + (yDir * (boxColliderSizeY / 2f + BUFFER)))));
-            TileInformation currentTilePositionToCheckRight = TileInformationManager.Instance.GetTileInformation(
-                new Vector2Int(Mathf.RoundToInt(currentPosition.x + boxColliderSizeX / 2f), Mathf.RoundToInt(currentPosition.y + (yDir * (boxColliderSizeY / 2f + BUFFER)))));
+            TileInformationManager.Instance.TryGetTileInformation(
+                new Vector2Int(Mathf.RoundToInt(currentPosition.x - boxColliderSizeX / 2f), Mathf.RoundToInt(currentPosition.y + (yDir * (boxColliderSizeY / 2f + BUFFER)))), out TileInformation currentTilePositionToCheckLeft);
+            TileInformationManager.Instance.TryGetTileInformation(
+                new Vector2Int(Mathf.RoundToInt(currentPosition.x + boxColliderSizeX / 2f), Mathf.RoundToInt(currentPosition.y + (yDir * (boxColliderSizeY / 2f + BUFFER)))), out TileInformation currentTilePositionToCheckRight);
 
             if (currentTilePositionToCheckLeft?.StairsStartPositions.Count > 0 &&
                 currentTilePositionToCheckRight?.StairsStartPositions.Count > 0)

@@ -6,7 +6,7 @@ using System;
 
 public class TimeManager : MonoBehaviour
 {
-    public readonly float timeSpeed = 2;
+    [SerializeField] public float timeSpeed = 5;
     [SerializeField] private int day;
     [SerializeField] private int hour;
     [SerializeField] private int minute;
@@ -26,10 +26,12 @@ public class TimeManager : MonoBehaviour
     public static event OnTurnedTimeOfDayDelegate OnTurnedEvening;
     public static event OnTurnedTimeOfDayDelegate OnTurnedNight;
 
-    private Dictionary<InGameTime, TurnedToTimeEvent> turnedTimeEvents  = new Dictionary<InGameTime, TurnedToTimeEvent>();
-
     private static TimeManager _instance;
     public static TimeManager Instance { get { return _instance; } }
+
+    private CustomEventManager<InGameTime> onTurnedTimeEventManager = new CustomEventManager<InGameTime>();
+
+    private InGameTime previousTime = default;
 
     private void Awake()
     {
@@ -78,16 +80,14 @@ public class TimeManager : MonoBehaviour
             }
         }
 
-        InGameTime gameTime = new InGameTime(hour, minute);
-        InGameTime recurringGameTime = new InGameTime(hour, minute, day);
+        InGameTime gameTime = new InGameTime(hour, minute, day);
+        InGameTime recurringGameTime = new InGameTime(hour, minute);
 
-        if (turnedTimeEvents.TryGetValue(gameTime, out TurnedToTimeEvent timeEvent))
+        if (!previousTime.Equals(gameTime))
         {
-            timeEvent.InvokeEvent();
-        }
-        if (turnedTimeEvents.TryGetValue(recurringGameTime, out TurnedToTimeEvent timeEvent2))
-        {
-            timeEvent2.InvokeEvent();
+            onTurnedTimeEventManager.TryInvokeEventGroup(gameTime, null);
+            onTurnedTimeEventManager.TryInvokeEventGroup(recurringGameTime, null);
+            previousTime = gameTime;
         }
 
         //Draw on UI
@@ -98,6 +98,16 @@ public class TimeManager : MonoBehaviour
             HourChanged();
 
         previousHour = hour;
+    }
+
+    public void SubscribeToTime(InGameTime time, CustomEventGroup<InGameTime>.Delegate eventHandler)
+    {
+        onTurnedTimeEventManager.Subscribe(time, eventHandler);
+    }
+
+    public void UnsubscribeFromTime(InGameTime time, CustomEventGroup<InGameTime>.Delegate eventHandler)
+    {
+        onTurnedTimeEventManager.Unsubscribe(time, eventHandler);
     }
 
     private void HourChanged()
@@ -146,41 +156,7 @@ public class TimeManager : MonoBehaviour
 
     //Day is optional
     //If day is set to -1, event will trigger every day
-    public void SubScribeToTime(InGameTime gameTime, TurnedToTimeEvent.TurnedTime onTurnedTimeDelegate)
-    {
-        void RemoveTurnedTimeEvent(InGameTime timeEventKey)
-        {
-            if (!turnedTimeEvents.TryGetValue(gameTime, out TurnedToTimeEvent senderEvent))
-            {
-                throw new System.Exception("Key not found");
-            }
 
-            senderEvent.OnSubscribersEmpty -= RemoveTurnedTimeEvent;
-            turnedTimeEvents.Remove(timeEventKey);
-        }
-
-        if (turnedTimeEvents.TryGetValue(gameTime, out TurnedToTimeEvent timeEvent))
-        {
-            timeEvent.AddSubscriber(onTurnedTimeDelegate);
-        }
-        else
-        {
-            TurnedToTimeEvent newTimeEvent = new TurnedToTimeEvent(gameTime, onTurnedTimeDelegate);
-            turnedTimeEvents.Add(gameTime, newTimeEvent);
-            newTimeEvent.OnSubscribersEmpty += RemoveTurnedTimeEvent;
-        }
-
-    }
-
-    public void UnsubscribeFromTime(InGameTime gameTime, TurnedToTimeEvent.TurnedTime onTurnedTimeDelegate)
-    {
-        if (!turnedTimeEvents.TryGetValue(gameTime, out TurnedToTimeEvent timeEvent))
-        {
-            throw new System.Exception("Key not found");
-        }
-
-        timeEvent.RemoveSubscriber(onTurnedTimeDelegate);
-    }
 
     private string GetTimeText(int _day, int _hour, int _minute)
     {
@@ -202,46 +178,4 @@ public enum TimeOfDay
     MidDay,
     Evening,
     Night
-}
-
-public class TurnedToTimeEvent
-{
-    public delegate void TurnedTime();
-    public event TurnedTime OnTurnedTime;
-
-    public delegate void SubscribersEmpty(InGameTime timeEventKey);
-    public event SubscribersEmpty OnSubscribersEmpty;
-
-    private HashSet<TurnedTime> delegates;
-    private InGameTime key;
-
-    public TurnedToTimeEvent(InGameTime key, TurnedTime initialSubscriber)
-    {
-        this.key = key;
-
-        delegates = new HashSet<TurnedTime>();
-        delegates.Add(initialSubscriber);
-    }
-
-    public void AddSubscriber(TurnedTime subscriber)
-    {
-        delegates.Add(subscriber);
-    }
-
-    public void RemoveSubscriber(TurnedTime subscriber)
-    {
-        if (!delegates.Remove(subscriber))
-            throw new System.Exception("Nothing to remove!");
-
-        if (delegates.Count <= 0)
-            OnSubscribersEmpty?.Invoke(key);
-    }
-
-    public void InvokeEvent()
-    {
-        foreach (TurnedTime d in delegates)
-        {
-            d.Invoke();
-        }
-    }
 }

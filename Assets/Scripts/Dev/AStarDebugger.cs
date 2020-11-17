@@ -32,7 +32,7 @@ public class AStarDebugger : MonoBehaviour
         }
         else if (CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary") && debugging) {
             Vector2Int mouseTilePos = TileInformationManager.Instance.GetMouseTile();
-            if (TileInformationManager.Instance.GetTileInformation(mouseTilePos) != null)
+            if (TileInformationManager.Instance.TryGetTileInformation(mouseTilePos, out TileInformation tileInfo))
             {
                 if (startPoint == null)
                 {

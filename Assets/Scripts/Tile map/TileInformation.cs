@@ -7,7 +7,7 @@ public class TileInformation
 {
     public int layerNum; //Water or sand is 0, land will be >1
     public TileLocation tileLocation;
-    public RegionInstance region;
+    public RegionInstance Region { get; private set; }
     public bool BuildCollision { get; private set; }
     public Dictionary<ObjectType, BuildOnTile> ObjectTypeToObject { get; private set; }
     public BuildOnTile TopMostBuild { get; private set; }
@@ -47,7 +47,7 @@ public class TileInformation
         layerNum = 0;
         tileLocation = TileLocation.Unknown;
         BuildCollision = false;
-        region = null;
+        Region = null;
 
         NormalFlooringGroup = null;
         SupportFlooringGroup = null;
@@ -71,7 +71,7 @@ public class TileInformation
         //Set tiles
         foreach (Vector2Int t in tilesToOccupy)
         {
-            TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(t);
+            TileInformationManager.Instance.TryGetTileInformation(t, out TileInformation tileInfo);
             tileInfo.SetTileBuild(buildOnTile);
         }
 
@@ -103,7 +103,7 @@ public class TileInformation
         //Check if there is any objects on above, if there is, it cannot be destroyed
         foreach (Vector2Int checkPos in TopMostBuild.OccupiedTiles)
         {
-            TileInformation thisInfo = TileInformationManager.Instance.GetTileInformation(checkPos);
+            TileInformationManager.Instance.TryGetTileInformation(checkPos, out TileInformation thisInfo);
 
             if (thisInfo.TopMostBuild != TopMostBuild)
                 return false;
@@ -135,13 +135,13 @@ public class TileInformation
 
         foreach (KeyValuePair<Vector2Int, FlooringNormalPartOnTile> pair in normalFloorings)
         {
-            TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(pair.Key);
+            TileInformationManager.Instance.TryGetTileInformation(pair.Key, out TileInformation tileInfo);
             tileInfo.SetNormalFlooringGroup(group);
             tileInfo.layerNum++;
         }
         foreach (Vector2Int p in supportFloorings)
         {
-            TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(p);
+            TileInformationManager.Instance.TryGetTileInformation(p, out TileInformation tileInfo);
             tileInfo.SetSupportFlooringGroup(group);
         }
 
@@ -181,7 +181,7 @@ public class TileInformation
 
         foreach (KeyValuePair<Vector2Int, FlooringNormalPartOnTile> floor in TopFlooringGroup.NormalFloorings)
         {
-            TileInformation thisTile = TileInformationManager.Instance.GetTileInformation(floor.Key);
+            TileInformationManager.Instance.TryGetTileInformation(floor.Key, out TileInformation thisTile);
             if (thisTile.TopMostBuild != null)
                 return false;
         }
@@ -323,7 +323,7 @@ public class TileInformation
 
         foreach (StairsStartPosition startPos in (new StairsStartPosition[] { stairs.startPositionAbove, stairs.startPositionBelow }))
         {
-            TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(startPos.startPosition);
+            TileInformationManager.Instance.TryGetTileInformation(startPos.startPosition, out TileInformation tileInfo);
             if (tileInfo != null)
                 tileInfo.StairsStartPositions.Add(startPos);
         }
@@ -336,7 +336,7 @@ public class TileInformation
 
         foreach (StairsStartPosition startPos in (new StairsStartPosition[] { StairsOnTile.startPositionAbove, StairsOnTile.startPositionBelow }))
         {
-            TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(startPos.startPosition);
+            TileInformationManager.Instance.TryGetTileInformation(startPos.startPosition, out TileInformation tileInfo);
             if (tileInfo != null)
                 tileInfo.StairsStartPositions.Remove(startPos);
         }
@@ -356,6 +356,26 @@ public class TileInformation
         }
         startPosition = null;
         return false;
+    }
+
+    public void SetRegion(RegionInstance instance)
+    {
+        if (Region != null)
+            throw new System.Exception("Region already set!");
+
+        Region = instance;
+
+        OnTileModified?.Invoke(this);
+
+        Region.OnRegionRemoved += OnRegionRemoved;
+    }
+
+    public void OnRegionRemoved()
+    {
+        Region.OnRegionRemoved -= OnRegionRemoved;
+
+        Region = null;
+        OnTileModified?.Invoke(this);
     }
 }
 

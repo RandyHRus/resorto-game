@@ -31,6 +31,13 @@ public abstract class ColorMapVisualizer : MapVisualizer
         }
     }
 
+    public void OverrideColor(Vector2Int overridePosition, Color32 color)
+    {
+        colorTileMap.SetTile((Vector3Int)overridePosition, tileSprite);
+        colorTileMap.SetTileFlags((Vector3Int)overridePosition, TileFlags.None);
+        colorTileMap.SetColor((Vector3Int)overridePosition, color);
+    }
+
     public override void HideVisualizer()
     {
         colorTileMap.ClearAllTiles();

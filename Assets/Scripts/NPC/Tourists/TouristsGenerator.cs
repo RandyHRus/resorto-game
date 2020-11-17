@@ -47,13 +47,13 @@ public class TouristsGenerator : MonoBehaviour
         return interests;
     }
 
-    public TouristSchedule GetRandomSchedule()
+    public TouristSchedule GetRandomSchedule(TouristInstance touristInstance)
     {
         int wakeTime = UnityEngine.Random.Range(5, 10);
         int sleepHours = UnityEngine.Random.Range(6, 9);
         int sleepTime = (int)MathFunctions.Mod(wakeTime - sleepHours, 24);
-        int leaveDay = TimeManager.Instance.GetCurrentTime().day + UnityEngine.Random.Range(2, 10);
+        int leaveDay = TimeManager.Instance.GetCurrentTime().day + UnityEngine.Random.Range(1, 8);
 
-        return new TouristSchedule(new InGameTime(wakeTime, 0), new InGameTime(sleepTime, 0), leaveDay);
+        return new TouristSchedule(touristInstance, new InGameTime(sleepTime, 0, 0), sleepHours, leaveDay);
     }
 }

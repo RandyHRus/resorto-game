@@ -17,5 +17,5 @@ public abstract class RegionInformation: ScriptableObject
     [SerializeField] private Sprite icon = null;
     public Sprite Icon => icon;
 
-    public abstract RegionInstance CreateInstance(HashSet<Vector2Int> positions);
+    public abstract RegionInstance CreateInstance(string instanceName, HashSet<Vector2Int> positions);
 }

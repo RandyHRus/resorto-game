@@ -125,7 +125,8 @@ public class TerrainManager : MonoBehaviour
         {
             if (AddOrRemoveTileCode(pos, code, waterBGTilemapInfo, waterBGTilemap, true, out int newCode))
             {
-                int[] tileTracker = TileInformationManager.Instance.GetTileInformation(pos).waterBGTracker;
+                TileInformationManager.Instance.TryGetTileInformation(pos, out TileInformation t);
+                int[] tileTracker = t.waterBGTracker;
                 for (int i = 0; i < 4; i++)
                     tileTracker[i] += (code >> i & 1); //Add 1 or 0
             }
@@ -144,7 +145,9 @@ public class TerrainManager : MonoBehaviour
             //Self tile
             {
                 AddOrRemoveTileCode(position, 0b111111111, sandWaterTilemapInfo, sandTilemap, true, out int newCode);
-                TileInformationManager.Instance.GetTileInformation(position).tileLocation = TileLocation.Sand;
+
+                TileInformationManager.Instance.TryGetTileInformation(position, out TileInformation t);
+                t.tileLocation = TileLocation.Sand;
             }
 
             //Neighbours
@@ -162,7 +165,7 @@ public class TerrainManager : MonoBehaviour
             foreach (KeyValuePair<Vector2Int, int> neighbour in codesToAddToNeighbours)
             {
                 AddOrRemoveTileCode(neighbour.Key, neighbour.Value, sandWaterTilemapInfo, sandTilemap, true, out int newCode);
-                TileInformation neighbourInfo = TileInformationManager.Instance.GetTileInformation(neighbour.Key);
+                TileInformationManager.Instance.TryGetTileInformation(neighbour.Key, out TileInformation neighbourInfo);
                 if (TileLocation.Water.HasFlag(neighbourInfo.tileLocation))
                     neighbourInfo.tileLocation = TileLocation.WaterEdge;
             }
@@ -227,23 +230,28 @@ public class TerrainManager : MonoBehaviour
             int newTileCode = 0b000000000;
             foreach (KeyValuePair<Vector2Int, int> neighbour in mouseTileBitsToAddFromNeighbours)
             {
-                if (TileInformationManager.Instance.GetTileInformation(neighbour.Key).tileLocation != TileLocation.WaterEdge)
+                TileInformationManager.Instance.TryGetTileInformation(neighbour.Key, out TileInformation t);
+                if (t.tileLocation != TileLocation.WaterEdge)
                 {
                     newTileCode = newTileCode | neighbour.Value;
                 }
             }
             SetTileCode(position, newTileCode, sandWaterTilemapInfo, sandTilemap);
+
+            TileInformationManager.Instance.TryGetTileInformation(position, out TileInformation positionTile);
+
             if (sandTilemap.GetTile((Vector3Int)position) == null)
-                TileInformationManager.Instance.GetTileInformation(position).tileLocation = TileLocation.DeepWater;
+                positionTile.tileLocation = TileLocation.DeepWater;
             else
-                TileInformationManager.Instance.GetTileInformation(position).tileLocation = TileLocation.WaterEdge;
+                positionTile.tileLocation = TileLocation.WaterEdge;
         }
         //Change neighbours tile
         {
             foreach (KeyValuePair<Vector2Int, int> neighbour in mouseTileBitsToAddFromNeighbours)
             {
                 //If neighbour is not water, we don't need to change it.
-                if (TileInformationManager.Instance.GetTileInformation(neighbour.Key).tileLocation != TileLocation.WaterEdge)
+                TileInformationManager.Instance.TryGetTileInformation(neighbour.Key, out TileInformation t);
+                if (t.tileLocation != TileLocation.WaterEdge)
                 {
                     continue;
                 }
@@ -263,7 +271,8 @@ public class TerrainManager : MonoBehaviour
                 int neighbourTileCode = 0b000000000;
                 foreach (KeyValuePair<Vector2Int, int> neighboursNeighbour in neighboursTileBitsToAddFromNeighbours)
                 {
-                    TileLocation tileLocation = TileInformationManager.Instance.GetTileInformation(neighboursNeighbour.Key).tileLocation;
+                    TileInformationManager.Instance.TryGetTileInformation(neighboursNeighbour.Key, out TileInformation nnt);
+                    TileLocation tileLocation = nnt.tileLocation;
                     if (!TileLocation.Water.HasFlag(tileLocation))
                     {
                         neighbourTileCode = neighbourTileCode | neighboursNeighbour.Value;
@@ -271,7 +280,10 @@ public class TerrainManager : MonoBehaviour
                 }
                 SetTileCode(neighbour.Key, neighbourTileCode, sandWaterTilemapInfo, sandTilemap);
                 if (neighbourTileCode == 0b000000000)
-                    TileInformationManager.Instance.GetTileInformation(neighbour.Key).tileLocation = TileLocation.DeepWater;
+                {
+                    TileInformationManager.Instance.TryGetTileInformation(neighbour.Key, out TileInformation nt);
+                    nt.tileLocation = TileLocation.DeepWater;
+                }
             }
         }
         //Water background
@@ -310,7 +322,8 @@ public class TerrainManager : MonoBehaviour
             if (!TileInformationManager.Instance.PositionInMap(toRemovePosition))
                 return;
 
-            int[] tileTracker = TileInformationManager.Instance.GetTileInformation(toRemovePosition).waterBGTracker;
+            TileInformationManager.Instance.TryGetTileInformation(toRemovePosition, out TileInformation t);
+            int[] tileTracker = t.waterBGTracker;
 
             string bitsToKeepBinaryString = "";
             for (int i = 3; i >= 0; i--)
@@ -372,7 +385,7 @@ public class TerrainManager : MonoBehaviour
             AddOrRemoveTileCode(pair.Key, pair.Value, landTilemapInfo, tilemapLayer, true, out int newCode);
 
             //Set new layers
-            TileInformation tile = TileInformationManager.Instance.GetTileInformation(pair.Key);
+            TileInformationManager.Instance.TryGetTileInformation(pair.Key, out TileInformation tile);
             bool newTileIsGrass = TileIsGrass(tilemapLayer.GetTile((Vector3Int)pair.Key), tilemapLayer);
 
             if (newTileIsGrass && !existingTileIsGrass)
@@ -416,7 +429,7 @@ public class TerrainManager : MonoBehaviour
             if (AddOrRemoveTileCode(pair.Key, pair.Value, landTilemapInfo, tilemapLayer, false, out int newCode))
             {
                 //Set new layers
-                TileInformation tile = TileInformationManager.Instance.GetTileInformation(pair.Key);
+                TileInformationManager.Instance.TryGetTileInformation(pair.Key, out TileInformation tile);
                 bool newTileIsGrass = TileIsGrass(tilemapLayer.GetTile((Vector3Int)pair.Key), tilemapLayer);
 
                 if (!newTileIsGrass && existingTileIsGrass)
@@ -481,9 +494,9 @@ public class TerrainManager : MonoBehaviour
             return false;
         }
 
-        TileInformation mainTile = TileInformationManager.Instance.GetTileInformation(position);
+        TileInformationManager.Instance.TryGetTileInformation(position, out TileInformation mainTile);
         TileLocation mainTileLocation = mainTile.tileLocation;
-        TileInformation aboveTileInformation = TileInformationManager.Instance.GetTileInformation(aboveTilePosition);
+        TileInformationManager.Instance.TryGetTileInformation(aboveTilePosition, out TileInformation aboveTileInformation);
 
         if (mainTileLocation == TileLocation.Sand)
         {
@@ -599,7 +612,7 @@ public class TerrainManager : MonoBehaviour
 
         bool checkForBuildAtPosition(Vector2Int pos, int layerNum)
         {
-            TileInformation info = TileInformationManager.Instance.GetTileInformation(pos);
+            TileInformationManager.Instance.TryGetTileInformation(pos, out TileInformation info);
             if (info.layerNum == layerNum && info.TopMostBuild != null)
             {
                 return true;
@@ -619,9 +632,9 @@ public class TerrainManager : MonoBehaviour
             return false;
         }
 
-        TileInformation mainTile = TileInformationManager.Instance.GetTileInformation(position);
+        TileInformationManager.Instance.TryGetTileInformation(position, out TileInformation mainTile);
         TileLocation mainTileLocation = mainTile.tileLocation;
-        TileInformation aboveTileInformation = TileInformationManager.Instance.GetTileInformation(aboveTilePosition);
+        TileInformationManager.Instance.TryGetTileInformation(aboveTilePosition, out TileInformation aboveTileInformation);
 
         //Sand is placeable
         if (TileLocation.Water.HasFlag(mainTileLocation))
@@ -637,7 +650,7 @@ public class TerrainManager : MonoBehaviour
             for (int i = -2; i <= 2; i++) {
                 for (int j = -2; j <= 2; j++) {
 
-                    TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(new Vector2Int(position.x + i, position.y + j));
+                    TileInformationManager.Instance.TryGetTileInformation(new Vector2Int(position.x + i, position.y + j), out TileInformation tileInfo);
                     if (tileInfo == null)
                     {
                         layerNumber = Constants.INVALID_TILE_LAYER;
@@ -669,7 +682,7 @@ public class TerrainManager : MonoBehaviour
                     return false;
                 }
                 //Check if any of the tiles are water
-                TileInformation tile = TileInformationManager.Instance.GetTileInformation(positionToCheck);
+                TileInformationManager.Instance.TryGetTileInformation(positionToCheck, out TileInformation tile);
                 if (TileLocation.Water.HasFlag(tile.tileLocation)) {
                     layerNumber = Constants.INVALID_TILE_LAYER;
                     return false;
@@ -679,7 +692,7 @@ public class TerrainManager : MonoBehaviour
             //Check if placeable above
             bool placeableAbove = true;
             foreach (Vector2Int positionToCheck in positionsToCheck) {
-                TileInformation tile = TileInformationManager.Instance.GetTileInformation(positionToCheck);
+                TileInformationManager.Instance.TryGetTileInformation(positionToCheck, out TileInformation tile);
 
                 //Check if on correct location
                 if (tile.layerNum < mainTile.layerNum)
@@ -699,7 +712,7 @@ public class TerrainManager : MonoBehaviour
             bool placeableBelow = true;
             foreach (Vector2Int positionToCheck in positionsToCheck)
             {
-                TileInformation tile = TileInformationManager.Instance.GetTileInformation(positionToCheck);
+                TileInformationManager.Instance.TryGetTileInformation(positionToCheck, out TileInformation tile);
                 TileLocation location = tile.tileLocation;
 
                 //Check if on correct location
@@ -759,7 +772,7 @@ public class TerrainManager : MonoBehaviour
     // On removeMode - 1 in code is bits to keep
     private bool AddOrRemoveTileCode(Vector2Int position, int code, TilemapInformation tilemapInfo, Tilemap tilemap, bool addMode, out int newCode)
     {
-        TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(position);
+        TileInformationManager.Instance.TryGetTileInformation(position, out TileInformation tileInfo);
 
         if (tileInfo == null)
         {
@@ -780,7 +793,7 @@ public class TerrainManager : MonoBehaviour
 
     private bool SetTileCode(Vector2Int position, int code, TilemapInformation tilemapInfo, Tilemap tilemap)
     {
-        TileInformation tileInfo = TileInformationManager.Instance.GetTileInformation(position);
+        TileInformationManager.Instance.TryGetTileInformation(position, out TileInformation tileInfo);
         if (tileInfo == null)
             return false;
 
@@ -806,7 +819,7 @@ public class TerrainManager : MonoBehaviour
         {
             for (int j = 0; j < mapSize; j++)
             {
-                TileInformation t = TileInformationManager.Instance.GetTileInformation(new Vector2Int(i, j));
+                TileInformationManager.Instance.TryGetTileInformation(new Vector2Int(i, j), out TileInformation t);
                 t.ResetTerrainInformation();
             }
         }

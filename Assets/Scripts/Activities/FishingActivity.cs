@@ -8,12 +8,14 @@ public class FishingActivity : Activity
 {
     [SerializeField] RegionInformation fishingRegionInformation = null;
 
-    public override bool CanStartActivity(out Type switchToState, out object[] switchToStateArgs)
+    public override bool GetActivityLocationAndStateToSwitchTo(out Vector2Int? location, out Type switchToState, out object[] switchToStateArgs, out string goingToLocationMessage)
     {
-        FishingRegionInstance targetRegion = (FishingRegionInstance)RegionManager.GetRandomRegionInstanceOfType(fishingRegionInformation);
-
+        location = null;
         switchToState = null;
         switchToStateArgs = null;
+        goingToLocationMessage = "";
+
+        FishingRegionInstance targetRegion = (FishingRegionInstance)RegionManager.GetRandomRegionInstanceOfType(fishingRegionInformation);
 
         if (targetRegion == null)
         {
@@ -30,9 +32,10 @@ public class FishingActivity : Activity
         }
 
         //Will walk to position, then start fishing state
-
-        switchToState = typeof(NPCWalkToPositionState);
-        switchToStateArgs = new object[] { randomFishingPosInRegion, typeof(NPCFishingState), null, "Going fishing" };
+        location = randomFishingPosInRegion;
+        switchToState = typeof(NPCFishingState);
+        switchToStateArgs = null;
+        goingToLocationMessage = "Going fishing";
 
         return true;
     }

@@ -28,7 +28,7 @@ public abstract class NPCIdleState : NPCState
     public override void StartState(object[] args)
     {
         Vector2Int position = new Vector2Int(Mathf.RoundToInt(npcInstance.npcTransform.position.x), Mathf.RoundToInt(npcInstance.npcTransform.position.y));
-        TileInformation info = TileInformationManager.Instance.GetTileInformation(position);
+        TileInformationManager.Instance.TryGetTileInformation(position, out TileInformation info);
         tileLayer = info.layerNum;
 
         idleNextMovementTimer = Random.Range(minMovementWait, maxMovementWait);
@@ -63,7 +63,7 @@ public abstract class NPCIdleState : NPCState
         else
         {
             Vector2 currentPos = npcInstance.npcTransform.position;
-            Vector2 proposedPos = Vector2.MoveTowards(currentPos, target, moveSpeed * Time.deltaTime);
+            Vector2 proposedPos = Vector2.MoveTowards(currentPos, target, npcInstance.moveSpeed * Time.deltaTime);
 
             bool stop = false;
             if (CollisionManager.CheckForCollisionMovement(currentPos, proposedPos, tileLayer, out bool collisionX, out bool collisionY))

@@ -14,8 +14,19 @@ public class SidebarTasksPanel : SidebarPanel
 
     private void Start()
     {
-        activeTasksPanel = new ComponentsListPanel<TaskInstanceUI>(transform.Find("Active tasks").gameObject);
-        completedTasksPanel = new ComponentsListPanel<TaskInstanceUI>(transform.Find("Completed tasks").gameObject);
+        foreach (Transform t in transform.GetComponentsInChildren<Transform>())
+        {
+            if (t.tag == "List Field")
+            {
+                activeTasksPanel = new ComponentsListPanel<TaskInstanceUI>(t.gameObject);
+                t.gameObject.SetActive(false);
+            }
+            else if (t.tag == "List Field 2")
+            {
+                completedTasksPanel = new ComponentsListPanel<TaskInstanceUI>(t.gameObject);
+                t.gameObject.SetActive(false);
+            }
+        }
 
         TasksManager.Instance.OnTaskAdded += ShowTaskActive;
         TasksManager.Instance.OnTaskCompleted += ShowTaskCompleted;

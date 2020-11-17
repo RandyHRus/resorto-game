@@ -37,6 +37,10 @@ TagManager:
   - State Field
   - Progress Field
   - Icon Field 5
+  - Collapsible Field
+  - Button
+  - Button 2
+  - List Field 2
   layers:
   - Default
   - TransparentFX

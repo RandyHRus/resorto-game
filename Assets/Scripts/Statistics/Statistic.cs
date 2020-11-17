@@ -32,4 +32,9 @@ public class Statistic
     {
         Value = Value + amount;
     }
+
+    public void Set(int amount)
+    {
+        Value = amount;
+    }
 }

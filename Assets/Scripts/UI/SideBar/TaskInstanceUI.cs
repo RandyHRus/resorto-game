@@ -81,7 +81,7 @@ public class TaskInstanceUI : ListComponentUI
             subtaskStatusImage.sprite = ResourceManager.Instance.SubtaskCompleteSprite;
         }
 
-        public void UnSub()
+        public void UnSub(UIObject sender)
         {
             subtask.OnSubtaskCompleted -= MarkSubtaskComplete;
             OnDestroy -= UnSub;

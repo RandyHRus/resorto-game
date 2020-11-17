@@ -36,4 +36,6 @@ public abstract class NPCInformation
     }
 
     protected abstract GameObject ObjectToInitialize { get; }
+
+    public abstract NPCSchedule CreateSchedule(NPCInstance instance);
 }
