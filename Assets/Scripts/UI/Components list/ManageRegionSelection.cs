@@ -5,12 +5,11 @@ using UnityEngine.UI;
 
 public class ManageRegionSelection : CollapsibleComponentUI
 {
-    public override int CollapsibleTargetSize => 100;
+    public override int CollapsibleTargetSize => 130;
 
     private RegionInstance instance;
-
     private Button removeButton;
-
+    private Button additionalButton;
     private ComponentsListPanel<TextComponentUI> warningsList;
 
     public ManageRegionSelection(RegionInstance instance, Transform parent): base(ResourceManager.Instance.ManageRegionComponent, parent)
@@ -38,6 +37,20 @@ public class ManageRegionSelection : CollapsibleComponentUI
             {
                 warningsList = new ComponentsListPanel<TextComponentUI>(t.gameObject);
             }
+            else if (t.tag == "Button 2")
+            {
+                additionalButton = t.GetComponent<Button>();
+                if (instance.AdditionalButtonText == null)
+                {
+                    t.gameObject.SetActive(false);
+                }
+                else
+                {
+                    OutlinedText buttonText = new OutlinedText(additionalButton.transform.GetChild(0).gameObject);
+                    buttonText.SetText(instance.AdditionalButtonText);
+                    additionalButton.onClick.AddListener(instance.OnAdditionalButtonClicked);
+                }
+            }
         }
 
         instance.OnRegionModified += OnRegionModifiedHandler;
@@ -60,6 +73,8 @@ public class ManageRegionSelection : CollapsibleComponentUI
         base.Destroy();
 
         removeButton.onClick.RemoveListener(OnRemoveButtonClicked);
+        additionalButton.onClick.RemoveListener(instance.OnAdditionalButtonClicked);
+
         instance.OnRegionModified -= OnRegionModifiedHandler;
     }
 

@@ -19,9 +19,8 @@ public abstract class NPCIdleState : NPCState
 
     public override string DisplayMessage => "Idle";
 
-    public override void Initialize()
+    public NPCIdleState(NPCInstance npcInstance): base(npcInstance)
     {
-        base.Initialize();
         animator = npcGameObject.GetComponent<Animator>();
     }
 

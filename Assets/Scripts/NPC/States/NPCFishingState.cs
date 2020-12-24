@@ -3,28 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-[CreateAssetMenu(menuName = "States/NPC/Fishing")]
 public class NPCFishingState : NPCActivityState, ITouristStateDialogue
 {
     private FishingStateController controller;
 
     public override string DisplayMessage => "Fishing";
 
-    public override void Initialize()
+    public NPCFishingState(NPCInstance npcInstance): base(npcInstance)
     {
-        base.Initialize();
-
         FishingResources resources = new FishingResources(npcInstance.npcTransform, new object[] { npcInstance });
 
         controller = new FishingStateController(new NPCFishingDefaultPhase(resources),
                                                 new NPCFishingChargingPhase(resources),
                                                 new FishingCastingPhase(resources),
                                                 new NPCFishingBobbingPhase(resources),
-                                                new NPCFishingHookedPhase(resources), 
+                                                new NPCFishingHookedPhase(resources),
                                                 resources);
 
         //controller.OnFishingEnd += () => InvokeChangeState(typeof(NPCIdleState), null);
-        controller.OnFishingEnd += InvokeEndState; //Can't do above because NPCIdle state might not be present (Eg. Could be touristIdleState)
+        controller.OnFishingEnd += InvokeEndState; //Can't do the one commented above because NPCIdle state might not be present (Eg. Could be touristIdleState)
     }
 
     public class NPCFishingDefaultPhase: FishingDefaultPhase

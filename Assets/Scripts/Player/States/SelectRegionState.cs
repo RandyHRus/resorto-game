@@ -11,7 +11,7 @@ public class SelectRegionState : PlayerState
     public override bool AllowMouseDirectionChange => false;
     public override CameraMode CameraMode => CameraMode.Drag;
 
-    private RegionInstance previousRegion;
+    private RegionInstance previousRegion = null;
 
     public override void StartState(object[] args)
     {
@@ -22,6 +22,7 @@ public class SelectRegionState : PlayerState
     public override void Execute()
     {
         Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
+
         if (!TileInformationManager.Instance.TryGetTileInformation(mouseTilePosition, out TileInformation mouseTileInfo))
         {
             if (previousRegion != null)

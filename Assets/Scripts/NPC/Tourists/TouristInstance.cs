@@ -62,11 +62,12 @@ public class TouristInstance: NPCInstance
 
     private void UnAssignRoom()
     {
-        AssignedRoom = null;
         AssignedRoom.UnOccupyRoom();
         AssignedRoom.OnRoomValidityChanged -= OnAssignedRoomValidityChangedHandler;
         AssignedRoom.OnRegionRemoved -= OnAssignedRoomRemovedHandler;
         AssignedBedPosition = null;
+        AssignedRoom = null;
+        Debug.Log("Unassign");
     }
 
     private void OnAssignedRoomValidityChangedHandler(HotelRoomRegionInstance room)

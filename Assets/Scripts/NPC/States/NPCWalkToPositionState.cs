@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-[CreateAssetMenu(menuName = "States/NPC/WalkToPosition")]
 public class NPCWalkToPositionState : NPCState
 {
     public delegate void pathChanged(LinkedList<Tuple<Vector2Int, Vector2Int?>> newPath);
@@ -21,13 +20,12 @@ public class NPCWalkToPositionState : NPCState
     private Vector2 currentStartPos;
     private bool goalReached;
 
-    private Type onFinishStateChange;
-    private object[] onFinishStateChangeArgs;
+    private Action onFinishAction;
 
     private string displayMessage;
     public override string DisplayMessage => displayMessage;
 
-    public override void Initialize()
+    public NPCWalkToPositionState(NPCInstance npcInstance): base(npcInstance)
     {
         animator = npcGameObject.GetComponent<Animator>();
     }
@@ -35,9 +33,8 @@ public class NPCWalkToPositionState : NPCState
     public override void StartState(object[] args)
     {
         goal = (Vector2Int)args[0];
-        onFinishStateChange = (Type)args[1];
-        onFinishStateChangeArgs = (object[])args[2];
-        displayMessage = (string)args[3];
+        onFinishAction = (Action)args[1];
+        displayMessage = (string)args[2];
 
         animator.SetBool("Walking", true);
 
@@ -71,7 +68,7 @@ public class NPCWalkToPositionState : NPCState
     {
         if (currentTarget != null && currentTarget.Next == null)
         {
-            InvokeChangeState(onFinishStateChange, onFinishStateChangeArgs);
+            onFinishAction?.Invoke();
             goalReached = true;
             return;
         }

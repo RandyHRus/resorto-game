@@ -36,7 +36,7 @@ public class PlayerStateMachineManager : MonoBehaviour
             stateInstancesCopy[i] = copy;
         }
 
-        stateMachine = new StateMachine<PlayerState>(defaultState.GetType(), stateInstancesCopy);
+        stateMachine = new StateMachineWithDefaultState<PlayerState>(defaultState.GetType(), stateInstancesCopy);
 
         SwitchState<DefaultState>();
 
@@ -108,7 +108,7 @@ public class PlayerStateMachineManager : MonoBehaviour
 
     public void SwitchState(Type type, object[] args = null) => stateMachine.SwitchState(type, args);
 
-    public void SwitchDefaultState() => stateMachine.SwitchDefaultState();
+    public void EndCurrentState() => stateMachine.EndCurrentState();
 
 
     private void OnStateChanged(PlayerState previousState, PlayerState newState)

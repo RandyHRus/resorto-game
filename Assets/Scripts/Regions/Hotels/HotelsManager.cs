@@ -12,6 +12,9 @@ public class HotelsManager: MonoBehaviour
 
     private static ArrayHashSet<HotelRoomRegionInstance> validRooms = new ArrayHashSet<HotelRoomRegionInstance>();
 
+    private static Dictionary<HotelRoomRegionInstance, HotelFrontDeskRegionInstance> roomToFrontDeskConnection = new Dictionary<HotelRoomRegionInstance, HotelFrontDeskRegionInstance>();
+    private static Dictionary<HotelFrontDeskRegionInstance, HashSet<HotelRoomRegionInstance>> frontDeskToRoomsConnection = new Dictionary<HotelFrontDeskRegionInstance, HashSet<HotelRoomRegionInstance>>();
+
     public delegate void HotelRoomCountChanged(int newCount);
     public static event HotelRoomCountChanged OnAvailableRoomsCountChanged;
     public static event HotelRoomCountChanged OnValidRoomsCountChanged;
@@ -103,5 +106,59 @@ public class HotelsManager: MonoBehaviour
             return null;
         else
             return availableRooms.GetRandom();
+    }
+
+    public HotelFrontDeskRegionInstance GetFrontDeskConnectedToRoom(HotelRoomRegionInstance room)
+    {
+        if (roomToFrontDeskConnection.TryGetValue(room, out HotelFrontDeskRegionInstance frontDesk))
+        {
+            return frontDesk;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public HashSet<HotelRoomRegionInstance> GetRoomsConnectedToFrontDesk(HotelFrontDeskRegionInstance frontDesk)
+    {
+        if (frontDeskToRoomsConnection.TryGetValue(frontDesk, out HashSet<HotelRoomRegionInstance> rooms))
+        {
+            return new HashSet<HotelRoomRegionInstance>(rooms); //Creates a copy
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public void AddConnection(HotelFrontDeskRegionInstance frontDesk, HotelRoomRegionInstance room)
+    {
+        if (roomToFrontDeskConnection.ContainsKey(room))
+        {
+            throw new System.Exception("Room already has connection");
+        }
+
+        //Add room to frontDesk connection
+        roomToFrontDeskConnection.Add(room, frontDesk);
+
+        //Add frontDesk to rooms connection
+        if (frontDeskToRoomsConnection.TryGetValue(frontDesk, out HashSet<HotelRoomRegionInstance> existingSet))
+        {
+            existingSet.Add(room);
+        }
+        else
+        {
+            HashSet<HotelRoomRegionInstance> newSet = new HashSet<HotelRoomRegionInstance>();
+            newSet.Add(room);
+            frontDeskToRoomsConnection.Add(frontDesk, newSet);
+        }
+    }
+
+    public void RemoveConnection(HotelRoomRegionInstance room)
+    {
+        HotelFrontDeskRegionInstance frontDesk = roomToFrontDeskConnection[room];
+        roomToFrontDeskConnection.Remove(room);
+        frontDeskToRoomsConnection[frontDesk].Remove(room);
     }
 }

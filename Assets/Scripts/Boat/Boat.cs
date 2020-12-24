@@ -36,7 +36,7 @@ public class Boat : MonoBehaviour
                 new BoatLeavingState(transform)
             };
 
-            stateMachine = new StateMachine<BoatState>(typeof(BoatMovingToUnloadingPositionState), stateInstances);
+            stateMachine = new StateMachineWithDefaultState<BoatState>(typeof(BoatMovingToUnloadingPositionState), stateInstances);
             stateMachine.OnStateChanged += OnStateChanged;
         }
     }
@@ -53,7 +53,7 @@ public class Boat : MonoBehaviour
 
     public virtual void ResetBoat()
     {
-        stateMachine.SwitchDefaultState();
+        stateMachine.EndCurrentState();
     }
 
     private void OnStateChanged(BoatState previousState, BoatState newState)

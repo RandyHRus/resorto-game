@@ -23,5 +23,12 @@ MonoBehaviour:
   unoccupiedValidRoomColor:
     serializedVersion: 2
     rgba: 4281007998
+  frontDeskColor:
+    serializedVersion: 2
+    rgba: 4294770432
   hotelRoomRegionInfo: {fileID: 11400000, guid: ff2bde1d900053143a316fc54286fd03,
     type: 2}
+  hotelFrontDeskRegionInfo: {fileID: 11400000, guid: 4fa2365260cf97d4ba3f6b476f884f21,
+    type: 2}
+  dottedLine: {fileID: 9021429853481397963, guid: d9161c77cf42b1d41af0b41d7840913d,
+    type: 3}

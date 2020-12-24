@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c02ea004625d8345977c3126cf1f74e, type: 3}
+  m_Name: Base_HotelConnections
+  m_EditorClassIdentifier: 
+  hotelVisualizer: {fileID: 11400000, guid: 83c0c6ad81fd168499183700ec752f2c, type: 2}
+  hotelRoomInfo: {fileID: 11400000, guid: ff2bde1d900053143a316fc54286fd03, type: 2}
+  hotelFrontDeskInfo: {fileID: 11400000, guid: 4fa2365260cf97d4ba3f6b476f884f21, type: 2}
+  dottedLine: {fileID: 9021429853481397963, guid: d9161c77cf42b1d41af0b41d7840913d,
+    type: 3}

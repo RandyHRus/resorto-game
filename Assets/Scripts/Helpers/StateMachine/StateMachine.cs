@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class StateMachine<T> where T: IStateMachineState
+public abstract class StateMachine<T> where T: IStateMachineState
 {
     public T CurrentState { get; private set; }
     protected Dictionary<Type, T> typeToStateInstance = new Dictionary<Type, T>();
@@ -11,25 +11,21 @@ public class StateMachine<T> where T: IStateMachineState
     public delegate void StateChanged(T previousState, T newState);
     public event StateChanged OnStateChanged;
 
-    public Type defaultStateType;
-
-    public StateMachine(Type defaultStateType, T[] stateInstances)
+    public StateMachine(T[] stateInstances)
     {
         foreach (T s in stateInstances)
         {
             Type stateType = s.GetType();
             typeToStateInstance.Add(stateType, s);
         }
-
-        this.defaultStateType = defaultStateType;
     }
 
-    public void RunExecute()
+    public virtual void RunExecute()
     {
         CurrentState.Execute();
     }
 
-    public void RunLateExecute()
+    public virtual void RunLateExecute()
     {
         CurrentState.LateExecute();
     }
@@ -49,17 +45,22 @@ public class StateMachine<T> where T: IStateMachineState
         SwitchState(typeof(T2), args);
     }
 
-    public void SwitchDefaultState()
+    private void OnEndStateHandler()
     {
-        SwitchState(defaultStateType);
+        SwitchState(OnEndStateGetNextState(out object[] args), args);
     }
+
+    public abstract Type OnEndStateGetNextState(out object[] args);
 
     public void SwitchState(Type type, object[] args = null)
     {
         if (CurrentState != null)
         {
+            //Im pretty sure I don't need to unsub from these
+            //When say when a tourist leaves because the 
+            //stateMachine will be deleted first before the states
             CurrentState.OnChangeState -= SwitchState;
-            CurrentState.OnEndState -= SwitchDefaultState;
+            CurrentState.OnEndState -= OnEndStateHandler;
 
             CurrentState.EndState();
         }
@@ -69,10 +70,15 @@ public class StateMachine<T> where T: IStateMachineState
         CurrentState = typeToStateInstance[type];
 
         CurrentState.OnChangeState += SwitchState;
-        CurrentState.OnEndState += SwitchDefaultState;
+        CurrentState.OnEndState += OnEndStateHandler;
 
         CurrentState.StartState(args);
 
         OnStateChanged?.Invoke(previousState, CurrentState);
+    }
+
+    public void EndCurrentState()
+    {
+        OnEndStateHandler();
     }
 }

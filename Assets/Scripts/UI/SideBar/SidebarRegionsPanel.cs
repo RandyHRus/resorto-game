@@ -54,7 +54,7 @@ public class SidebarRegionsPanel : SidebarPanel
 
     void OnPanelClosedHandler()
     {
-        PlayerStateMachineManager.Instance.SwitchDefaultState();
+        PlayerStateMachineManager.Instance.EndCurrentState();
     }
 
     public void ShowTab(int tabIndex)

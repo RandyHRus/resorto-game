@@ -16,6 +16,8 @@ public abstract class NPCActivityState : NPCState
     public delegate void ActivityCompleted(Activity activity, float completenessFrac);
     public event ActivityCompleted OnActivityCompleted;
 
+    public NPCActivityState(NPCInstance npcInstance): base(npcInstance) { }
+
     public override void StartState(object[] args)
     {
         timer = 0;

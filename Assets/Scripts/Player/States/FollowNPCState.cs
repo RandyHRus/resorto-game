@@ -32,7 +32,7 @@ public class FollowNPCState : PlayerState
         {
             Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
             if (TileInformationManager.Instance.TryGetTileInformation(mouseTilePosition, out TileInformation mouseTileInfo)) {
-                npcMono.SwitchState<NPCWalkToPositionState>(new object[] { (Vector2Int)mouseTilePosition, null, null, "Going to target location" });
+                npcMono.SwitchState<NPCWalkToPositionState>(new object[] { (Vector2Int)mouseTilePosition, null, "Going to target location" });
             }
         }
     }

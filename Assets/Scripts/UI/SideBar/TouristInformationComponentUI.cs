@@ -139,7 +139,7 @@ public class TouristInformationComponentUI : CollapsibleComponentUI
 
     private void UpdateWhenLeaving(object[] args)
     {
-        int daysUntilLeave = ((TouristSchedule)touristMono.Schedule).leaveDay - TimeManager.Instance.GetCurrentTime().day;
+        int daysUntilLeave = ((TouristScheduleManager)touristMono.ScheduleManager).leaveDay - TimeManager.Instance.GetCurrentTime().day;
         string text = "Leaving in: " + daysUntilLeave + (daysUntilLeave == 1 ? " Day" : " Days");
         whenLeavingText.SetText(text);
     }

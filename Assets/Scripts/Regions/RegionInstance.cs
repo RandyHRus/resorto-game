@@ -15,6 +15,13 @@ public class RegionInstance
     public delegate void RegionModified(RegionInstance instance, TileInformation tileInfo);
     public event RegionModified OnRegionModified;
 
+    public virtual string AdditionalButtonText => null; //Keep null to hide button
+    public virtual void OnAdditionalButtonClicked()
+    {
+        Sidebar.Instance.CloseSidebar();
+        //Override to create button action
+    }
+
     public RegionInstance(string instanceName, RegionInformation regionInformation, HashSet<Vector2Int> positions)
     {
         this.InstanceName = instanceName;

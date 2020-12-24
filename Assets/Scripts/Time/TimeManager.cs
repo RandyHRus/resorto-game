@@ -61,10 +61,13 @@ public class TimeManager : MonoBehaviour
         //Change time
         {
             timePassed += Time.deltaTime * timeSpeed;
-            while (timePassed > 1)
+
+            //We don't want it to skip any minutes, (Could messs with subscriptions
+            //so even if timePassed is greater than 2, it will only calculate for 1.
+            if (timePassed >= 1)
             {
                 minute += 1;
-                timePassed -= 1;
+                timePassed = 0;
 
                 if (minute >= 60)
                 {

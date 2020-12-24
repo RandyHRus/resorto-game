@@ -2,34 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "States/Tourist/Idle")]
 public class TouristIdleState : NPCIdleState
 {
-    private readonly float minActivityTimer = 3f;
-    private readonly float maxActivityTimer = 5f;
+    private readonly float timeBetweenTryStartScheduleAction = 5f;
+    private float nextTryStartScheduleActionTimer = 0;
 
-    private float nextActivityTimer = 0;
+    public TouristIdleState(NPCInstance npcInstance): base(npcInstance)
+    {
 
-    private TouristInstance touristInstance => (TouristInstance)npcInstance;
+    }
 
     public override void StartState(object[] args)
     {
         base.StartState(args);
-        nextActivityTimer = Random.Range(minActivityTimer, maxActivityTimer);
+        nextTryStartScheduleActionTimer = timeBetweenTryStartScheduleAction;
     }
 
     public override void Execute()
     {
         base.Execute();
 
-        nextActivityTimer -= Time.deltaTime;
-        if (nextActivityTimer <= 0)
+        nextTryStartScheduleActionTimer -= Time.deltaTime;
+        if (nextTryStartScheduleActionTimer <= 0)
         {
-            nextActivityTimer = Random.Range(minActivityTimer, maxActivityTimer);
-            TouristInterest randomInterest = touristInstance.interests[Random.Range(0, touristInstance.interests.Length)];
-            Activity randomActivity = randomInterest.Activies[Random.Range(0, randomInterest.Activies.Length)];
-            InvokeStartActivity(randomActivity);
+            nextTryStartScheduleActionTimer = timeBetweenTryStartScheduleAction;
 
+            //If still in idle state, it means action wasn't successfully started so keep trying
+            npcInstance.InvokeTryStartScheduleAction();
             return;
         }
     }

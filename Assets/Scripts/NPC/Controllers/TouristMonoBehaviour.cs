@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using System;
 
 public class TouristMonoBehaviour : NPCMonoBehaviour
 {
@@ -10,6 +12,8 @@ public class TouristMonoBehaviour : NPCMonoBehaviour
 
     public delegate void TouristDeleting(TouristMonoBehaviour mono);
     public event TouristDeleting OnTouristDeleting;
+
+    public override Type DefaultStateType => typeof(TouristIdleState);
 
     public override NPCInstance CreateNPCInstance(NPCInformation npcInfo, Transform npcTransform)
     {
@@ -26,27 +30,17 @@ public class TouristMonoBehaviour : NPCMonoBehaviour
 
     public override void Initialize(NPCInformation npcInfo)
     {
-        void OnGoBackToUnloadingDockHandler()
-        {
-            ((TouristSchedule)Schedule).OnGoBackToUnloadingDockTime -= OnGoBackToUnloadingDockHandler;
-            ((TouristSchedule)Schedule).OnGoToBedLocationTime -= GoToBedLocation; //We don't want the tourist going to bed while going back to unloading dock!
-            GoBackToUnloadingDock();
-        }
-
         base.Initialize(npcInfo);
-
-        ((TouristSchedule)Schedule).OnGoBackToUnloadingDockTime += OnGoBackToUnloadingDockHandler;
-        ((TouristSchedule)Schedule).OnGoToBedLocationTime += GoToBedLocation;
 
         happinessManager = new TouristHappinessManager(TouristInstance, stateMachine);
         happinessDiaplay = new TouristHappinessChangeDisplay(TouristInstance);
 
-        stateMachine.GetStateInstance<NPCLeaveAndDeleteState>().OnNPCDeleting += InvokeOnTouristDeleting;
+        NpcInstance.OnNPCDelete += InvokeOnTouristDeleting;
     }
 
     private void InvokeOnTouristDeleting()
     {
-        stateMachine.GetStateInstance<NPCLeaveAndDeleteState>().OnNPCDeleting -= InvokeOnTouristDeleting;
+        NpcInstance.OnNPCDelete -= InvokeOnTouristDeleting;
         OnTouristDeleting?.Invoke(this);
     }
 
@@ -67,22 +61,36 @@ public class TouristMonoBehaviour : NPCMonoBehaviour
         ((SidebarTouristsPanel)Sidebar.Instance.GetPanel(SidebarTab.Tourists)).SelectTourist(TouristInstance);
     }
 
-    private void GoBackToUnloadingDock()
-    {
-        Debug.Log("Going back to unloading dock");
-        Vector2Int unloadingPosition = RegionManager.GetRandomRegionInstanceOfType(ResourceManager.Instance.BoatUnloadingRegion).GetRegionPositionsAsList()[0];
-        SwitchState<NPCWalkToPositionState>(new object[] { unloadingPosition, typeof(NPCLeaveAndDeleteState), null, "Leaving island" });
-    }
-
-    private void GoToBedLocation(Vector2Int bedAccessLocation)
-    {
-        Debug.Log("Going to bed");
-        SwitchState<NPCWalkToPositionState>(new object[] { bedAccessLocation, typeof(NPCSleepingState), null, "Going to bed" });
-    }
-
     public override void OnDelete()
     {
         base.OnDelete();
-        ((TouristSchedule)Schedule).OnGoToBedLocationTime -= GoToBedLocation;
+    }
+
+    public override NPCScheduleManager CreateNPCScheduleManager(NPCSchedule[] schedules, NPCInstance instance)
+    {
+        int wakeTime = UnityEngine.Random.Range(5, 10);
+        int sleepHours = UnityEngine.Random.Range(6, 9);
+        int sleepTime = (int)MathFunctions.Mod(wakeTime - sleepHours, 24);
+        int leaveDay = TimeManager.Instance.GetCurrentTime().day + UnityEngine.Random.Range(1, 8);
+
+        return new TouristScheduleManager(new InGameTime(sleepTime, 0, 0), sleepHours, leaveDay, schedules, TouristInstance);
+    }
+
+    public override NPCState[] CreateNPCStates(NPCInstance npcInstance)
+    {
+        NPCState[] additionalStates = {
+               new TouristIdleState(npcInstance),
+        };
+
+        return base.CreateNPCStates(npcInstance).Union(additionalStates).ToArray();
+    }
+
+    public override NPCSchedule[] CreateNPCSchedules(NPCInstance npcInstance)
+    {
+        NPCSchedule[] additionalSchedules = {
+            new TouristCheckInSchedule((TouristInstance)npcInstance)
+        };
+
+        return base.CreateNPCSchedules(npcInstance).Union(additionalSchedules).ToArray();
     }
 }

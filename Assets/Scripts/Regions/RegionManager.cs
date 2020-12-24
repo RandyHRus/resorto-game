@@ -93,15 +93,21 @@ public class RegionManager
         OnRegionRemovedEventManager.TryInvokeEventGroup(instance.regionInformation, new object[] { instance });
     }
 
-    public static RegionInstance GetRandomRegionInstanceOfType(RegionInformation type)
+    public static ArrayHashSet<RegionInstance> GetAllRegionInstancesOfType(RegionInformation type)
     {
         if (regionsInMap.TryGetValue(type, out ArrayHashSet<RegionInstance> set))
-        {
-            return (set.Count > 0) ? set.GetRandom() : null;
-        }
+            return set;
         else
-        {
             return null;
-        }
+    }
+
+    public static RegionInstance GetRandomRegionInstanceOfType(RegionInformation type)
+    {
+        ArrayHashSet<RegionInstance> set = GetAllRegionInstancesOfType(type);
+        return (set == null) ? 
+            null : 
+            (set.Count > 0) ? 
+                set.GetRandom() : 
+                null;
     }
 }

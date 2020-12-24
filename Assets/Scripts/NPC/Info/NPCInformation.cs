@@ -30,6 +30,7 @@ public abstract class NPCInformation
         obj.tag = "NPC";
 
         NPCMonoBehaviour mono = obj.GetComponent<NPCMonoBehaviour>();
+
         mono.Initialize(this);
 
         return mono;
@@ -37,5 +38,5 @@ public abstract class NPCInformation
 
     protected abstract GameObject ObjectToInitialize { get; }
 
-    public abstract NPCSchedule CreateSchedule(NPCInstance instance);
+    //public abstract NPCSchedule CreateSchedule(NPCInstance instance);
 }

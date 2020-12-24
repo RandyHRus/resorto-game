@@ -5,13 +5,10 @@ using System;
 
 public abstract class NPCMonoBehaviour : MonoBehaviour
 {
-    [SerializeField] private NPCState defaultState = null;
-    [SerializeField] private NPCState[] states = null;
-
-    public NPCSchedule Schedule { get; private set; }
-
-    public NPCStateMachine stateMachine;
+    protected NPCStateMachine stateMachine;
     public NPCState CurrentState => stateMachine.CurrentState;
+
+    public NPCScheduleManager ScheduleManager { get; private set; }
 
     public NPCInformation NpcInformation { get; private set; }
     public Transform ObjectTransform { get; private set; }
@@ -23,32 +20,32 @@ public abstract class NPCMonoBehaviour : MonoBehaviour
 
     public abstract NPCInstance CreateNPCInstance(NPCInformation npcInfo, Transform npcTransform);
 
+    public abstract NPCScheduleManager CreateNPCScheduleManager(NPCSchedule[] schedules, NPCInstance instance);
+
+    public abstract Type DefaultStateType { get; }
+
     public virtual void Initialize(NPCInformation npcInfo)
     {
         this.NpcInformation = npcInfo;
 
         NpcInstance = CreateNPCInstance(npcInfo, transform);
-        Schedule = npcInfo.CreateSchedule(NpcInstance);
 
-        NPCState[] stateInstancesCopy = new NPCState[states.Length];
-        for (int i = 0; i < states.Length; i++)
-        {
-            NPCState copy = Instantiate(states[i]);
-            copy.Initialize(gameObject, NpcInstance);
-            stateInstancesCopy[i] = copy;
-        }
+        stateMachine = new NPCStateMachine(NpcInstance, DefaultStateType, CreateNPCStates(NpcInstance));
+        stateMachine.OnStateChanged += OnStateChangedHandler;
 
-        stateMachine = new NPCStateMachine(NpcInstance, Schedule, defaultState.GetType(), stateInstancesCopy);
-        stateMachine.OnStateChanged += InvokeStateChanged; 
+        NpcInstance.OnNPCDelete += OnDelete;
+
+        ScheduleManager = CreateNPCScheduleManager(CreateNPCSchedules(NpcInstance), NpcInstance);
 
         NPCClickOn c = gameObject.GetComponent<NPCClickOn>();
         c.OnClick += FollowNPC; 
 
-        stateMachine.SwitchState(defaultState.GetType());
-
         ObjectTransform = transform;
 
-        stateMachine.GetStateInstance<NPCLeaveAndDeleteState>().OnNPCDeleting += OnDelete;
+        ScheduleManager.SwitchState(ScheduleManager.OnEndStateGetNextState(out object[] args), args);
+        stateMachine.SwitchState(DefaultStateType);
+
+        NpcInstance.ChangeNPCStateEvent += OnSignalChangeNPCStateDelegateHandler;
     }
 
     public abstract Dialogue GetDialogue();
@@ -68,10 +65,15 @@ public abstract class NPCMonoBehaviour : MonoBehaviour
         stateMachine.RunLateExecute();
     }
 
-    private void InvokeStateChanged(NPCState previousState, NPCState newState)
+    private void OnStateChangedHandler(NPCState previousState, NPCState newState)
     {
         OnStateChanged?.Invoke(previousState, newState);
         NpcInstance.InvokeOnNPCStateChanged(previousState, newState);
+    }
+
+    private void OnSignalChangeNPCStateDelegateHandler(Type schedule, object[] args)
+    {
+        stateMachine.SwitchState(schedule, args);
     }
 
     public void SwitchState<T>(object[] args = null) where T : NPCState => stateMachine.SwitchState<T>(args);
@@ -80,32 +82,52 @@ public abstract class NPCMonoBehaviour : MonoBehaviour
 
     public T GetStateInstance<T>() where T : NPCState => stateMachine.GetStateInstance<T>();
 
+    //Override to add npc specific schedules (such as tourist specific or worker specific)
+    public virtual NPCSchedule[] CreateNPCSchedules(NPCInstance npcInstance)
+    {
+        return new NPCSchedule[]
+        {
+            new NPCLeavingSchedule(npcInstance),
+            new NPCActivitiesSchedule(npcInstance),
+            new NPCGoingToSleepSchedule(npcInstance),
+            new NPCSleepSchedule(npcInstance)
+        };
+    }
+
+    //Override to add npc specific states (such as tourist specific or worker specific)
+    public virtual NPCState[] CreateNPCStates(NPCInstance npcInstance)
+    {
+        return new NPCState[]
+        {
+            new NPCWalkToPositionState(npcInstance),
+            new NPCFishingState(npcInstance),
+            new NPCSleepingState(npcInstance),
+        };
+    }
+
     public virtual void OnDelete()
     {
         Destroy(gameObject);
-        stateMachine.OnStateChanged -= InvokeStateChanged;
+        stateMachine.OnStateChanged -= OnStateChangedHandler;
 
         NPCClickOn c = gameObject.GetComponent<NPCClickOn>();
         c.OnClick -= FollowNPC;
 
-        stateMachine.GetStateInstance<NPCLeaveAndDeleteState>().OnNPCDeleting -= OnDelete;
-
-        NpcInstance.InvokeOnDelete();
+        NpcInstance.ChangeNPCStateEvent -= OnSignalChangeNPCStateDelegateHandler;
     }
 }
 
-public class NPCStateMachine : StateMachine<NPCState>
+public class NPCStateMachine : StateMachineWithDefaultState<NPCState>
 {
     public delegate void ActivityCompleted(Activity activity, float completenessFrac);
     public event ActivityCompleted OnActivityCompleted;
 
-    private NPCSchedule schedule;
     private NPCInstance npcInstance;
 
-    public NPCStateMachine(NPCInstance npcInstance, NPCSchedule schedule, Type defaultStateType, NPCState[] stateInstances) : base(defaultStateType, stateInstances)
+    public NPCStateMachine(NPCInstance npcInstance, Type defaultStateType, NPCState[] stateInstances) : base(defaultStateType, stateInstances)
     {
         this.npcInstance = npcInstance;
-        this.schedule = schedule;
+
         OnStateChanged += SubscribeEvents;  
         npcInstance.OnNPCDelete += OnDelete;
     }
@@ -114,26 +136,12 @@ public class NPCStateMachine : StateMachine<NPCState>
     {
         if (previousState != null)
         {
-            previousState.StartActivity -= GoToActivityLocationAndStartActivity;
-
             if (previousState is NPCActivityState previousActivityState)
                 previousActivityState.OnActivityCompleted -= InvokeActivityCompleted;
         }
 
-        currentState.StartActivity += GoToActivityLocationAndStartActivity;
-
         if (currentState is NPCActivityState currentActivityState)
             currentActivityState.OnActivityCompleted += InvokeActivityCompleted;
-    }
-
-    private void GoToActivityLocationAndStartActivity(Activity activity)
-    {
-        bool canGoToLocation = activity.GetActivityLocationAndStateToSwitchTo(out Vector2Int? location, out Type switchToState, out object[] switchToStateArgs, out string goingToLocationMessage);
-
-        if (!canGoToLocation)
-            return;
-
-        SwitchState<NPCWalkToPositionState>(new object[] { location, switchToState, switchToStateArgs, goingToLocationMessage });
     }
 
     private void InvokeActivityCompleted(Activity activity, float completenessFrac)
@@ -145,5 +153,8 @@ public class NPCStateMachine : StateMachine<NPCState>
     {
         OnStateChanged -= SubscribeEvents;
         npcInstance.OnNPCDelete -= OnDelete;
+
+        if (CurrentState is NPCActivityState currentActivityState)
+            currentActivityState.OnActivityCompleted -= InvokeActivityCompleted;
     }
 }
