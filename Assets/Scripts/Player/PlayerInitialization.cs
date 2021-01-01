@@ -23,6 +23,11 @@ public class PlayerInitialization : MonoBehaviour
         IslandGenerationPipeline.IslandCompleted += SetInitialLocation;
     }
 
+    private void OnDestroy()
+    {
+        IslandGenerationPipeline.IslandCompleted -= SetInitialLocation;
+    }
+
     private void Start()
     {
         //Load character

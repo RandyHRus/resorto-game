@@ -41,6 +41,8 @@ TagManager:
   - Button
   - Button 2
   - List Field 2
+  - Pivot
+  - Date Field
   layers:
   - Default
   - TransparentFX
@@ -122,4 +124,7 @@ TagManager:
     locked: 0
   - name: Above UI
     uniqueID: 3303314261
+    locked: 0
+  - name: Loading
+    uniqueID: 2647109359
     locked: 0

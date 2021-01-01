@@ -10,8 +10,6 @@ public class CreateBuildingsState : PlayerState
     private BuildingStructureVariant buildingVariant;
     private IBuildingCustomization buildingCustomization = null;
 
-    private TilesIndicatorManager indicatorManager;
-
     public override bool AllowMovement => false;
     public override bool AllowMouseDirectionChange => false;
     public override CameraMode CameraMode => CameraMode.Drag;
@@ -19,21 +17,21 @@ public class CreateBuildingsState : PlayerState
     public override void Execute()
     {
         Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
-        bool buildingPlaceable = BuildingsManager.BuildingPlaceable(mouseTilePosition, buildingVariant, out HashSet<Vector2Int> tilesToOccupy);
+        bool buildingPlaceable = BuildingsManager.Instance.BuildingPlaceable(mouseTilePosition, buildingVariant, out HashSet<Vector2Int> tilesToOccupy);
 
         //Indicator things TODO: CHANGE
         {
-            indicatorManager.SwapCurrentTiles(tilesToOccupy);
+            TilesIndicatorManager.Instance.SwapCurrentTiles(tilesToOccupy);
             foreach (Vector2Int pos in tilesToOccupy)
             {
-                indicatorManager.SetColor(pos, buildingPlaceable ? ResourceManager.Instance.Green : ResourceManager.Instance.Red);
-                indicatorManager.SetSprite(pos, indicatorSprite);
+                TilesIndicatorManager.Instance.SetColor(pos, buildingPlaceable ? ResourceManager.Instance.Green : ResourceManager.Instance.Red);
+                TilesIndicatorManager.Instance.SetSprite(pos, indicatorSprite);
             }
         }
 
         if (buildingPlaceable && CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
         {
-            if (BuildingsManager.TryCreateBuilding(mouseTilePosition, buildingVariant, buildingCustomization))
+            if (BuildingsManager.Instance.TryCreateBuilding(mouseTilePosition, buildingVariant, buildingCustomization))
             {
                 //Todo: remove resources from inventory. etc
             }
@@ -43,13 +41,12 @@ public class CreateBuildingsState : PlayerState
 
     public override void StartState(object[] args)
     {
-        indicatorManager = new TilesIndicatorManager();
         buildingVariant = (BuildingStructureVariant)args[0];
         buildingCustomization = (IBuildingCustomization)args[1];
     }
 
     public override void EndState()
     {
-        indicatorManager.ClearCurrentTiles();
+        TilesIndicatorManager.Instance.ClearCurrentTiles();
     }
 }

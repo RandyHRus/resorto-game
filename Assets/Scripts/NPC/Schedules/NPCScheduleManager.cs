@@ -5,11 +5,11 @@ using System;
 
 public abstract class NPCScheduleManager: StateMachine<NPCSchedule>
 {
-    protected NPCInstance npcInstance;
+    protected NPCComponents npcComponents;
 
-    public NPCScheduleManager(NPCSchedule[] schedules, NPCInstance npcInstance) : base(schedules)
+    public NPCScheduleManager(NPCSchedule[] schedules, NPCComponents npcComponents) : base(schedules)
     {
-        this.npcInstance = npcInstance;
+        this.npcComponents = npcComponents;
     }
 
     public sealed override void RunExecute()

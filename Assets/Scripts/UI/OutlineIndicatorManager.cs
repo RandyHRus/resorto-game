@@ -2,7 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class OutlineIndicatorManager {
+public class OutlineIndicatorManager : MonoBehaviour
+{
+    private OutlineIndicator outlineIndicator;
+
+    private static OutlineIndicatorManager _instance;
+    public static OutlineIndicatorManager Instance { get { return _instance; } }
+    private void Awake()
+    {
+        //Singleton
+        {
+            if (_instance != null && _instance != this)
+            {
+                Destroy(this.gameObject);
+            }
+            else
+            {
+                _instance = this;
+            }
+        }
+    }
+
+    private void Start()
+    {
+        outlineIndicator = new OutlineIndicator();
+    }
 
     private class OutlineIndicator {
 
@@ -21,14 +45,6 @@ public class OutlineIndicatorManager {
         public Transform Transform { get; private set; }
         public SpriteRenderer Renderer { get; private set; }
         public GameObject Object { get; private set; }
-    }
-
-    private static OutlineIndicator outlineIndicator;
-
-    //Initializer
-    static OutlineIndicatorManager()
-    {
-        outlineIndicator = new OutlineIndicator();
     }
 
     public void SetSizeAndPosition(Vector2Int bottomLeft, Vector2Int topRight)

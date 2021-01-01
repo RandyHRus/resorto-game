@@ -75,7 +75,7 @@ public class FlooringGroup: IRemovable
                 FlooringGroup group = neighbourTileInfo.NormalFlooringGroup;
 
                 //TODO change
-                group.NormalFloorings[n].Renderer.sprite = FlooringManager.GetSprite(group.FlooringVariant, toBeRemoved, false, n, group.Rotation);
+                group.NormalFloorings[n].Renderer.sprite = FlooringManager.Instance.GetSprite(group.FlooringVariant, toBeRemoved, false, n, group.Rotation);
             }
         }
 

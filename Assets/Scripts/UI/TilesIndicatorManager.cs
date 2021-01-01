@@ -2,15 +2,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TilesIndicatorManager
+public class TilesIndicatorManager: MonoBehaviour
 {
-    private static TileIndicator[,] tileIndicators;
-    private static Vector2Int defaultPos = new Vector2Int(-1, -1);
-    private HashSet<Vector2Int> currentTileIndicatorPositions;
+    private TileIndicator[,] tileIndicators;
+    private Vector2Int defaultPos = new Vector2Int(-1, -1);
+    private HashSet<Vector2Int> currentTileIndicatorPositions = new HashSet<Vector2Int>();
 
-    public TilesIndicatorManager()
+    private static TilesIndicatorManager _instance;
+    public static TilesIndicatorManager Instance { get { return _instance; } }
+    private void Awake()
     {
-        currentTileIndicatorPositions = new HashSet<Vector2Int>();
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
+
+        tileIndicators = new TileIndicator[TileInformationManager.mapSize, TileInformationManager.mapSize];
+
+        for (int i = 0; i < TileInformationManager.mapSize; i++)
+        {
+            for (int j = 0; j < TileInformationManager.mapSize; j++)
+            {
+                tileIndicators[i, j] = new TileIndicator(new Vector2Int(i, j));
+            }
+        }
     }
 
     private class TileIndicator
@@ -45,19 +64,6 @@ public class TilesIndicatorManager
         public GameObject Object { get; private set; }
     }
 
-    //Initializer
-    static TilesIndicatorManager()
-    {
-        tileIndicators = new TileIndicator[TileInformationManager.mapSize, TileInformationManager.mapSize];
-
-        for (int i = 0; i < TileInformationManager.mapSize; i++)
-        {
-            for (int j = 0; j < TileInformationManager.mapSize; j++)
-            {
-                tileIndicators[i, j] = new TileIndicator(new Vector2Int(i, j));
-            }
-        }
-    }
 
     public void SetColor(Vector2Int pos, Color32 color)
     {

@@ -25,12 +25,42 @@ public class IslandStatisticsManager: MonoBehaviour
         {
             statistics[(StatisticInstance)i] = new Statistic(statisticsToCreateToName[i]);
         }
+    }
 
-        TouristsManager.OnTouristAdded += (TouristMonoBehaviour touristMono) => GetStatistic(StatisticInstance.NumberOfTourists).Set(TouristsManager.Instance.touristsCount);
-        TouristsManager.OnTouristRemoved += (TouristMonoBehaviour touristMono) => GetStatistic(StatisticInstance.NumberOfTourists).Set(TouristsManager.Instance.touristsCount);
+    private void Start()
+    {
+        TouristsManager.Instance.OnTouristAdded += OnTouristAddedHandler;
+        TouristsManager.Instance.OnTouristRemoved += OnTouristRemovedHandler;
+        HotelsManager.Instance.OnValidRoomsCountChanged += OnValidRoomCountChangedHandler;
+        HotelsManager.Instance.OnAvailableRoomsCountChanged += OnAvailableRoomsCountChangedHandler;
+    }
 
-        HotelsManager.OnValidRoomsCountChanged += (int newCount) => GetStatistic(StatisticInstance.NumberOfValidRooms).Set(newCount);
-        HotelsManager.OnAvailableRoomsCountChanged += (int newCount) => GetStatistic(StatisticInstance.NumberOfAvailableRooms).Set(newCount);
+    private void OnDestroy()
+    {
+        TouristsManager.Instance.OnTouristAdded -= OnTouristAddedHandler;
+        TouristsManager.Instance.OnTouristRemoved -= OnTouristRemovedHandler;
+        HotelsManager.Instance.OnValidRoomsCountChanged -= OnValidRoomCountChangedHandler;
+        HotelsManager.Instance.OnAvailableRoomsCountChanged -= OnAvailableRoomsCountChangedHandler;
+    }
+
+    private void OnTouristAddedHandler(TouristMonoBehaviour touristMono)
+    {
+        GetStatistic(StatisticInstance.NumberOfTourists).Set(TouristsManager.Instance.touristsCount);
+    }
+
+    private void OnTouristRemovedHandler(TouristMonoBehaviour touristMono)
+    {
+        GetStatistic(StatisticInstance.NumberOfTourists).Set(TouristsManager.Instance.touristsCount);
+    }
+
+    private void OnValidRoomCountChangedHandler(int newCount)
+    {
+        GetStatistic(StatisticInstance.NumberOfValidRooms).Set(newCount);
+    }
+
+    private void OnAvailableRoomsCountChangedHandler(int newCount)
+    {
+        GetStatistic(StatisticInstance.NumberOfAvailableRooms).Set(newCount);
     }
 
     public Statistic GetStatistic(StatisticInstance type)

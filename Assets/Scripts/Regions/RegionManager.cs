@@ -2,18 +2,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RegionManager
+public class RegionManager: MonoBehaviour
 {
-    private static Dictionary<RegionInformation, ArrayHashSet<RegionInstance>> regionsInMap = new Dictionary<RegionInformation, ArrayHashSet<RegionInstance>>();
+    private Dictionary<RegionInformation, ArrayHashSet<RegionInstance>> regionsInMap = new Dictionary<RegionInformation, ArrayHashSet<RegionInstance>>();
 
     public delegate void RegionDelegate(RegionInstance instance);
-    public static event RegionDelegate OnRegionCreated;
-    public static event RegionDelegate OnRegionRemoved;
+    public event RegionDelegate OnRegionCreated;
+    public event RegionDelegate OnRegionRemoved;
 
-    public static CustomEventManager<RegionInformation> OnRegionCreatedEventManager { get; private set; } = new CustomEventManager<RegionInformation>();
-    public static CustomEventManager<RegionInformation> OnRegionRemovedEventManager { get; private set; } = new CustomEventManager<RegionInformation>();
+    public CustomEventManager<RegionInformation> OnRegionCreatedEventManager { get; private set; } = new CustomEventManager<RegionInformation>();
+    public CustomEventManager<RegionInformation> OnRegionRemovedEventManager { get; private set; } = new CustomEventManager<RegionInformation>();
 
-    public static bool RegionPlaceable(RegionInformation info, Vector2Int position)
+    private static RegionManager _instance;
+    public static RegionManager Instance { get { return _instance; } }
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
+    }
+
+    public bool RegionPlaceable(RegionInformation info, Vector2Int position)
     {
         if (!TileInformationManager.Instance.TryGetTileInformation(position, out TileInformation tileInfo))
             return false;
@@ -24,7 +38,7 @@ public class RegionManager
         return true;
     }
 
-    public static bool TryCreateRegion(RegionInformation info, HashSet<Vector2Int> positions)
+    public bool TryCreateRegion(RegionInformation info, HashSet<Vector2Int> positions)
     {
         foreach (Vector2Int pos in positions) {
             if (!RegionPlaceable(info, pos))
@@ -49,7 +63,7 @@ public class RegionManager
                 if (TileInformationManager.Instance.TryGetTileInformation(neighbour, out TileInformation nTileInfo) && nTileInfo.Region?.regionInformation == info)
                 {
                     //Add neighbouring region to new instance and remove old instance
-                    HashSet<Vector2Int> oldInstancePositions = nTileInfo.Region.GetRegionPositions();
+                    List<Vector2Int> oldInstancePositions = nTileInfo.Region.GetRegionPositions();
                     newInstance.AddPositions(oldInstancePositions);
                     allInstancePositions.UnionWith(oldInstancePositions);
                     RemoveRegion(nTileInfo.Region);
@@ -83,7 +97,7 @@ public class RegionManager
         return true;
     }
 
-    public static void RemoveRegion(RegionInstance instance)
+    public void RemoveRegion(RegionInstance instance)
     {
         regionsInMap[instance.regionInformation].Remove(instance);
 
@@ -93,7 +107,7 @@ public class RegionManager
         OnRegionRemovedEventManager.TryInvokeEventGroup(instance.regionInformation, new object[] { instance });
     }
 
-    public static ArrayHashSet<RegionInstance> GetAllRegionInstancesOfType(RegionInformation type)
+    public ArrayHashSet<RegionInstance> GetAllRegionInstancesOfType(RegionInformation type)
     {
         if (regionsInMap.TryGetValue(type, out ArrayHashSet<RegionInstance> set))
             return set;
@@ -101,7 +115,7 @@ public class RegionManager
             return null;
     }
 
-    public static RegionInstance GetRandomRegionInstanceOfType(RegionInformation type)
+    public RegionInstance GetRandomRegionInstanceOfType(RegionInformation type)
     {
         ArrayHashSet<RegionInstance> set = GetAllRegionInstancesOfType(type);
         return (set == null) ? 

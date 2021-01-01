@@ -10,11 +10,11 @@ public abstract class NPCSchedule : IStateMachineState
 
     public abstract bool AllowTransitionToGoingToSleep { get; }
 
-    protected NPCInstance npcInstance;
+    protected NPCComponents npcComponents;
 
-    public NPCSchedule(NPCInstance npcInstance)
+    public NPCSchedule(NPCComponents npcComponents)
     {
-        this.npcInstance = npcInstance;
+        this.npcComponents = npcComponents;
     }
 
     public virtual void StartState(object[] args)

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TouristInstance: NPCInstance
+public class TouristComponents: NPCComponents
 {
     public TouristInformation TouristInformation => (TouristInformation)npcInformation;
     public readonly TouristDialogue dialogue;
@@ -10,10 +10,10 @@ public class TouristInstance: NPCInstance
     public readonly TouristHappiness happiness;
     public HotelRoomRegionInstance AssignedRoom { get; private set; }
     public Vector2Int? AssignedBedPosition { get; private set; }
-
+    
     private HashSet<Activity> interestedActivities;
 
-    public TouristInstance(TouristInformation info, Transform touristTransform, TouristDialogue dialogue, TouristInterest[] interests, TouristHappiness happiness): base(info, touristTransform)
+    public TouristComponents(TouristInformation info, Transform touristTransform, TouristDialogue dialogue, TouristInterest[] interests, TouristHappiness happiness): base(info, touristTransform)
     {
         this.dialogue = dialogue;
         this.interests = interests;
@@ -29,10 +29,21 @@ public class TouristInstance: NPCInstance
             }
         }
 
-        HotelsManager.OnAvailableRoomsCountChanged += OnAvailableRoomsCountChangedHandler;
-        OnNPCDelete += OnNPCDeleteHandler;
+        HotelsManager.Instance.OnAvailableRoomsCountChanged += OnAvailableRoomsCountChangedHandler;
+        SubscribeToEvent(NPCInstanceEvent.Delete, OnNPCDeleteHandler);
 
         TryAssignRandomRoom();
+    }
+
+    private void OnNPCDeleteHandler(object[] args)
+    {
+        UnsubscribeToEvent(NPCInstanceEvent.Delete, OnNPCDeleteHandler);
+        HotelsManager.Instance.OnAvailableRoomsCountChanged -= OnAvailableRoomsCountChangedHandler;
+
+        if (AssignedRoom != null)
+        {
+            UnAssignRoom();
+        }
     }
 
     private void OnAvailableRoomsCountChangedHandler(int count)
@@ -79,17 +90,6 @@ public class TouristInstance: NPCInstance
     private void OnAssignedRoomRemovedHandler()
     {
         UnAssignRoom();
-    }
-
-    private void OnNPCDeleteHandler()
-    {
-        OnNPCDelete -= OnNPCDeleteHandler;
-        HotelsManager.OnAvailableRoomsCountChanged -= OnAvailableRoomsCountChangedHandler;
-
-        if (AssignedRoom != null)
-        {
-            UnAssignRoom();
-        }
     }
 
     public bool IsInterestedInActivity(Activity activity)

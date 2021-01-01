@@ -7,7 +7,7 @@ public class TouristIdleState : NPCIdleState
     private readonly float timeBetweenTryStartScheduleAction = 5f;
     private float nextTryStartScheduleActionTimer = 0;
 
-    public TouristIdleState(NPCInstance npcInstance): base(npcInstance)
+    public TouristIdleState(NPCComponents npcComponents): base(npcComponents)
     {
 
     }
@@ -28,7 +28,7 @@ public class TouristIdleState : NPCIdleState
             nextTryStartScheduleActionTimer = timeBetweenTryStartScheduleAction;
 
             //If still in idle state, it means action wasn't successfully started so keep trying
-            npcInstance.InvokeTryStartScheduleAction();
+            npcComponents.InvokeEvent(NPCInstanceEvent.TryStartScheduleAction, null);
             return;
         }
     }

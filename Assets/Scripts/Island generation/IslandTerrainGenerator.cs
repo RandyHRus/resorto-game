@@ -99,11 +99,6 @@ public class IslandTerrainGenerator : MonoBehaviour
         }
     }
 
-    public void ClearAllTerrain()
-    {
-        TerrainManager.Instance.ClearAllTerrain();
-    }
-
     private float[,] GenerateMapData()
     {
         float[,] noiseMap = GenerateNoiseMap();

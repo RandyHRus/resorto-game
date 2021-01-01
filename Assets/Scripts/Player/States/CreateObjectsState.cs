@@ -11,7 +11,6 @@ public class CreateObjectsState : PlayerState
     private BuildRotation objectRotation;
 
     private ObjectInformation selectedObject;
-    private TilesIndicatorManager indicatorManager;
 
     public override bool AllowMovement => false;
     public override bool AllowMouseDirectionChange => false;
@@ -22,13 +21,11 @@ public class CreateObjectsState : PlayerState
         objectRotation = BuildRotation.Front;
 
         selectedObject = (ObjectInformation)args[0];
-
-        indicatorManager = new TilesIndicatorManager();
     }
 
     public override void EndState()
     {
-        indicatorManager.ClearCurrentTiles();
+        TilesIndicatorManager.Instance.ClearCurrentTiles();
     }
 
     public override void Execute()
@@ -52,31 +49,31 @@ public class CreateObjectsState : PlayerState
                     break;
                 }
             }
-            indicatorManager.ClearCurrentTiles();
+            TilesIndicatorManager.Instance.ClearCurrentTiles();
         }
 
         Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
-        bool objectIsPlaceable = TileObjectsManager.ObjectPlaceable(mouseTilePosition, selectedObject, out ObjectType modifiedType, out float yOffset, objectRotation);
+        bool objectIsPlaceable = TileObjectsManager.Instance.ObjectPlaceable(mouseTilePosition, selectedObject, out ObjectType modifiedType, out float yOffset, objectRotation);
 
         //Indicator things
         {
             Sprite proposedSprite = (selectedObject.HasSprite) ? selectedObject.GetSpriteInformation(objectRotation).Sprite : defaultIndicatorSprite;
 
-            if (indicatorManager.SwapCurrentTiles(mouseTilePosition))
+            if (TilesIndicatorManager.Instance.SwapCurrentTiles(mouseTilePosition))
             {
-                indicatorManager.Offset(mouseTilePosition, new Vector2(0, yOffset));
-                indicatorManager.SetSprite(mouseTilePosition, proposedSprite);
-                indicatorManager.SetColor(mouseTilePosition, objectIsPlaceable ? ResourceManager.Instance.Green : ResourceManager.Instance.Red);
+                TilesIndicatorManager.Instance.Offset(mouseTilePosition, new Vector2(0, yOffset));
+                TilesIndicatorManager.Instance.SetSprite(mouseTilePosition, proposedSprite);
+                TilesIndicatorManager.Instance.SetColor(mouseTilePosition, objectIsPlaceable ? ResourceManager.Instance.Green : ResourceManager.Instance.Red);
             }
         }
 
         //Create object
         if (objectIsPlaceable && CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
         {
-            if (TileObjectsManager.TryCreateObject(selectedObject, mouseTilePosition, out BuildOnTile buildOnTile, objectRotation))
+            if (TileObjectsManager.Instance.TryCreateObject(selectedObject, mouseTilePosition, out BuildOnTile buildOnTile, objectRotation))
             {
                 InventoryManager.Instance.SelectedSlot.RemoveItem(1);  //TODO make listener of an event (Event can be OnObjectCreated or something)
-                indicatorManager.ClearCurrentTiles();
+                TilesIndicatorManager.Instance.ClearCurrentTiles();
             }
         }
     }

@@ -11,8 +11,6 @@ public class CreateFlooringState : PlayerState
     private bool coroutineRunning = false;
     private Coroutine floorCoroutine;
 
-    private TilesIndicatorManager indicatorManager;
-
     public override bool AllowMovement => false;
     public override bool AllowMouseDirectionChange => false;
     public override CameraMode CameraMode => CameraMode.Drag;
@@ -31,20 +29,20 @@ public class CreateFlooringState : PlayerState
         }
 
         Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
-        bool floorPlaceable = FlooringManager.FlooringPlaceable(flooringVariant, mouseTilePosition);
+        bool floorPlaceable = FlooringManager.Instance.FlooringPlaceable(flooringVariant, mouseTilePosition);
 
         //Indicator things
         {
             Sprite proposedSprite = flooringVariant.IndicatorSprites[(int)rotation];
-            indicatorManager.SwapCurrentTiles(mouseTilePosition);
-            indicatorManager.SetSprite(mouseTilePosition, proposedSprite);
-            indicatorManager.SetColor(mouseTilePosition, floorPlaceable ? ResourceManager.Instance.Green : ResourceManager.Instance.Red);
+            TilesIndicatorManager.Instance.SwapCurrentTiles(mouseTilePosition);
+            TilesIndicatorManager.Instance.SetSprite(mouseTilePosition, proposedSprite);
+            TilesIndicatorManager.Instance.SetColor(mouseTilePosition, floorPlaceable ? ResourceManager.Instance.Green : ResourceManager.Instance.Red);
         }
 
         //CreateFloor
         if (floorPlaceable && CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
         {
-            indicatorManager.ClearCurrentTiles();
+            TilesIndicatorManager.Instance.ClearCurrentTiles();
             floorCoroutine = Coroutines.Instance.StartCoroutine(PlaceFloor());
         }
     }
@@ -53,7 +51,7 @@ public class CreateFlooringState : PlayerState
     {
         coroutineRunning = true;
         Vector2Int previousTilePosition = new Vector2Int(-1, -1);
-        indicatorManager = new TilesIndicatorManager(); //We need to refresh the previous tiles
+        TilesIndicatorManager.Instance.ClearCurrentTiles();
 
         Vector2Int startPos = TileInformationManager.Instance.GetMouseTile();
         int[,] floorPlaceableCache = new int[TileInformationManager.mapSize, TileInformationManager.mapSize]; // 0 not visited, -1 not placeable, 1 placeable
@@ -92,7 +90,7 @@ public class CreateFlooringState : PlayerState
                     int tilePlaceable = floorPlaceableCache[i, j];
                     if (tilePlaceable != 0)
                     {
-                        tilePlaceable = (FlooringManager.FlooringPlaceable(flooringVariant, new Vector2Int(i, j))) ? 1 : 0;
+                        tilePlaceable = (FlooringManager.Instance.FlooringPlaceable(flooringVariant, new Vector2Int(i, j))) ? 1 : 0;
                         floorPlaceableCache[i, j] = tilePlaceable;
                     }
 
@@ -106,22 +104,22 @@ public class CreateFlooringState : PlayerState
             }
 
             //Show new indicators
-            indicatorManager.SwapCurrentTiles(currentPositions);
+            TilesIndicatorManager.Instance.SwapCurrentTiles(currentPositions);
             
             foreach (Vector2Int pos in currentPositions)
             {
-                indicatorManager.SetSprite(pos, FlooringManager.GetSprite(flooringVariant, currentPositions, true, pos, rotation));
-                indicatorManager.SetColor(pos, ResourceManager.Instance.Green);
+                TilesIndicatorManager.Instance.SetSprite(pos, FlooringManager.Instance.GetSprite(flooringVariant, currentPositions, true, pos, rotation));
+                TilesIndicatorManager.Instance.SetColor(pos, ResourceManager.Instance.Green);
             }
 
             yield return 0;
         }
         coroutineRunning = false;
-        indicatorManager.ClearCurrentTiles();
+        TilesIndicatorManager.Instance.ClearCurrentTiles();
 
         if (placeable)
         {       
-            if (FlooringManager.TryPlaceFlooring(flooringVariant, currentPositions, rotation))
+            if (FlooringManager.Instance.TryPlaceFlooring(flooringVariant, currentPositions, rotation))
             {
                 //TODO Remove money or something
             }
@@ -137,13 +135,11 @@ public class CreateFlooringState : PlayerState
             Debug.LogError("No flooring selected! This should not happen!");
 
         coroutineRunning = false;
-
-        indicatorManager = new TilesIndicatorManager();
     }
 
     public override void EndState()
     {
-        indicatorManager.ClearCurrentTiles();
+        TilesIndicatorManager.Instance.ClearCurrentTiles();
 
         if (coroutineRunning)
         {

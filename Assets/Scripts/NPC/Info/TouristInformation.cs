@@ -21,6 +21,4 @@ public class TouristInformation : NPCInformation
 
         return new TouristInformation(randomPersonality, randomName, randomCustomization);
     }
-
-    protected override GameObject ObjectToInitialize => ResourceManager.Instance.TouristNpc;
 }

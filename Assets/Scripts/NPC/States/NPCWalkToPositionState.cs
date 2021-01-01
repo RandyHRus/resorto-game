@@ -25,7 +25,7 @@ public class NPCWalkToPositionState : NPCState
     private string displayMessage;
     public override string DisplayMessage => displayMessage;
 
-    public NPCWalkToPositionState(NPCInstance npcInstance): base(npcInstance)
+    public NPCWalkToPositionState(NPCComponents npcComponents): base(npcComponents)
     {
         animator = npcGameObject.GetComponent<Animator>();
     }
@@ -48,12 +48,12 @@ public class NPCWalkToPositionState : NPCState
 
         if (distanceToNextPositionTravelled < distanceToNextPosition)
         {
-            distanceToNextPositionTravelled += Time.deltaTime * npcInstance.moveSpeed;
+            distanceToNextPositionTravelled += Time.deltaTime * npcComponents.moveSpeed;
             if (distanceToNextPositionTravelled >= distanceToNextPosition)
                 distanceToNextPositionTravelled = distanceToNextPosition;
 
             Vector2 proposedPos = Vector2.Lerp(currentStartPos, currentTarget.Value.Item1, distanceToNextPositionTravelled / distanceToNextPosition);
-            npcInstance.npcTransform.position = new Vector3(proposedPos.x, proposedPos.y, 
+            npcComponents.npcTransform.position = new Vector3(proposedPos.x, proposedPos.y, 
                 isOnStairs ? DynamicZDepth.GetDynamicZDepth((Vector2Int)stairsPosition, DynamicZDepth.CHARACTER_ON_STAIRS) :
                              DynamicZDepth.GetDynamicZDepth(proposedPos, DynamicZDepth.NPC_OFFSET));
         }
@@ -68,13 +68,12 @@ public class NPCWalkToPositionState : NPCState
     {
         if (currentTarget != null && currentTarget.Next == null)
         {
-            onFinishAction?.Invoke();
-            goalReached = true;
+            EndWalk();
             return;
         }
 
-        currentStartPos = npcInstance.npcTransform.position;
-        currentTarget = currentTarget == null ? currentPath.First : currentTarget.Next;
+        currentStartPos = npcComponents.npcTransform.position;
+        currentTarget = (currentTarget == null) ? currentPath.First : currentTarget.Next;
 
         distanceToNextPositionTravelled = 0;
         distanceToNextPosition = Vector2.Distance(currentStartPos, currentTarget.Value.Item1);
@@ -83,7 +82,14 @@ public class NPCWalkToPositionState : NPCState
         stairsPosition = currentTarget.Value.Item2;
 
 
-        npcInstance.npcDirection.SetDirectionOnMove(currentTarget.Value.Item1 - currentStartPos);
+        npcComponents.npcDirection.SetDirectionOnMove(currentTarget.Value.Item1 - currentStartPos);
+    }
+
+    private void EndWalk()
+    {
+        onFinishAction?.Invoke();
+        goalReached = true;
+        InvokeEndState();
     }
 
     public override void EndState()
@@ -93,17 +99,19 @@ public class NPCWalkToPositionState : NPCState
 
     private void RecalculatePath()
     {
-        Vector3 currentPos = npcInstance.npcTransform.position;
+        Vector3 currentPos = npcComponents.npcTransform.position;
         Vector2Int currentPosRounded = new Vector2Int(Mathf.RoundToInt(currentPos.x), Mathf.RoundToInt(currentPos.y));
         LinkedList<Tuple<Vector2Int, Vector2Int?>> proposedPath = AStar.GetShortestPath(currentPosRounded, goal);
 
-        if (proposedPath != null)
+        if (proposedPath == null)
         {
-            currentPath = proposedPath;
-
-            currentTarget = null;
-            OnPathChanged?.Invoke(currentPath);
+            EndWalk();
+            return;
         }
+
+        currentPath = proposedPath;
+        currentTarget = null;
+        OnPathChanged?.Invoke(currentPath);
 
         goalReached = false;
         GetNextGoal();

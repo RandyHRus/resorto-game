@@ -2,9 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BuildingsManager
+public class BuildingsManager: MonoBehaviour
 {
-    public static bool BuildingPlaceable(Vector2Int pos, BuildingStructureVariant variant, out HashSet<Vector2Int> tilesToOccupy)
+    private static BuildingsManager _instance;
+    public static BuildingsManager Instance { get { return _instance; } }
+    private void Awake()
+    {
+        //Singleton
+        {
+            if (_instance != null && _instance != this)
+            {
+                Destroy(this.gameObject);
+            }
+            else
+            {
+                _instance = this;
+            }
+        }
+    }
+
+
+    public bool BuildingPlaceable(Vector2Int pos, BuildingStructureVariant variant, out HashSet<Vector2Int> tilesToOccupy)
     {
         tilesToOccupy = new HashSet<Vector2Int>();
 
@@ -32,7 +50,7 @@ public class BuildingsManager
         return true;
     }
 
-    public static bool TryCreateBuilding(Vector2Int pos, BuildingStructureVariant variant, IBuildingCustomization customization)
+    public bool TryCreateBuilding(Vector2Int pos, BuildingStructureVariant variant, IBuildingCustomization customization)
     {
         if (!BuildingPlaceable(pos, variant, out HashSet<Vector2Int> tilesToOccupy))
             return false;

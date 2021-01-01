@@ -223,21 +223,6 @@ public class TileInformation
                 (ObjectTypeToObject[ObjectType.Ground] != null && ObjectTypeToObject[ObjectType.Ground].BuildInfo.Collision));
     }
 
-    public void RemoveAllBuilds()
-    {
-        while (TopMostBuild != null)
-        {
-            TopMostBuild.Remove(false);
-        }
-    }
-
-    public void ResetTerrainInformation()
-    {
-        waterBGTracker = new int[4];
-        tileLocation = TileLocation.Unknown;
-        layerNum = 0;
-    }
-
     private void RefreshTopMostObject()
     {
         TopMostBuild = ObjectTypeToObject[ObjectType.OnTop] ?? ObjectTypeToObject[ObjectType.Standard] ?? ObjectTypeToObject[ObjectType.Ground] ?? null;
@@ -267,8 +252,8 @@ public class TileInformation
 
             shownRightClickListUI.Destroy();
             shownRightClickListUI = null;
-            UIManager.OnAllUIClosed -= DestroyUI;
-            PlayerMovement.PlayerMoved -= DestroyUIOnMove;
+            UIManager.Instance.OnAllUIClosed -= DestroyUI;
+            PlayerMovement.Instance.PlayerMoved -= DestroyUIOnMove;
         }
 
         void DestroyUIOnMove(Vector2 position, bool show, Vector2 directionVector)
@@ -301,8 +286,8 @@ public class TileInformation
             return;
 
         shownRightClickListUI = new ComponentsListPanel<RightClickOptionUI>(ResourceManager.Instance.IndicatorsCanvas.transform, position + new Vector2Int(3,0), 100f, false);
-        UIManager.OnAllUIClosed += DestroyUI;
-        PlayerMovement.PlayerMoved += DestroyUIOnMove;
+        UIManager.Instance.OnAllUIClosed += DestroyUI;
+        PlayerMovement.Instance.PlayerMoved += DestroyUIOnMove;
         shownRightClickListUI.OnSelected += DestroyUIOnSelected;
 
         foreach (RightClickOptionUI o in options)

@@ -7,7 +7,7 @@ public class NPCGoingToSleepSchedule : NPCSchedule
 {
     public override bool AllowTransitionToGoingToSleep => false;
 
-    public NPCGoingToSleepSchedule(NPCInstance npcInstance) : base(npcInstance) { }
+    public NPCGoingToSleepSchedule(NPCComponents npcComponents) : base(npcComponents) { }
 
     private InGameTime nextWakeTime;
 
@@ -30,7 +30,7 @@ public class NPCGoingToSleepSchedule : NPCSchedule
     public override void TryStartScheduleAction()
     {
         //Calculate accessLocation again
-        Vector2Int? bedAccessLocation = ((TouristInstance)npcInstance).GetRandomBedAccessLocation();
+        Vector2Int? bedAccessLocation = ((TouristComponents)npcComponents).GetRandomBedAccessLocation();
         TryStartScheduleAction(bedAccessLocation);
     }
 
@@ -45,7 +45,8 @@ public class NPCGoingToSleepSchedule : NPCSchedule
 
         Debug.Log("Going to bed");
         Action callBack = OnNPCReachedBedHandler;
-        npcInstance.InvokeChangeNPCState<NPCWalkToPositionState>(new object[] { (Vector2Int)bedAccessLocation, callBack, "Going to bed" });
+        npcComponents.InvokeEvent(NPCInstanceEvent.ChangeState, new object[] { typeof(NPCWalkToPositionState),
+                    new object[] { (Vector2Int)bedAccessLocation, callBack, "Going to bed" }});
     }
 
     private void OnNPCReachedBedHandler()

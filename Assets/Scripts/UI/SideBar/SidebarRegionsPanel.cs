@@ -13,12 +13,6 @@ public class SidebarRegionsPanel : SidebarPanel
 
     private Dictionary<RegionInstance, ManageRegionSelection> instanceToManageComponent = new Dictionary<RegionInstance, ManageRegionSelection>();
 
-    protected override void Awake()
-    {
-        base.Awake();
-        RegionManager.OnRegionCreated += OnRegionCreatedHandler;
-        RegionManager.OnRegionRemoved += OnRegionRemovedHandler;
-    }
 
     void Start()
     {
@@ -41,10 +35,20 @@ public class SidebarRegionsPanel : SidebarPanel
             createRegionsPanel.InsertListComponent(new CreateRegionSelection(i, createRegionsPanel));
         }
 
+        RegionManager.Instance.OnRegionCreated += OnRegionCreatedHandler;
+        RegionManager.Instance.OnRegionRemoved += OnRegionRemovedHandler;
         OnPanelOpen += OnPanelOpenHandler;
         OnPanelClosed += OnPanelClosedHandler;
 
         ShowTab(0);
+    }
+
+    private void OnDestroy()
+    {
+        RegionManager.Instance.OnRegionCreated -= OnRegionCreatedHandler;
+        RegionManager.Instance.OnRegionRemoved -= OnRegionRemovedHandler;
+        OnPanelOpen -= OnPanelOpenHandler;
+        OnPanelClosed -= OnPanelClosedHandler;
     }
 
     void OnPanelOpenHandler()

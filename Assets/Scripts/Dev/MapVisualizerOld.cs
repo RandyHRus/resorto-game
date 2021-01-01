@@ -21,6 +21,7 @@ public class MapVisualizerOld : MonoBehaviour
 
     private void Update()
     {
+        /*
         if (Input.GetButtonDown("Dev"))
         {
             //Cycle through visualizations
@@ -69,6 +70,7 @@ public class MapVisualizerOld : MonoBehaviour
             if (proposedVisualization != null)
                 ShowVisualization(proposedVisualization);
         }
+        */
     }
 
     private void ShowVisualization(Color32[,] colorMap)

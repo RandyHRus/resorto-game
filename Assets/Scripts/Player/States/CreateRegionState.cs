@@ -12,8 +12,6 @@ public class CreateRegionState : PlayerState
     private bool coroutineRunning = false;
     private Coroutine currentCoroutine;
 
-    private OutlineIndicatorManager indicatorManager;
-
     public override bool AllowMovement => false;
     public override bool AllowMouseDirectionChange => false;
     public override CameraMode CameraMode => CameraMode.Drag;
@@ -28,8 +26,7 @@ public class CreateRegionState : PlayerState
         selectedRegion = (RegionInformation)args[0];
         regionVisualizer.ShowVisualizer();
 
-        indicatorManager = new OutlineIndicatorManager();
-        indicatorManager.Toggle(true);
+        OutlineIndicatorManager.Instance.Toggle(true);
     }
 
     public override void EndState()
@@ -40,7 +37,7 @@ public class CreateRegionState : PlayerState
             coroutineRunning = false;
         }
 
-        indicatorManager.Toggle(false);
+        OutlineIndicatorManager.Instance.Toggle(false);
         regionVisualizer.HideVisualizer();
     }
 
@@ -52,19 +49,19 @@ public class CreateRegionState : PlayerState
         Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
         TileInformationManager.Instance.TryGetTileInformation(mouseTilePosition, out TileInformation mouseTile);
 
-        bool regionPlaceable = RegionManager.RegionPlaceable(selectedRegion, mouseTilePosition);
+        bool regionPlaceable = RegionManager.Instance.RegionPlaceable(selectedRegion, mouseTilePosition);
         bool regionRemoveable = (mouseTile != null && mouseTile.Region != null);
 
         //Indicator things
         {
-            indicatorManager.SetSizeAndPosition((Vector2Int)mouseTilePosition, (Vector2Int)mouseTilePosition);
+            OutlineIndicatorManager.Instance.SetSizeAndPosition((Vector2Int)mouseTilePosition, (Vector2Int)mouseTilePosition);
 
             if (regionPlaceable)
-                indicatorManager.SetColor(selectedRegion.ShowColor);
+                OutlineIndicatorManager.Instance.SetColor(selectedRegion.ShowColor);
             else if (regionRemoveable) //Region is removeable
-                indicatorManager.SetColor(ResourceManager.Instance.Yellow);
+                OutlineIndicatorManager.Instance.SetColor(ResourceManager.Instance.Yellow);
             else
-                indicatorManager.SetColor(ResourceManager.Instance.Red);
+                OutlineIndicatorManager.Instance.SetColor(ResourceManager.Instance.Red);
         }
 
         if (regionPlaceable && CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
@@ -116,7 +113,7 @@ public class CreateRegionState : PlayerState
                     int tilePlaceable = regionPlaceableCache[i, j];
                     if (tilePlaceable == 0)
                     {
-                        tilePlaceable = (RegionManager.RegionPlaceable(info, pos)) ? 1 : 0;
+                        tilePlaceable = (RegionManager.Instance.RegionPlaceable(info, pos)) ? 1 : 0;
                         regionPlaceableCache[i, j] = tilePlaceable;
                     }
 
@@ -129,8 +126,8 @@ public class CreateRegionState : PlayerState
                 }
             }
 
-            indicatorManager.SetSizeAndPosition(new Vector2Int(minX, minY), new Vector2Int(maxX, maxY));
-            indicatorManager.SetColor(selectedRegion.ShowColor);
+            OutlineIndicatorManager.Instance.SetSizeAndPosition(new Vector2Int(minX, minY), new Vector2Int(maxX, maxY));
+            OutlineIndicatorManager.Instance.SetColor(selectedRegion.ShowColor);
 
             yield return 0;
         }
@@ -139,7 +136,10 @@ public class CreateRegionState : PlayerState
 
         if (placeable)
         {
-            RegionManager.TryCreateRegion(info, currentPositions);
+            if (RegionManager.Instance.TryCreateRegion(info, currentPositions))
+            {
+                regionVisualizer.ShowVisualizer(); //Refreshes
+            }
         }
     }
 

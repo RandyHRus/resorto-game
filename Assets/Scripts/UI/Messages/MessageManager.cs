@@ -53,15 +53,35 @@ public class MessageManager : MonoBehaviour
         }
         messageBoxes = new Queue<MessageBox>();
 
-        InventoryManager.OnItemGained += (InventoryItemInstance item, int count) => { item.ShowMessage(count); };
-
         currentSideBarXPos = messagesXPosWhenSidebarClosed;
+    }
 
-        Sidebar.OnSidebarOpened += MoveOutMessages;
-        Sidebar.OnSidebarClosed += MoveInMessages;
+    private void Start()
+    {
+        InventoryManager.Instance.OnItemGained += (InventoryItemInstance item, int count) => { item.ShowMessage(count); };
+        Sidebar.Instance.OnSidebarOpened += MoveOutMessages;
+        Sidebar.Instance.OnSidebarClosed += MoveInMessages;
+        TouristsManager.Instance.OnTouristAdded += OnTouristAddedHandler;
+        TouristsManager.Instance.OnTouristRemoved += OnTouristRemovedHandler;
+    }
 
-        TouristsManager.OnTouristAdded += (TouristMonoBehaviour mono) => { new TouristArrivedMessage(mono.TouristInstance); };
-        TouristsManager.OnTouristRemoved += (TouristMonoBehaviour mono) => { new TouristLeftMessage(mono.TouristInstance); };
+    private void OnDestroy()
+    {
+        InventoryManager.Instance.OnItemGained -= (InventoryItemInstance item, int count) => { item.ShowMessage(count); };
+        Sidebar.Instance.OnSidebarOpened -= MoveOutMessages;
+        Sidebar.Instance.OnSidebarClosed -= MoveInMessages;
+        TouristsManager.Instance.OnTouristAdded -= OnTouristAddedHandler;
+        TouristsManager.Instance.OnTouristRemoved -= OnTouristRemovedHandler;
+    }
+
+    private void OnTouristAddedHandler(TouristMonoBehaviour mono)
+    {
+        new TouristArrivedMessage(mono.TouristComponents);
+    }
+
+    private void OnTouristRemovedHandler(TouristMonoBehaviour mono)
+    {
+        new TouristLeftMessage(mono.TouristComponents);
     }
 
     public void ShowMessage(MessageBox newMessageBox)

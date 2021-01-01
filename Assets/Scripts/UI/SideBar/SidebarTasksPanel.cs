@@ -28,15 +28,21 @@ public class SidebarTasksPanel : SidebarPanel
             }
         }
 
-        TasksManager.Instance.OnTaskAdded += ShowTaskActive;
-        TasksManager.Instance.OnTaskCompleted += ShowTaskCompleted;
-
         for (int i = 0; i < 10; i++)
         {
             TasksManager.Instance.AddTask(new TaskInstance(testTask));
         }
 
+        TasksManager.Instance.OnTaskAdded += ShowTaskActive;
+        TasksManager.Instance.OnTaskCompleted += ShowTaskCompleted;
+
         ShowTab(0);
+    }
+
+    private void OnDestroy()
+    {
+        TasksManager.Instance.OnTaskAdded -= ShowTaskActive;
+        TasksManager.Instance.OnTaskCompleted -= ShowTaskCompleted;
     }
 
     public void ShowTab(int tabIndex)

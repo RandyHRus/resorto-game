@@ -11,7 +11,7 @@ public class FishingRegionInstance : RegionInstance
     {      
     }
 
-    public override void AddPositions(HashSet<Vector2Int> positions)
+    public override void AddPositions(IEnumerable<Vector2Int> positions)
     {
         base.AddPositions(positions);
 

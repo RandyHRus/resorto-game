@@ -7,7 +7,7 @@ public class LoadingScene : MonoBehaviour
 {
     IEnumerator Start()
     {
-        yield return new WaitForSeconds(2.0f);
+        yield return new WaitForSeconds(0.3f);
         SceneManager.LoadSceneAsync("Main");
     }
 }

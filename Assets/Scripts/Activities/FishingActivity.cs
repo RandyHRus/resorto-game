@@ -15,7 +15,7 @@ public class FishingActivity : Activity
         switchToStateArgs = null;
         goingToLocationMessage = "";
 
-        FishingRegionInstance targetRegion = (FishingRegionInstance)RegionManager.GetRandomRegionInstanceOfType(fishingRegionInformation);
+        FishingRegionInstance targetRegion = (FishingRegionInstance)RegionManager.Instance.GetRandomRegionInstanceOfType(fishingRegionInformation);
 
         if (targetRegion == null)
         {

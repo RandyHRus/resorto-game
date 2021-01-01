@@ -10,22 +10,35 @@ public class TouristHappinessChangeDisplay
 
     private Vector3 startingOffset = new Vector3(0, 2);
 
-    private readonly TouristInstance touristInstance;
+    private readonly TouristComponents touristComponents;
 
     private Queue<OutlinedText> displayPool;
 
-    public TouristHappinessChangeDisplay(TouristInstance touristInstance)
+    public TouristHappinessChangeDisplay(TouristComponents touristComponents)
     {
-        this.touristInstance = touristInstance;
+        this.touristComponents = touristComponents;
 
-        touristInstance.happiness.OnHappinessChanged += OnHappinessChangedHandler;
-        touristInstance.OnNPCDelete += OnDelete;
+        touristComponents.happiness.OnHappinessChanged += OnHappinessChangedHandler;
+        touristComponents.SubscribeToEvent(NPCInstanceEvent.Delete, OnDeleteHandler);
 
         displayPool = new Queue<OutlinedText>();
         for (int i = 0; i < initialPoolCount; i++)
         {
             displayPool.Enqueue(CreateNewOutlinedText());
         }
+    }
+
+    private void OnDeleteHandler(object[] args)
+    {
+        touristComponents.happiness.OnHappinessChanged -= OnHappinessChangedHandler;
+        touristComponents.UnsubscribeToEvent(NPCInstanceEvent.Delete, OnDeleteHandler);
+
+        while (displayPool.Count > 0)
+        {
+            OutlinedText text = displayPool.Dequeue();
+            text.Destroy();
+        }
+        displayPool = null;
     }
 
     private void OnHappinessChangedHandler(TouristHappinessFactor changeFactor, int newHappinessValue, TouristHappinessEnum newHappinessEnum)
@@ -40,7 +53,7 @@ public class TouristHappinessChangeDisplay
 
         textToShow.SetColor(changeFactor.value > 0 ? ResourceManager.Instance.Green : ResourceManager.Instance.Red);
         textToShow.SetText(changeFactor.value > 0 ? "+" + changeFactor.value : changeFactor.value.ToString());
-        textToShow.ObjectTransform.position = touristInstance.npcTransform.position + startingOffset;
+        textToShow.ObjectTransform.position = touristComponents.npcTransform.position + startingOffset;
 
         Coroutines.Instance.StartCoroutine(FloatUpAndFadeDisplay(textToShow));
     }
@@ -60,7 +73,7 @@ public class TouristHappinessChangeDisplay
 
             //Change position
             currentYOffset += (floatUpSpeed * Time.deltaTime);
-            outlinedText.ObjectTransform.position = touristInstance.npcTransform.position + startingOffset + new Vector3(0, currentYOffset);
+            outlinedText.ObjectTransform.position = touristComponents.npcTransform.position + startingOffset + new Vector3(0, currentYOffset);
 
             yield return 0;
         }
@@ -72,19 +85,6 @@ public class TouristHappinessChangeDisplay
             outlinedText.Destroy(); 
         else
             displayPool.Enqueue(outlinedText);
-    }
-
-    private void OnDelete()
-    {
-        touristInstance.happiness.OnHappinessChanged -= OnHappinessChangedHandler;
-        touristInstance.OnNPCDelete -= OnDelete;
-
-        while (displayPool.Count > 0)
-        {
-            OutlinedText text = displayPool.Dequeue();
-            text.Destroy();
-        }
-        displayPool = null;
     }
 
     private OutlinedText CreateNewOutlinedText()

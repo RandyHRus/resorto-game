@@ -2,17 +2,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraDrag
+public class CameraDrag: MonoBehaviour
 {
-    private static Vector3 dragOrigin;
+    private Vector3 dragOrigin;
 
-    private static readonly Transform cameraTransform;
+    private Transform cameraTransform;
 
-    static CameraDrag() {
+    private static CameraDrag _instance;
+    public static CameraDrag Instance { get { return _instance; } }
+    private void Awake()
+    {
+        //Singleton
+        {
+            if (_instance != null && _instance != this)
+            {
+                Destroy(this.gameObject);
+            }
+            else
+            {
+                _instance = this;
+            }
+        }
+
         cameraTransform = Camera.main.transform;
     }
 
-    public static void ExecuteLateUpdate()
+    public void ExecuteLateUpdate()
     {
         if (CheckMouseOverUI.GetButtonDownAndNotOnUI("Secondary"))
         {

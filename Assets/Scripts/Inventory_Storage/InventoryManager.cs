@@ -62,10 +62,10 @@ public class InventoryManager : MonoBehaviour
     };
 
     public delegate void ItemGained(InventoryItemInstance item, int count);
-    public static event ItemGained OnItemGained;
+    public event ItemGained OnItemGained;
 
     public delegate void InventoryClosed();
-    public static event InventoryClosed OnInventoryClosed;
+    public event InventoryClosed OnInventoryClosed;
 
     private static InventoryManager _instance;
     public static InventoryManager Instance { get { return _instance; } }
@@ -82,8 +82,16 @@ public class InventoryManager : MonoBehaviour
                 _instance = this;
             }
         }
+    }
 
-        Sidebar.OnSidebarOpened += ShowInventory;
+    private void OnEnable()
+    {
+        Sidebar.Instance.OnSidebarOpened += ShowInventory;
+    }
+
+    private void OnDisable()
+    {
+        Sidebar.Instance.OnSidebarOpened -= ShowInventory;
     }
 
     private void Start()
@@ -124,7 +132,6 @@ public class InventoryManager : MonoBehaviour
             ItemSlotUI hatSlotUI = new ItemSlotUI(hatSlot, inventoryCanvas, purpleSlot);
             hatSlotUI.RectTransform.anchoredPosition = new Vector2(slotStartX + (slotPadding * 0), slotStartY - (inventorySize_v * slotPadding));
             uiToClose.Add(Tuple.Create((InventorySlotUI)hatSlotUI, true));
-            hatSlot.ItemChanged += () => customizationLoader.LoadHatInstance((HatItemInstance)hatSlot.Item);
 
             hatSlot.SetSlot(PlayerCustomization.Character.Hat);
 
@@ -132,7 +139,6 @@ public class InventoryManager : MonoBehaviour
             ItemSlotUI shirtSlotUI = new ItemSlotUI(shirtSlot, inventoryCanvas, greenSlot);
             shirtSlotUI.RectTransform.anchoredPosition = new Vector2(slotStartX +(slotPadding * 1), slotStartY - (inventorySize_v * slotPadding));
             uiToClose.Add(Tuple.Create((InventorySlotUI)shirtSlotUI, true));
-            shirtSlot.ItemChanged += () => customizationLoader.LoadShirtInstance((ShirtItemInstance)shirtSlot.Item);
 
             shirtSlot.SetSlot(PlayerCustomization.Character.Shirt);
 
@@ -140,7 +146,10 @@ public class InventoryManager : MonoBehaviour
             ItemSlotUI pantsSlotUI = new ItemSlotUI(pantsSlot, inventoryCanvas, greenSlot);
             pantsSlotUI.RectTransform.anchoredPosition = new Vector2(slotStartX + (slotPadding * 2), slotStartY - (inventorySize_v * slotPadding));
             uiToClose.Add(Tuple.Create((InventorySlotUI)pantsSlotUI, true));
-            pantsSlot.ItemChanged += () => customizationLoader.LoadPantsInstance((PantsItemInstance)pantsSlot.Item); ;
+
+            hatSlot.ItemChanged += OnHatSlotChangedHandler;
+            shirtSlot.ItemChanged += OnShirtSlotChangedHandler;
+            pantsSlot.ItemChanged += OnPantsSlotChangedHandler;
 
             pantsSlot.SetSlot(PlayerCustomization.Character.Pants);
 
@@ -170,6 +179,33 @@ public class InventoryManager : MonoBehaviour
 
         TryHideInventory();
         GainStartItems();
+    }
+
+    private void OnHatSlotChangedHandler()
+    {
+        customizationLoader.LoadHatInstance((HatItemInstance)hatSlot.Item);
+    }
+
+    private void OnShirtSlotChangedHandler()
+    {
+        customizationLoader.LoadShirtInstance((ShirtItemInstance)shirtSlot.Item);
+    }
+
+    private void OnPantsSlotChangedHandler()
+    {
+        customizationLoader.LoadPantsInstance((PantsItemInstance)pantsSlot.Item);
+    }
+
+    private void OnDestroy()
+    {
+        hatSlot.ItemChanged -= OnHatSlotChangedHandler;
+        shirtSlot.ItemChanged -= OnShirtSlotChangedHandler;
+        pantsSlot.ItemChanged -= OnPantsSlotChangedHandler;
+
+        if (selectedSlotIndex != -1)
+        {
+            ((StorageItemInventorySlot)inventorySlotToUI[SelectedSlot].Slot).ItemChanged -= OnSelectedItemChanged;
+        }
     }
 
     private void Update()

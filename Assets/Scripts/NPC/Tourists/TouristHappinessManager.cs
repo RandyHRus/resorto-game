@@ -4,29 +4,29 @@ using UnityEngine;
 
 public class TouristHappinessManager
 {
-    private TouristInstance touristInstance;
+    private TouristComponents touristComponents;
     private NPCStateMachine touristStateMachine;
 
-    public TouristHappinessManager(TouristInstance touristInstance, NPCStateMachine touristStateMachine)
+    public TouristHappinessManager(TouristComponents touristComponents, NPCStateMachine touristStateMachine)
     {
-        this.touristInstance = touristInstance;
+        this.touristComponents = touristComponents;
         this.touristStateMachine = touristStateMachine;
 
         touristStateMachine.OnActivityCompleted += OnActivityCompletedHandler;
-        touristInstance.OnNPCDelete += OnDelete;
+        touristComponents.SubscribeToEvent(NPCInstanceEvent.Delete, OnDeleteHandler);
     }
 
     public void OnActivityCompletedHandler(Activity activity, float completenessFrac)
     {
-        if (touristInstance.IsInterestedInActivity(activity))
-            touristInstance.happiness.ChangeHappiness(TouristHappinessFactor.CompleteInterestActivity, completenessFrac);
+        if (touristComponents.IsInterestedInActivity(activity))
+            touristComponents.happiness.ChangeHappiness(TouristHappinessFactor.CompleteInterestActivity, completenessFrac);
         else
-            touristInstance.happiness.ChangeHappiness(TouristHappinessFactor.CompleteNonInterestActivity, completenessFrac);
+            touristComponents.happiness.ChangeHappiness(TouristHappinessFactor.CompleteNonInterestActivity, completenessFrac);
     }
 
-    private void OnDelete()
+    private void OnDeleteHandler(object[] args)
     {
-        touristInstance.OnNPCDelete -= OnDelete;
+        touristComponents.UnsubscribeToEvent(NPCInstanceEvent.Delete, OnDeleteHandler);
         touristStateMachine.OnActivityCompleted -= OnActivityCompletedHandler;
     }
 }

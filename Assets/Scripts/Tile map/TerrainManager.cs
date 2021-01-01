@@ -801,27 +801,4 @@ public class TerrainManager : MonoBehaviour
         tileInfo.InvokeTerrainModified();
         return true;
     }
-
-    public void ClearAllTerrain()
-    {
-        sandTilemap.ClearAllTiles();
-        waterBGTilemap.ClearAllTiles();
-
-        foreach (Tilemap t in tilemapLayers_)
-        {
-            Destroy(t.gameObject);
-        }
-        tilemapLayers_.Clear();
-
-        int mapSize = TileInformationManager.mapSize;
-
-        for (int i = 0; i < mapSize; i++)
-        {
-            for (int j = 0; j < mapSize; j++)
-            {
-                TileInformationManager.Instance.TryGetTileInformation(new Vector2Int(i, j), out TileInformation t);
-                t.ResetTerrainInformation();
-            }
-        }
-    }
 }

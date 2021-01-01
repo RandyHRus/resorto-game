@@ -52,20 +52,6 @@ public class IslandObjectsGenerator : MonoBehaviour
         GenerateTrees();
         GenerateDriftwood();
     }
-
-    public void RemoveAllBuilds()
-    {
-        int mapSize = TileInformationManager.mapSize;
-
-        for (int i = 0; i < mapSize; i++)
-        {
-            for (int j = 0; j < mapSize; j++)
-            {
-                TileInformationManager.Instance.TryGetTileInformation(new Vector2Int(i, j), out TileInformation tileInfo);
-                tileInfo.RemoveAllBuilds();
-            }
-        }
-    }
     /*
     private void GenerateGrass()
     {
@@ -123,7 +109,7 @@ public class IslandObjectsGenerator : MonoBehaviour
             if (tileInfo.tileLocation != TileLocation.Grass)
                 continue;
 
-            TileObjectsManager.TryCreateObject(bushObjectInfo, proposedPos, out BuildOnTile buildOnTile);
+            TileObjectsManager.Instance.TryCreateObject(bushObjectInfo, proposedPos, out BuildOnTile buildOnTile);
         }
     }
 
@@ -147,7 +133,7 @@ public class IslandObjectsGenerator : MonoBehaviour
             if (tileInfo.tileLocation != TileLocation.Sand)
                 continue;
 
-            TileObjectsManager.TryCreateObject(seashellObjectInfo, proposedPos, out BuildOnTile buildOnTile);
+            TileObjectsManager.Instance.TryCreateObject(seashellObjectInfo, proposedPos, out BuildOnTile buildOnTile);
         }
     }
 
@@ -171,7 +157,7 @@ public class IslandObjectsGenerator : MonoBehaviour
             if (tileInfo.tileLocation != TileLocation.Sand)
                 continue;
 
-            TileObjectsManager.TryCreateObject(palmTreeObjectInfo, proposedPos, out BuildOnTile buildOnTile);
+            TileObjectsManager.Instance.TryCreateObject(palmTreeObjectInfo, proposedPos, out BuildOnTile buildOnTile);
         }
     }
 
@@ -191,7 +177,7 @@ public class IslandObjectsGenerator : MonoBehaviour
             int randomY = Random.Range(0, mapSize);
             Vector2Int proposedPos = new Vector2Int(randomX, randomY);
 
-            if (!TileObjectsManager.ObjectPlaceable(proposedPos, driftwoodObjectInfo, out ObjectType modifiedType, out float yOffset))
+            if (!TileObjectsManager.Instance.ObjectPlaceable(proposedPos, driftwoodObjectInfo, out ObjectType modifiedType, out float yOffset))
                 continue;
 
             bool placeable = true;
@@ -209,7 +195,7 @@ public class IslandObjectsGenerator : MonoBehaviour
             if (!placeable)
                 continue;
 
-            TileObjectsManager.TryCreateObject(driftwoodObjectInfo, proposedPos, out BuildOnTile buildOnTile);
+            TileObjectsManager.Instance.TryCreateObject(driftwoodObjectInfo, proposedPos, out BuildOnTile buildOnTile);
         }
     }
 }

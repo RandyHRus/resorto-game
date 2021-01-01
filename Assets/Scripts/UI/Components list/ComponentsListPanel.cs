@@ -24,6 +24,8 @@ public class ComponentsListPanel<T> : ComponentsListPanel where T: ListComponent
     private ScrollRect scrollRect;
 
     private List<T> components;
+    public int ComponentsCount => components.Count;
+
     private float panelContentHeight = 0;
 
     private readonly float FIXED_PADDING = 3f;
@@ -68,8 +70,6 @@ public class ComponentsListPanel<T> : ComponentsListPanel where T: ListComponent
 
         components = new List<T>();
         panelContentHeight = FIXED_PADDING;
-
-        OnDestroy += OnDestroyHandler;
     }
 
     public virtual void InsertListComponent(T comp)
@@ -184,13 +184,12 @@ public class ComponentsListPanel<T> : ComponentsListPanel where T: ListComponent
         }
     }
 
-    private void OnDestroyHandler(UIObject sender)
+    public override void Destroy()
     {
+        base.Destroy();
+
         //To make sure everything is destroyed and unsubbed
         ClearComponents();
-
-        //Unsub
-        OnDestroy -= OnDestroyHandler;
     }
 
     public void ClearComponents()

@@ -31,6 +31,12 @@ public class SidebarTabSelectionUI : MonoBehaviour, IPointerEnterHandler, IPoint
         targetPanel.OnPanelOpen += SlideOut;
     }
 
+    private void OnDestroy()
+    {
+        targetPanel.OnPanelClosed -= SlideIn;
+        targetPanel.OnPanelOpen -= SlideOut;
+    }
+
     private void OnButtonClick()
     {
         Sidebar.Instance.OpenSidebar(targetPanelTab);

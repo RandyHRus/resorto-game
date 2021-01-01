@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TouristLeftMessage : MessageBox
 {
-    public TouristLeftMessage(TouristInstance tourist) : base(MessageManager.Instance.TouristLeftMessage)
+    public TouristLeftMessage(TouristComponents components) : base(MessageManager.Instance.TouristLeftMessage)
     {
         Transform t = ObjectInScene.transform;
         foreach (Transform tr in t)
@@ -12,7 +12,7 @@ public class TouristLeftMessage : MessageBox
             if (tr.tag == "Name Field")
             {
                 OutlinedText outlinedText = new OutlinedText(tr.gameObject);
-                outlinedText.SetText(tourist.TouristInformation.NpcName);
+                outlinedText.SetText(components.TouristInformation.NpcName);
             }
         }
     }

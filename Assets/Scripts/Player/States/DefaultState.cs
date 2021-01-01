@@ -84,7 +84,8 @@ public class DefaultState : PlayerState
 
                         if (Input.GetButtonDown("Interact"))
                         {
-                            SceneTransitions.TransitionScene("A");
+                            //TODO
+                            //SceneTransitions.TransitionScene("A");
                         }
 
                         break;

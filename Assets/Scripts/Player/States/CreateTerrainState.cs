@@ -11,15 +11,12 @@ public class CreateTerrainState : PlayerState
     private bool coroutineRunning = false;
     private Coroutine currentCoroutine;
 
-    private TilesIndicatorManager indicatorManager;
-
     public override bool AllowMovement => false;
     public override bool AllowMouseDirectionChange => false;
     public override CameraMode CameraMode => CameraMode.Drag;
 
     public override void StartState(object[] args)
     {
-        indicatorManager = new TilesIndicatorManager();
     }
 
     public override void EndState()
@@ -27,7 +24,7 @@ public class CreateTerrainState : PlayerState
         if (coroutineRunning)
             Coroutines.Instance.StopCoroutine(currentCoroutine);
 
-        indicatorManager.ClearCurrentTiles();
+        TilesIndicatorManager.Instance.ClearCurrentTiles();
     }
 
     public override void Execute()
@@ -37,16 +34,16 @@ public class CreateTerrainState : PlayerState
 
         Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
 
-        indicatorManager.SwapCurrentTiles(mouseTilePosition);
+        TilesIndicatorManager.Instance.SwapCurrentTiles(mouseTilePosition);
 
         if (TerrainManager.Instance.TerrainPlaceable(mouseTilePosition, out int layerNumber))
         {
-            indicatorManager.SetColor(mouseTilePosition, ResourceManager.Instance.Green);
+            TilesIndicatorManager.Instance.SetColor(mouseTilePosition, ResourceManager.Instance.Green);
 
             if (layerNumber == 0)
-                indicatorManager.SetSprite(mouseTilePosition, sandIndicatorSprite);
+                TilesIndicatorManager.Instance.SetSprite(mouseTilePosition, sandIndicatorSprite);
             else
-                indicatorManager.SetSprite(mouseTilePosition, landIndicatorSprite);
+                TilesIndicatorManager.Instance.SetSprite(mouseTilePosition, landIndicatorSprite);
 
             if (CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
             {
@@ -64,15 +61,15 @@ public class CreateTerrainState : PlayerState
         }
         else
         {
-            indicatorManager.SetSprite(mouseTilePosition, noneIndicatorSprite);
-            indicatorManager.SetColor(mouseTilePosition, ResourceManager.Instance.Red);
+            TilesIndicatorManager.Instance.SetSprite(mouseTilePosition, noneIndicatorSprite);
+            TilesIndicatorManager.Instance.SetColor(mouseTilePosition, ResourceManager.Instance.Red);
         }
     }
 
     IEnumerator PlaceSand()
     {
         coroutineRunning = true;
-        indicatorManager.ClearCurrentTiles();
+        TilesIndicatorManager.Instance.ClearCurrentTiles();
         Vector2Int previousTilePosition = new Vector2Int(-1, -1);
 
         while (Input.GetButton("Primary"))
@@ -96,7 +93,7 @@ public class CreateTerrainState : PlayerState
     IEnumerator PlaceLand(int layerNumber)
     {
         coroutineRunning = true;
-        indicatorManager.ClearCurrentTiles();
+        TilesIndicatorManager.Instance.ClearCurrentTiles();
         Vector2Int previousTilePosition = new Vector2Int(-1, -1);
 
         while (Input.GetButton("Primary"))

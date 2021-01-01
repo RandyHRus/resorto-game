@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FlooringManager
+public class FlooringManager: MonoBehaviour
 {
     /*
      * Flooring code
@@ -24,7 +24,21 @@ public class FlooringManager
 
     private static int MAX_SUPPORTS_SPACING = 4;
 
-    public static bool FlooringPlaceable(FlooringVariantBase flooringVariant, Vector2Int position)
+    private static FlooringManager _instance;
+    public static FlooringManager Instance { get { return _instance; } }
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
+    }
+
+    public bool FlooringPlaceable(FlooringVariantBase flooringVariant, Vector2Int position)
     {
         TileInformationManager.Instance.TryGetTileInformation(position, out TileInformation info);
         TileInformationManager.Instance.TryGetTileInformation(new Vector2Int(position.x, position.y -1), out TileInformation belowInfo);
@@ -52,7 +66,7 @@ public class FlooringManager
         return true;
     }
 
-    public static bool TryPlaceFlooring(FlooringVariantBase flooringVariant, HashSet<Vector2Int> positions, FlooringRotation rotation)
+    public bool TryPlaceFlooring(FlooringVariantBase flooringVariant, HashSet<Vector2Int> positions, FlooringRotation rotation)
     {
         foreach (Vector2Int position in positions)
         {
@@ -73,7 +87,7 @@ public class FlooringManager
         return true;
     }
 
-    private static void CreateDock(FlooringVariantBase flooringVariant, HashSet<Vector2Int> positions, FlooringRotation rotation)
+    private void CreateDock(FlooringVariantBase flooringVariant, HashSet<Vector2Int> positions, FlooringRotation rotation)
     {
         FindEdges(positions, out int minX, out int maxX, out int minY, out int maxY);
 
@@ -201,7 +215,7 @@ public class FlooringManager
         }
     }
 
-    private static void FindEdges(HashSet<Vector2Int> positions, out int minX, out int maxX, out int minY, out int maxY)
+    private void FindEdges(HashSet<Vector2Int> positions, out int minX, out int maxX, out int minY, out int maxY)
     {
         maxX = int.MinValue; maxY = int.MinValue; minX = int.MaxValue; minY = int.MaxValue;
 
@@ -221,7 +235,7 @@ public class FlooringManager
         }
     }
 
-    public static Sprite GetSprite(FlooringVariantBase flooringVariant, HashSet<Vector2Int> positionsToBeAddedOrRemoved, bool addingPositions, Vector2Int p, FlooringRotation r)
+    public Sprite GetSprite(FlooringVariantBase flooringVariant, HashSet<Vector2Int> positionsToBeAddedOrRemoved, bool addingPositions, Vector2Int p, FlooringRotation r)
     {
         int resultCode = (r == FlooringRotation.Horizontal) ? 0b00000 : 0b10000;
 
@@ -273,7 +287,7 @@ public class FlooringManager
         return flooringVariant.CodeToSprite[resultCode];
     }
 
-    private static bool PositionHasFlooringVariant(FlooringVariantBase flooringVariant, Vector2Int p, out FlooringNormalPartOnTile flooring)
+    private bool PositionHasFlooringVariant(FlooringVariantBase flooringVariant, Vector2Int p, out FlooringNormalPartOnTile flooring)
     {
         flooring = null;
         if (!TileInformationManager.Instance.TryGetTileInformation(p, out TileInformation info)) 

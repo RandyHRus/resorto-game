@@ -223,7 +223,7 @@ public class CharacterCustomizationLoader : MonoBehaviour
 
     public void SetHair(CharacterHair hair)
     {
-        renderers.HairFrontRenderer.Enable(hair != null && hair.FrontHair != null && animator.GetFloat("Vertical") < 0);
+        renderers.HairFrontRenderer.Enable(hair != null && hair.FrontHair != null && animator.GetFloat("Vertical") <= 0);
         renderers.HairBackRenderer.Enable(hair != null && hair.BackHair != null && animator.GetFloat("Vertical") > 0);
 
         renderers.HairFrontRenderer.SetSprite(hair?.FrontHair);
@@ -262,10 +262,10 @@ public class CharacterCustomizationLoader : MonoBehaviour
     public void SetHat(CharacterHatItemInformation hat)
     {
         renderers.HatFrontRenderer1.SetSprite(hat?.BaseSpritePair.SpriteFront);
-        renderers.HatFrontRenderer1.Enable(hat != null && hat.BaseSpritePair.SpriteFront != null && animator.GetFloat("Vertical") < 0);
+        renderers.HatFrontRenderer1.Enable(hat != null && hat.BaseSpritePair.SpriteFront != null && animator.GetFloat("Vertical") <= 0);
 
         renderers.HatFrontRenderer2.SetSprite(hat?.ColorableSpritePair.SpriteFront);
-        renderers.HatFrontRenderer2.Enable(hat != null  && hat.ColorableSpritePair.SpriteFront != null && animator.GetFloat("Vertical") < 0);
+        renderers.HatFrontRenderer2.Enable(hat != null  && hat.ColorableSpritePair.SpriteFront != null && animator.GetFloat("Vertical") <= 0);
 
         renderers.HatBackRenderer1.SetSprite(hat?.BaseSpritePair.SpriteBack);
         renderers.HatBackRenderer1.Enable(hat != null && hat.BaseSpritePair.SpriteBack != null && animator.GetFloat("Vertical") > 0);
@@ -307,13 +307,13 @@ public class CharacterCustomizationLoader : MonoBehaviour
     public void SetShirt(CharacterShirtItemInformation shirt)
     {
         renderers.ShirtFrontRenderer1.SetSprite(shirt?.BaseSpritePair.SpriteFront);
-        renderers.ShirtFrontRenderer1.Enable(shirt != null && shirt.BaseSpritePair.SpriteFront != null && animator.GetFloat("Vertical") < 0);
+        renderers.ShirtFrontRenderer1.Enable(shirt != null && shirt.BaseSpritePair.SpriteFront != null && animator.GetFloat("Vertical") <= 0);
+
+        renderers.ShirtFrontRenderer2.SetSprite(shirt?.ColorableSpritePair.SpriteFront);
+        renderers.ShirtFrontRenderer2.Enable(shirt != null && shirt.ColorableSpritePair.SpriteFront != null && animator.GetFloat("Vertical") <= 0);
 
         renderers.ShirtBackRenderer1.SetSprite(shirt?.BaseSpritePair.SpriteBack);
         renderers.ShirtBackRenderer1.Enable(shirt != null && shirt.BaseSpritePair.SpriteBack != null && animator.GetFloat("Vertical") > 0);
-
-        renderers.ShirtFrontRenderer2.SetSprite(shirt?.ColorableSpritePair.SpriteFront);
-        renderers.ShirtFrontRenderer2.Enable(shirt != null && shirt.ColorableSpritePair.SpriteFront != null && animator.GetFloat("Vertical") < 0);
 
         renderers.ShirtBackRenderer2.SetSprite(shirt?.ColorableSpritePair.SpriteBack);
         renderers.ShirtBackRenderer2.Enable(shirt != null && shirt.ColorableSpritePair.SpriteBack != null && animator.GetFloat("Vertical") > 0);

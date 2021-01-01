@@ -32,7 +32,16 @@ public class BoatManager : MonoBehaviour
 
         touristBoatInstance = Instantiate(touristBoat).GetComponent<TouristBoat>();
         touristBoatInstance.gameObject.SetActive(false);
-        touristBoatInstance.OnBoatDespawnPointReached += () => touristBoatInstance.gameObject.SetActive(false);
+    }
+
+    private void OnEnable()
+    {
+        touristBoatInstance.OnBoatDespawnPointReached += DespawnTouristBoat;
+    }
+
+    private void OnDisable()
+    {
+        touristBoatInstance.OnBoatDespawnPointReached -= DespawnTouristBoat;
     }
 
     private void Start()
@@ -40,9 +49,14 @@ public class BoatManager : MonoBehaviour
         TimeManager.Instance.SubscribeToTime(BoatSpawnTime, SpawnTouristBoat);
     }
 
-    void SpawnTouristBoat(object[] args)
+    private void SpawnTouristBoat(object[] args)
     {
         touristBoatInstance.gameObject.SetActive(true);
         touristBoatInstance.ResetBoat();
+    }
+
+    private void DespawnTouristBoat()
+    {
+        touristBoatInstance.gameObject.SetActive(false);
     }
 }

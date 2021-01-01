@@ -27,8 +27,28 @@ public class WildlifeManager : MonoBehaviour
             _instance = this;
         }
 
-        IslandGenerationPipeline.IslandCompleted += (Vector2Int startPos) => Initialize();
-        PlayerMovement.PlayerMoved += (Vector2 playerPosition, bool slow, Vector2 directionVector) => StartleNearbyAnimals(playerPosition, slow);
+        IslandGenerationPipeline.IslandCompleted += OnIslandCompletedHandler;
+    }
+
+    private void Start()
+    {
+        PlayerMovement.Instance.PlayerMoved += OnPlayerMovedHandler;
+    }
+
+    private void OnDestroy()
+    {
+        IslandGenerationPipeline.IslandCompleted -= OnIslandCompletedHandler;
+        PlayerMovement.Instance.PlayerMoved -= OnPlayerMovedHandler;
+    }
+
+    private void OnIslandCompletedHandler(Vector2Int startPos)
+    {
+        Initialize();
+    }
+
+    private void OnPlayerMovedHandler(Vector2 playerPosition, bool slow, Vector2 directionVector)
+    {
+        StartleNearbyAnimals(playerPosition, slow);
     }
 
     private void Initialize()

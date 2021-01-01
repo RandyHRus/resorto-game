@@ -21,18 +21,17 @@ public class TimeManager : MonoBehaviour
     private const int nightStart = 20;
 
     public delegate void OnTurnedTimeOfDayDelegate();
-    public static event OnTurnedTimeOfDayDelegate OnTurnedMorning;
-    public static event OnTurnedTimeOfDayDelegate OnTurnedMidDay;
-    public static event OnTurnedTimeOfDayDelegate OnTurnedEvening;
-    public static event OnTurnedTimeOfDayDelegate OnTurnedNight;
-
-    private static TimeManager _instance;
-    public static TimeManager Instance { get { return _instance; } }
+    public event OnTurnedTimeOfDayDelegate OnTurnedMorning;
+    public event OnTurnedTimeOfDayDelegate OnTurnedMidDay;
+    public event OnTurnedTimeOfDayDelegate OnTurnedEvening;
+    public event OnTurnedTimeOfDayDelegate OnTurnedNight;
 
     private CustomEventManager<InGameTime> onTurnedTimeEventManager = new CustomEventManager<InGameTime>();
 
     private InGameTime previousTime = default;
 
+    private static TimeManager _instance;
+    public static TimeManager Instance { get { return _instance; } }
     private void Awake()
     {
         //Singleton

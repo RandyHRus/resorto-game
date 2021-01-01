@@ -15,10 +15,10 @@ public class LightingManager : MonoBehaviour
 
     private void Start()
     {
-        TimeManager.OnTurnedMorning += () => StartChangeLight(new Color32(187, 227, 255, 255), 0.8f,  20);
-        TimeManager.OnTurnedMidDay  += () => StartChangeLight(new Color32(255, 255, 255, 255), 1f,    20);
-        TimeManager.OnTurnedEvening += () => StartChangeLight(new Color32(255, 174, 144, 255), 0.9f,  20);
-        TimeManager.OnTurnedNight   += () => StartChangeLight(new Color32(55,  136, 255, 255), 0.4f,  20);
+        TimeManager.Instance.OnTurnedMorning += () => StartChangeLight(new Color32(187, 227, 255, 255), 0.8f,  20);
+        TimeManager.Instance.OnTurnedMidDay  += () => StartChangeLight(new Color32(255, 255, 255, 255), 1f,    20);
+        TimeManager.Instance.OnTurnedEvening += () => StartChangeLight(new Color32(255, 174, 144, 255), 0.9f,  20);
+        TimeManager.Instance.OnTurnedNight   += () => StartChangeLight(new Color32(55,  136, 255, 255), 0.4f,  20);
     }
 
     private void StartChangeLight(Color32 targetColor, float targetIntensity, float durationSeconds)
@@ -28,6 +28,8 @@ public class LightingManager : MonoBehaviour
             StopCoroutine(currentCoroutine);
             Debug.Log("Stopping color changing coroutine that was already running previously");
         }
+
+        Debug.Log("Changing light");
         currentCoroutine = StartCoroutine(ChangeLight(targetColor, targetIntensity, durationSeconds));
     }
 

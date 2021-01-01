@@ -2,19 +2,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class CameraFunctions
+public class CameraFunctions: MonoBehaviour
 {
     public static readonly float targetShiftTime = 0.3f;
-    public static Coroutine lerpingCoroutine;
+    public Coroutine lerpingCoroutine;
 
-    private static readonly Transform cameraTransform;
+    private Transform cameraTransform;
 
-    static CameraFunctions()
+    private static CameraFunctions _instance;
+    public static CameraFunctions Instance { get { return _instance; } }
+    private void Awake()
     {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
+
         cameraTransform = Camera.main.transform;
     }
 
-    public static void LerpToPosition(Vector2 targetPos)
+    public void LerpToPosition(Vector2 targetPos)
     {
         void OnProgress(Vector2 pos)
         {

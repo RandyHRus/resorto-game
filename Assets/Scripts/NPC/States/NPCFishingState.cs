@@ -9,9 +9,9 @@ public class NPCFishingState : NPCActivityState, ITouristStateDialogue
 
     public override string DisplayMessage => "Fishing";
 
-    public NPCFishingState(NPCInstance npcInstance): base(npcInstance)
+    public NPCFishingState(NPCComponents npcComponents): base(npcComponents)
     {
-        FishingResources resources = new FishingResources(npcInstance.npcTransform, new object[] { npcInstance });
+        FishingResources resources = new FishingResources(npcComponents.npcTransform, new object[] { npcComponents });
 
         controller = new FishingStateController(new NPCFishingDefaultPhase(resources),
                                                 new NPCFishingChargingPhase(resources),
@@ -51,8 +51,8 @@ public class NPCFishingState : NPCActivityState, ITouristStateDialogue
 
                 Vector2Int targetDirection = validDirections[UnityEngine.Random.Range(0, validDirections.Count)];
 
-                NPCInstance npcInstance = (NPCInstance)resources.additionalResources[0];
-                npcInstance.npcDirection.SetDirectionOnMove(targetDirection);
+                NPCComponents npcComponents = (NPCComponents)resources.additionalResources[0];
+                npcComponents.npcDirection.SetDirectionOnMove(targetDirection);
 
                 int targetFishingLineLength = 0;
 

@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 public class CharacterCustomizationMenu : MonoBehaviour
 {
     private ColorCustomizationPart currentColorPart = 0;
-    private CharacterSex currentSex = 0;
+    private CharacterSex currentSex = CharacterSex.Female;
     private int currentEyebrowIndex = 0, currentHairIndex = 0, currentShirtIndex = 0;
     private TurnDirection currentTurnDirection = 0;
 
@@ -61,14 +61,22 @@ public class CharacterCustomizationMenu : MonoBehaviour
             }
         }
 
-        colorWheel.OnColorChanged += (Color32 color) => SetPartColor(currentColorPart, color);
-
         eyebrowSelectionOutlinedText = new OutlinedText(eyebrowsSelectionText);
         shirtSelectionOutlinedText = new OutlinedText(shirtSelectionText);
         hairSelectionOutlinedText = new OutlinedText(hairSelectionText);
         sexSelectionOutlinedText = new OutlinedText(sexSelectionText);
 
         LoadCustomization(ScenesSharedResources.Instance.DefaultCharacter.CharacterCustomization);
+    }
+
+    private void OnEnable()
+    {
+        colorWheel.OnColorChanged += OnColorWheelChangedHandler;
+    }
+
+    private void OnDisable()
+    {
+        colorWheel.OnColorChanged -= OnColorWheelChangedHandler;
     }
 
     private void Update()
@@ -115,6 +123,11 @@ public class CharacterCustomizationMenu : MonoBehaviour
     private void LateUpdate()
     {
         nameInputText.SetText(fakeText.text);
+    }
+
+    private void OnColorWheelChangedHandler(Color32 color)
+    {
+        SetPartColor(currentColorPart, color);
     }
 
     public void SwitchSex()
@@ -181,8 +194,8 @@ public class CharacterCustomizationMenu : MonoBehaviour
     {
         currentShirtIndex = index;
 
-        colorPickerImage[(int)ColorCustomizationPart.ShirtBase].enabled = ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex] != null && ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex].BaseColorable;
-        colorPickerImage[(int)ColorCustomizationPart.ShirtColorable].enabled = ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex] != null && ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex].HasColorable;
+        colorPickerImage[(int)ColorCustomizationPart.ShirtBase].transform.parent.gameObject.SetActive(ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex] != null && ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex].BaseColorable);
+        colorPickerImage[(int)ColorCustomizationPart.ShirtColorable].transform.parent.gameObject.SetActive(ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex] != null && ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex].HasColorable);
 
         customizationLoader.SetShirt(ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex]);
         shirtSelectionOutlinedText.SetText(currentShirtIndex.ToString());
@@ -267,17 +280,18 @@ public class CharacterCustomizationMenu : MonoBehaviour
 
     public void Finish()
     {
-        Color32 shirtBaseColor = colorPickerImage[(int)ColorCustomizationPart.ShirtBase].color;
-        Color shirtColorableColor = colorPickerImage[(int)ColorCustomizationPart.ShirtColorable].color;
+        Color32? shirtBaseColor = colorPickerImage[(int)ColorCustomizationPart.ShirtBase].gameObject.activeInHierarchy ? (Color32?)colorPickerImage[(int)ColorCustomizationPart.ShirtBase].color : null;
+        Color32? shirtColorableColor = colorPickerImage[(int)ColorCustomizationPart.ShirtColorable].gameObject.activeInHierarchy ? (Color32?)colorPickerImage[(int)ColorCustomizationPart.ShirtColorable].color : null;
 
         PlayerCustomization.Character = new CharacterCustomization(
             ScenesSharedResources.Instance.EyebrowsOptions[currentEyebrowIndex], 
             colorPickerImage[(int)ColorCustomizationPart.Eyebrows].color,
             ScenesSharedResources.Instance.HairOptions[currentHairIndex], colorPickerImage[(int)ColorCustomizationPart.Hair].color, 
             colorPickerImage[(int)ColorCustomizationPart.Skin].color,
-            colorPickerImage[(int)ColorCustomizationPart.Eyes].color, currentSex, 
-            null, 
-            new ShirtItemInstance(ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex], shirtBaseColor, shirtColorableColor), 
+            colorPickerImage[(int)ColorCustomizationPart.Eyes].color, 
+            currentSex, 
+            null,
+            ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex] == null ? null : new ShirtItemInstance(ScenesSharedResources.Instance.ShirtOptions[currentShirtIndex], shirtBaseColor, shirtColorableColor), 
             new PantsItemInstance(ScenesSharedResources.Instance.Pants, colorPickerImage[(int)ColorCustomizationPart.Pants].color));
 
         PlayerCustomization.PlayerName = nameInputField.text;
@@ -311,19 +325,19 @@ public class CharacterCustomizationMenu : MonoBehaviour
         {
             case (TurnDirection.FrontRight):
                 characterTransform.localScale = new Vector3(50, 50, 1);
-                characterAnimator.SetBool("FaceFront", true);
+                characterAnimator.SetFloat("Vertical", -1);
                 break;
             case (TurnDirection.FrontLeft):
                 characterTransform.localScale = new Vector3(-50, 50, 1);
-                characterAnimator.SetBool("FaceFront", true);
+                characterAnimator.SetFloat("Vertical", -1);
                 break;
             case (TurnDirection.BackLeft):
                 characterTransform.localScale = new Vector3(-50, 50, 1);
-                characterAnimator.SetBool("FaceFront", false);
+                characterAnimator.SetFloat("Vertical", 1);
                 break;
             case (TurnDirection.BackRight):
                 characterTransform.localScale = new Vector3(50, 50, 1);
-                characterAnimator.SetBool("FaceFront", false);
+                characterAnimator.SetFloat("Vertical", 1);
                 break;
             default:
                 throw new System.NotImplementedException();

@@ -82,11 +82,11 @@ public class CollisionManager
             int xDir = Mathf.RoundToInt(Mathf.Sign(xChange));
 
             TileInformationManager.Instance.TryGetTileInformation(
-                new Vector2Int(Mathf.RoundToInt(currentPosition.x + (xDir * (boxColliderSizeX / 2f + BUFFER))), Mathf.RoundToInt(currentPosition.y + boxColliderSizeY / 2f)), out TileInformation currentTilePositionToCheckUp);
+                new Vector2Int(Mathf.RoundToInt(currentPosition.x), Mathf.RoundToInt(currentPosition.y + boxColliderSizeY / 2f)), out TileInformation currentTilePositionToCheckUp);
             TileInformationManager.Instance.TryGetTileInformation(
-                new Vector2Int(Mathf.RoundToInt(currentPosition.x + (xDir * (boxColliderSizeX / 2f + BUFFER))), Mathf.RoundToInt(currentPosition.y - boxColliderSizeY / 2f)), out TileInformation currentTilePositionCheckDown);
+                new Vector2Int(Mathf.RoundToInt(currentPosition.x), Mathf.RoundToInt(currentPosition.y - boxColliderSizeY / 2f)), out TileInformation currentTilePositionCheckDown);
 
-            if (currentTilePositionToCheckUp?.StairsStartPositions.Count > 0 &&
+            if (currentTilePosition.StairsStartPositions.Count > 0 &&
                 currentTilePositionCheckDown?.StairsStartPositions.Count > 0)
             {
                 Direction playerXMoveDirection = xChange > 0 ? Direction.Right : Direction.Left;
@@ -109,9 +109,9 @@ public class CollisionManager
         {
             int yDir = Mathf.RoundToInt(Mathf.Sign(yChange));
             TileInformationManager.Instance.TryGetTileInformation(
-                new Vector2Int(Mathf.RoundToInt(currentPosition.x - boxColliderSizeX / 2f), Mathf.RoundToInt(currentPosition.y + (yDir * (boxColliderSizeY / 2f + BUFFER)))), out TileInformation currentTilePositionToCheckLeft);
+                new Vector2Int(Mathf.RoundToInt(currentPosition.x - boxColliderSizeX / 2f), Mathf.RoundToInt(currentPosition.y)), out TileInformation currentTilePositionToCheckLeft);
             TileInformationManager.Instance.TryGetTileInformation(
-                new Vector2Int(Mathf.RoundToInt(currentPosition.x + boxColliderSizeX / 2f), Mathf.RoundToInt(currentPosition.y + (yDir * (boxColliderSizeY / 2f + BUFFER)))), out TileInformation currentTilePositionToCheckRight);
+                new Vector2Int(Mathf.RoundToInt(currentPosition.x + boxColliderSizeX / 2f), Mathf.RoundToInt(currentPosition.y)), out TileInformation currentTilePositionToCheckRight);
 
             if (currentTilePositionToCheckLeft?.StairsStartPositions.Count > 0 &&
                 currentTilePositionToCheckRight?.StairsStartPositions.Count > 0)

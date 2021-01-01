@@ -9,21 +9,21 @@ public class FollowNPCState : PlayerState
     public override bool AllowMouseDirectionChange => false;
     public override CameraMode CameraMode => CameraMode.Follow;
 
-    private NPCMonoBehaviour npcMono;
+    public NPCMonoBehaviour NpcMono { get; private set; }
     private NPCWalkToPositionState walkToPositionState;
     private Transform previousFollowing;
 
     public override void StartState(object[] args)
     {
-        npcMono = ((NPCInstance)args[0]).npcTransform.GetComponent<NPCMonoBehaviour>() ;
-        walkToPositionState = npcMono.GetStateInstance<NPCWalkToPositionState>();
+        NpcMono = ((NPCComponents)args[0]).npcTransform.GetComponent<NPCMonoBehaviour>() ;
+        walkToPositionState = NpcMono.GetStateInstance<NPCWalkToPositionState>();
 
-        previousFollowing = CameraFollow.Following;
-        CameraFollow.ChangeFollowTarget(npcMono.ObjectTransform);
+        previousFollowing = CameraFollow.Instance.Following;
+        CameraFollow.Instance.ChangeFollowTarget(NpcMono.ObjectTransform);
 
         walkToPositionState.OnPathChanged += PathFindingVisualizer.VisualizePath;
 
-        npcMono.NpcInstance.OnNPCDelete += OnNPCDeletedHandler;
+        NpcMono.NPCComponents.SubscribeToEvent(NPCInstanceEvent.Delete, OnNPCDeletedHandler);
     }
 
     public override void Execute()
@@ -32,7 +32,7 @@ public class FollowNPCState : PlayerState
         {
             Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
             if (TileInformationManager.Instance.TryGetTileInformation(mouseTilePosition, out TileInformation mouseTileInfo)) {
-                npcMono.SwitchState<NPCWalkToPositionState>(new object[] { (Vector2Int)mouseTilePosition, null, "Going to target location" });
+                NpcMono.SwitchState<NPCWalkToPositionState>(new object[] { (Vector2Int)mouseTilePosition, null, "Going to target location" });
             }
         }
     }
@@ -41,11 +41,13 @@ public class FollowNPCState : PlayerState
     {
         walkToPositionState.OnPathChanged -= PathFindingVisualizer.VisualizePath;
         PathFindingVisualizer.Hide();
-        CameraFollow.ChangeFollowTarget(previousFollowing);
+        CameraFollow.Instance.ChangeFollowTarget(previousFollowing);
     }
 
-    private void OnNPCDeletedHandler()
+    private void OnNPCDeletedHandler(object[] args)
     {
+        walkToPositionState.OnPathChanged -= PathFindingVisualizer.VisualizePath;
+        NpcMono.NPCComponents.UnsubscribeToEvent(NPCInstanceEvent.Delete, OnNPCDeletedHandler);
         InvokeEndState();
     }
 }

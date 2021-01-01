@@ -10,8 +10,6 @@ public class PlayerStateMachineManager : MonoBehaviour
     [SerializeField] private PlayerState[] playerStates = null;
     private StateMachine<PlayerState> stateMachine;
 
-    private PlayerState comebackState;
-
     private static PlayerStateMachineManager _instance;
     public static PlayerStateMachineManager Instance { get { return _instance; } }
     private void Awake()
@@ -42,7 +40,7 @@ public class PlayerStateMachineManager : MonoBehaviour
 
         stateMachine.OnStateChanged += OnStateChanged;
 
-        CameraFollow.ChangeFollowTarget(ResourceManager.Instance.Player);
+        CameraFollow.Instance.ChangeFollowTarget(ResourceManager.Instance.Player);
     }
 
     private void Update()
@@ -86,10 +84,10 @@ public class PlayerStateMachineManager : MonoBehaviour
         switch (stateMachine.CurrentState.CameraMode)
         {
             case (CameraMode.Follow):
-                CameraFollow.ExecuteLateUpdate();
+                CameraFollow.Instance.ExecuteLateUpdate();
                 break;
             case (CameraMode.Drag):
-                CameraDrag.ExecuteLateUpdate();
+                CameraDrag.Instance.ExecuteLateUpdate();
                 break;
             default:
                 throw new System.NotImplementedException();
@@ -98,17 +96,13 @@ public class PlayerStateMachineManager : MonoBehaviour
         stateMachine.RunLateExecute();
     }
 
-    public void SwitchStateTemporary<T>(object[] args = null) where T : PlayerState
-    {
-        comebackState = stateMachine.CurrentState;
-        SwitchState<T>();
-    }
-
     public void SwitchState<T>(object[] args = null) where T: PlayerState => stateMachine.SwitchState<T>(args);
 
     public void SwitchState(Type type, object[] args = null) => stateMachine.SwitchState(type, args);
 
     public void EndCurrentState() => stateMachine.EndCurrentState();
+
+    public PlayerState CurrentState => stateMachine.CurrentState;
 
 
     private void OnStateChanged(PlayerState previousState, PlayerState newState)

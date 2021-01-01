@@ -18,7 +18,7 @@ public class UIManager : MonoBehaviour
     private SavedUI savedUI;
 
     public delegate void AllUIClosed();
-    public static event AllUIClosed OnAllUIClosed;
+    public AllUIClosed OnAllUIClosed;
 
     private static UIManager _instance;
     public static UIManager Instance { get { return _instance; } }

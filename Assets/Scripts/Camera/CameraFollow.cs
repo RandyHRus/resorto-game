@@ -2,26 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class CameraFollow
+public class CameraFollow: MonoBehaviour
 {
-    public static Transform Following { get; private set; }
+    public Transform Following { get; private set; }
 
-    private static bool changingTarget;
+    private bool changingTarget;
 
-    private static readonly Transform cameraTransform;
+    private Transform cameraTransform;
 
-    static CameraFollow()
+    private static CameraFollow _instance;
+    public static CameraFollow Instance { get { return _instance; } }
+    private void Awake()
     {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
+
         cameraTransform = Camera.main.transform;
     }
 
-    public static void ExecuteLateUpdate()
+    public void ExecuteLateUpdate()
     {
         if (!changingTarget)
             cameraTransform.position = new Vector3(Following.position.x, Following.position.y, -100);
     }
 
-    public static void ChangeFollowTarget(Transform t)
+    public void ChangeFollowTarget(Transform t)
     {
         Vector2 previousTargetPosition;
 
@@ -44,14 +55,14 @@ public static class CameraFollow
         {
             previousTargetPosition = t.position;
 
-            if (CameraFunctions.lerpingCoroutine != null)
-                Coroutines.Instance.StopCoroutine(CameraFunctions.lerpingCoroutine);
+            if (CameraFunctions.Instance.lerpingCoroutine != null)
+                Coroutines.Instance.StopCoroutine(CameraFunctions.Instance.lerpingCoroutine);
 
-            CameraFunctions.lerpingCoroutine = Coroutines.Instance.StartCoroutine(LerpEffect.LerpVectorTime(cameraTransform.position, t.position, CameraFunctions.targetShiftTime, OnProgress, OnEnd, false));
+            CameraFunctions.Instance.lerpingCoroutine = Coroutines.Instance.StartCoroutine(LerpEffect.LerpVectorTime(cameraTransform.position, t.position, CameraFunctions.targetShiftTime, OnProgress, OnEnd, false));
         }
 
-        if (CameraFunctions.lerpingCoroutine != null)
-            Coroutines.Instance.StopCoroutine(CameraFunctions.lerpingCoroutine);
+        if (CameraFunctions.Instance.lerpingCoroutine != null)
+            Coroutines.Instance.StopCoroutine(CameraFunctions.Instance.lerpingCoroutine);
 
         changingTarget = true;
 

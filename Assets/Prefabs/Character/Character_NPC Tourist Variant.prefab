@@ -12,17 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7e97834eba489549b4c789d4008a778, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultState: {fileID: 11400000, guid: 08b2faa6ce3a41143aa3bb9c5fc6ea69, type: 2}
-  states:
-  - {fileID: 11400000, guid: 9ba542f44689e444389202feee67215e, type: 2}
-  - {fileID: 11400000, guid: 08b2faa6ce3a41143aa3bb9c5fc6ea69, type: 2}
-  - {fileID: 11400000, guid: 874374bb6dcfa9f40a27dd6cbe93982c, type: 2}
-  - {fileID: 11400000, guid: 6a1b25e75c7e80b4b9164e0857470fd9, type: 2}
-  schedules:
-  - {fileID: 11400000, guid: 81ea933241373ab4ebe7fd42c34ec0da, type: 2}
-  - {fileID: 11400000, guid: 9de15cd4ad332d94f8ddf3df4da37dd9, type: 2}
-  - {fileID: 11400000, guid: 5e9bd64f26332f8419db211e19bfaec3, type: 2}
-  - {fileID: 11400000, guid: 451bd08f3ccbdbb45bb30536987181af, type: 2}
 --- !u!1001 &5651644596683465380
 PrefabInstance:
   m_ObjectHideFlags: 0

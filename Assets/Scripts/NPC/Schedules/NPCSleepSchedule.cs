@@ -8,7 +8,7 @@ public class NPCSleepSchedule : NPCSchedule
 
     public override bool AllowTransitionToGoingToSleep => false;
 
-    public NPCSleepSchedule(NPCInstance npcInstance): base(npcInstance) { }
+    public NPCSleepSchedule(NPCComponents npcComponents): base(npcComponents) { }
 
     public override void StartState(object[] args)
     {
@@ -20,7 +20,7 @@ public class NPCSleepSchedule : NPCSchedule
 
     public override void TryStartScheduleAction()
     {
-        npcInstance.InvokeChangeNPCState<NPCSleepingState>();
+        npcComponents.InvokeEvent(NPCInstanceEvent.ChangeState, new object[] { typeof(NPCSleepingState), null });
 
         if (TimeManager.Instance.GetCurrentTime() >= wakeTime)
         {

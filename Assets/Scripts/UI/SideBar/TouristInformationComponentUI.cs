@@ -16,7 +16,7 @@ public class TouristInformationComponentUI : CollapsibleComponentUI
     public TouristInformationComponentUI(TouristMonoBehaviour touristMono, Transform parent) : base(ResourceManager.Instance.TouristInformationComponentUI, parent)
     {
         this.touristMono = touristMono;
-        TouristInstance instance = touristMono.TouristInstance;
+        TouristComponents instance = touristMono.TouristComponents;
 
         foreach (Transform t in ObjectTransform.GetComponentsInChildren<Transform>())
         {
@@ -24,8 +24,8 @@ public class TouristInformationComponentUI : CollapsibleComponentUI
             {
                 case ("Character Field"):
                     {
-                        CharacterCustomizationLoader loader = t.GetComponent<CharacterCustomizationLoader>();
-                        loader.LoadCustomization(instance.TouristInformation.CharacterCustomization);
+                        t.GetComponent<Animator>().SetFloat("Vertical", -1);
+                        t.GetComponent<CharacterCustomizationLoader>().LoadCustomization(instance.TouristInformation.CharacterCustomization);
                         break;
                     }
 
@@ -85,7 +85,7 @@ public class TouristInformationComponentUI : CollapsibleComponentUI
                 case ("Icon Field 5"):
                     {
                         happinessIcon = t.GetComponent<Image>();
-                        ChangeHappinessIcon(touristMono.TouristInstance.happiness.GetTouristHappinessEnum());
+                        ChangeHappinessIcon(touristMono.TouristComponents.happiness.GetTouristHappinessEnum());
                         TimeManager.Instance.SubscribeToTime(new InGameTime(0, 0), UpdateWhenLeaving); //Refreshes every start of day.
 
                         break;
@@ -93,7 +93,7 @@ public class TouristInformationComponentUI : CollapsibleComponentUI
                 case ("Progress Field"):
                     {
                         happinessBar = new ProgressBar(ObjectInScene);
-                        ChangeHappinessBarFill(touristMono.TouristInstance.happiness.Value);
+                        ChangeHappinessBarFill(touristMono.TouristComponents.happiness.Value);
                         break;
                     }
                 case ("Description Field"):
@@ -105,14 +105,13 @@ public class TouristInformationComponentUI : CollapsibleComponentUI
             }
         }
 
-        touristMono.TouristInstance.happiness.OnHappinessChanged += OnHappinessChangedHandler;
-        OnDestroy += OnDestroyed;
+        touristMono.TouristComponents.happiness.OnHappinessChanged += OnHappinessChangedHandler;
     }
 
     public override void OnClick()
     {
         base.OnClick();
-        PlayerStateMachineManager.Instance.SwitchState<FollowNPCState>(new object[] { touristMono.TouristInstance });
+        PlayerStateMachineManager.Instance.SwitchState<FollowNPCState>(new object[] { touristMono.TouristComponents });
     }
 
     private void OnStateChangedHandler(NPCState previousState, NPCState newState)
@@ -144,12 +143,12 @@ public class TouristInformationComponentUI : CollapsibleComponentUI
         whenLeavingText.SetText(text);
     }
 
-    private void OnDestroyed(UIObject sender)
+    public override void Destroy()
     {
-        OnDestroy -= OnDestroyed;
+        base.Destroy();
 
         touristMono.OnStateChanged -= OnStateChangedHandler;
         TimeManager.Instance.UnsubscribeFromTime(new InGameTime(0, 0), UpdateWhenLeaving);
-        touristMono.TouristInstance.happiness.OnHappinessChanged -= OnHappinessChangedHandler;
+        touristMono.TouristComponents.happiness.OnHappinessChanged -= OnHappinessChangedHandler;
     }
 }

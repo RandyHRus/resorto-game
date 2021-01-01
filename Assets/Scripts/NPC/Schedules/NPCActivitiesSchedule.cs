@@ -5,18 +5,18 @@ using System;
 
 public class NPCActivitiesSchedule : NPCSchedule
 {
-    private TouristInstance touristInstance => (TouristInstance)npcInstance;
+    private TouristComponents touristComponents => (TouristComponents)npcComponents;
 
     public override bool AllowTransitionToGoingToSleep => true;
 
-    public NPCActivitiesSchedule(NPCInstance npcInstance): base(npcInstance) { }
+    public NPCActivitiesSchedule(NPCComponents npcComponents): base(npcComponents) { }
 
     private Type switchToState;
     private object[] switchToStateArgs;
 
     public override void TryStartScheduleAction()
     {
-        TouristInterest randomInterest = touristInstance.interests[UnityEngine.Random.Range(0, touristInstance.interests.Length)];
+        TouristInterest randomInterest = touristComponents.interests[UnityEngine.Random.Range(0, touristComponents.interests.Length)];
         Activity randomActivity = randomInterest.Activies[UnityEngine.Random.Range(0, randomInterest.Activies.Length)];
 
         bool locationExists = randomActivity.GetActivityLocationAndStateToSwitchTo(out Vector2Int? location, out switchToState, out switchToStateArgs, out string goingToLocationMessage);
@@ -25,12 +25,14 @@ public class NPCActivitiesSchedule : NPCSchedule
             return;
 
         Action callback = OnNPCAtActivityLocationHandler;
-        npcInstance.InvokeChangeNPCState<NPCWalkToPositionState>(new object[] { location, callback, goingToLocationMessage });
+        npcComponents.InvokeEvent(NPCInstanceEvent.ChangeState, new object[] {
+                            typeof(NPCWalkToPositionState),
+                            new object[] { (Vector2Int)location, callback, goingToLocationMessage }});
     }
 
     private void OnNPCAtActivityLocationHandler()
     {
-        npcInstance.InvokeChangeNPCState(switchToState, switchToStateArgs);
+        npcComponents.InvokeEvent(NPCInstanceEvent.ChangeState, new object[] { switchToState, switchToStateArgs });
     }
 
     public override void EndState()

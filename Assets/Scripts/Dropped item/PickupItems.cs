@@ -8,7 +8,7 @@ public class PickupItems : MonoBehaviour
 
     private void Awake()
     {
-        PlayerMovement.PlayerMoved += (Vector2 pos, bool slow, Vector2 directionVector) => PickUpNearby(pos);
+        PlayerMovement.Instance.PlayerMoved += (Vector2 pos, bool slow, Vector2 directionVector) => PickUpNearby(pos);
     }
 
     public void PickUpNearby(Vector2 pos)

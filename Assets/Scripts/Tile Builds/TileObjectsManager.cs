@@ -2,9 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class TileObjectsManager
+public class TileObjectsManager: MonoBehaviour
 {
-    public static bool ObjectPlaceable(Vector2Int mainPos, ObjectInformation info, out ObjectType modifiedType, out float yOffset, BuildRotation rotation = BuildRotation.Front)
+    private static TileObjectsManager _instance;
+    public static TileObjectsManager Instance { get { return _instance; } }
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
+    }
+
+    public bool ObjectPlaceable(Vector2Int mainPos, ObjectInformation info, out ObjectType modifiedType, out float yOffset, BuildRotation rotation = BuildRotation.Front)
     {
         modifiedType = 0;
         yOffset = 0;
@@ -105,7 +119,7 @@ public static class TileObjectsManager
         }
     }
 
-    public static bool TryCreateObject(ObjectInformation info, Vector2Int mainPos, out BuildOnTile buildOnTile, BuildRotation rotation = BuildRotation.Front)
+    public bool TryCreateObject(ObjectInformation info, Vector2Int mainPos, out BuildOnTile buildOnTile, BuildRotation rotation = BuildRotation.Front)
     {
         if (!ObjectPlaceable(mainPos, info, out ObjectType modifiedType, out float yOffset, rotation))
         {

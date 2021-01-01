@@ -17,9 +17,10 @@ public class PlayerMovement : MonoBehaviour
     private Animator animator;
 
     private int currentTileLayer; //Starts at 0 which means the player is on the sand layer, which means we need to check collision at land layer 0
+    public int CurrentTileLayer => currentTileLayer;
 
     public delegate void OnPlayerMove(Vector2 position, bool slow, Vector2 directionVector);
-    public static event OnPlayerMove PlayerMoved;
+    public event OnPlayerMove PlayerMoved;
 
     private static PlayerMovement _instance;
     public static PlayerMovement Instance { get { return _instance; } }

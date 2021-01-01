@@ -8,6 +8,4 @@ public class WorkerInformation : NPCInformation
     {
         throw new System.NotImplementedException();
     }
-
-    protected override GameObject ObjectToInitialize => ResourceManager.Instance.WorkerNpc;
 }

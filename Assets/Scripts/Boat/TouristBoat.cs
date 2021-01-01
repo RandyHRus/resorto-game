@@ -7,12 +7,22 @@ public class TouristBoat : Boat
     private Vector2Int touristSpawnPosition;
     private int touristCount;
 
-    public override void Initialize()
+    public override void Initialize(Vector2Int playerStartingPosition)
     {
-        base.Initialize();
+        base.Initialize(playerStartingPosition);
+        touristSpawnPosition = boatUnloadingRegionInstance.GetRegionPositions()[0];
+    }
 
+    public override void Awake()
+    {
+        base.Awake();
         OnBoatUnloadingPointReached += SpawnTourists;
-        touristSpawnPosition = boatUnloadingRegionInstance.GetRegionPositionsAsList()[0];
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        OnBoatUnloadingPointReached -= SpawnTourists;
     }
 
     private void SpawnTourists()

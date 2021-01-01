@@ -37,7 +37,7 @@ public class StartingChestGenerator : MonoBehaviour
 
     public void CreateStartingChest(IslandStartingPosition position)
     {
-        if (!TileObjectsManager.TryCreateObject(chestObject, position.StartingChestPosition, out BuildOnTile buildOnTile))
+        if (!TileObjectsManager.Instance.TryCreateObject(chestObject, position.StartingChestPosition, out BuildOnTile buildOnTile))
         {
             throw new IslandGenerationException("Failed to create starting chest.");
         }

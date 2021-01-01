@@ -33,11 +33,11 @@ public class StairsVariant : StructureInformation, IBuildable
         //Refresh connected docks
         if (buildTileInfo.tileLocation == TileLocation.WaterEdge)
         {
-            Vector2Int dockTilePosition = StairsManager.GetStairsConnectedDockPosition(build.BottomLeft, build.Rotation);
+            Vector2Int dockTilePosition = StairsManager.Instance.GetStairsConnectedDockPosition(build.BottomLeft, build.Rotation);
             TileInformationManager.Instance.TryGetTileInformation(dockTilePosition, out TileInformation dockTileInformation);
 
             dockTileInformation.NormalFlooringGroup.NormalFloorings[dockTilePosition].Renderer.sprite =
-                FlooringManager.GetSprite(dockTileInformation.NormalFlooringGroup.FlooringVariant, null, false, dockTilePosition, dockTileInformation.NormalFlooringGroup.Rotation);
+                FlooringManager.Instance.GetSprite(dockTileInformation.NormalFlooringGroup.FlooringVariant, null, false, dockTilePosition, dockTileInformation.NormalFlooringGroup.Rotation);
 
             dockTileInformation.NormalFlooringGroup.AddConnectedBuild(build);
         }
@@ -60,12 +60,12 @@ public class StairsVariant : StructureInformation, IBuildable
 
         //Change connected dock sprite
         {
-            Vector2Int checkForDockPos = StairsManager.GetStairsConnectedDockPosition(build.BottomLeft, build.Rotation);
+            Vector2Int checkForDockPos = StairsManager.Instance.GetStairsConnectedDockPosition(build.BottomLeft, build.Rotation);
             TileInformationManager.Instance.TryGetTileInformation(checkForDockPos, out TileInformation checkForDockTileInfo);
             if (checkForDockTileInfo?.NormalFlooringGroup != null)
             {
                 checkForDockTileInfo.NormalFlooringGroup.NormalFloorings[checkForDockPos].Renderer.sprite =
-                    FlooringManager.GetSprite(checkForDockTileInfo.NormalFlooringGroup.FlooringVariant, new HashSet<Vector2Int> { build.BottomLeft }, false, checkForDockPos, checkForDockTileInfo.NormalFlooringGroup.Rotation);
+                    FlooringManager.Instance.GetSprite(checkForDockTileInfo.NormalFlooringGroup.FlooringVariant, new HashSet<Vector2Int> { build.BottomLeft }, false, checkForDockPos, checkForDockTileInfo.NormalFlooringGroup.Rotation);
             }
         }
 

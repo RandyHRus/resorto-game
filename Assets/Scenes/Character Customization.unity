@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 0
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -1725,37 +1725,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d37f56510bcbdd40b95ae9b8646bac6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  eyebrowsOptions:
-  - {fileID: 11400000, guid: 07d4eb248d9cd1748bb63976c87c6177, type: 2}
-  - {fileID: 11400000, guid: f6eac92c1700813408ff6bc5292e347b, type: 2}
-  hairOptions:
-  - {fileID: 11400000, guid: 5435324896504ea4f99e5dcba0c68f3d, type: 2}
-  - {fileID: 11400000, guid: daa304ef22368ed48bba8ee3690d8e2b, type: 2}
-  - {fileID: 11400000, guid: 7f5b3c55e303c604882c19247b0ec6b2, type: 2}
-  - {fileID: 11400000, guid: ef408ab3bd2721641b015db92518a789, type: 2}
-  - {fileID: 11400000, guid: ee417c10a8f79594596be7d887ebdda5, type: 2}
-  - {fileID: 11400000, guid: 7bfa5e1d988e28d4cac20cace96fabde, type: 2}
-  - {fileID: 11400000, guid: 71fb71743793048438fc97aa438de2e6, type: 2}
-  - {fileID: 11400000, guid: 14f1d81dd16a0084981a65ea48d035b6, type: 2}
-  - {fileID: 11400000, guid: 1347da320231d1d4f9efc28b332d30ac, type: 2}
-  - {fileID: 11400000, guid: dfc95ad7d5d225141b28cc67c775e8b2, type: 2}
-  - {fileID: 11400000, guid: 25a9d129adf191e4e9847b69da36e6e7, type: 2}
-  - {fileID: 11400000, guid: 859a4c2ca45bb354787a5629bef1e451, type: 2}
-  - {fileID: 11400000, guid: de7a958ed1d2ba8468f75a35b39750ec, type: 2}
-  - {fileID: 11400000, guid: 0b8933c91db26d640bd3b685c83b8ddd, type: 2}
-  - {fileID: 11400000, guid: 7b62a5f40f0ee57408f1097fa65914c8, type: 2}
-  - {fileID: 11400000, guid: cfd13428ba535f94ba9d6651478c16a2, type: 2}
-  - {fileID: 11400000, guid: 164363fbb8b0afd459ac3da43cad607c, type: 2}
-  - {fileID: 11400000, guid: 8ec167b6270c1f543a9b7b5524ee76fd, type: 2}
-  - {fileID: 11400000, guid: f8c86939eda0bcd4a96f1a159a1271ae, type: 2}
-  - {fileID: 11400000, guid: 68bfa2902b1d5ed48a9afa42e4bf437f, type: 2}
-  - {fileID: 11400000, guid: fd83fe9b69c0ea64cab90d7d607938d1, type: 2}
-  - {fileID: 0}
-  shirtOptions:
-  - {fileID: 11400000, guid: 3ff12e44f92ea704e8e83f3f966501fc, type: 2}
-  - {fileID: 0}
-  pants: {fileID: 11400000, guid: 147c5b5dd5a3010439d5b87747ec5dc0, type: 2}
-  defaultCharacter: {fileID: 11400000, guid: 1b794f0b65c952c4f8b66636cc9b6bd5, type: 2}
   colorPickerUI: {fileID: 1634813699}
   colorWheel: {fileID: 1803923508}
   customizationLoader: {fileID: 399131877}

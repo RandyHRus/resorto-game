@@ -16,10 +16,10 @@ public class Sidebar : MonoBehaviour
     private Dictionary<SidebarTab, SidebarPanel> sidebarPanelDict = new Dictionary<SidebarTab, SidebarPanel>();
 
     public delegate void SidebarOpenedDelegate();
-    public static event SidebarOpenedDelegate OnSidebarOpened; //Only should run when sidebar first opens, not when switched
+    public event SidebarOpenedDelegate OnSidebarOpened; //Only should run when sidebar first opens, not when switched
 
     public delegate void SidebarClosedDelegate();
-    public static event SidebarClosedDelegate OnSidebarClosed;
+    public event SidebarClosedDelegate OnSidebarClosed;
 
     private static Sidebar _instance;
     public static Sidebar Instance { get { return _instance; } }

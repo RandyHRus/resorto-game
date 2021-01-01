@@ -6,7 +6,7 @@ public class NPCSleepingState : NPCState
 {
     public override string DisplayMessage => "Sleeping";
 
-    public NPCSleepingState(NPCInstance npcInstance) : base(npcInstance) { }
+    public NPCSleepingState(NPCComponents npcComponents) : base(npcComponents) { }
 
     public override void StartState(object[] args)
     {

@@ -7,9 +7,7 @@ public class InventoryExternalUI : UIObject
     public InventoryExternalUI(GameObject prefab, Transform parent): base(prefab, parent)
     {
         InventoryManager.Instance.ShowInventory();
-        InventoryManager.OnInventoryClosed += Hide;
-
-        OnDestroy += UnSub;
+        InventoryManager.Instance.OnInventoryClosed += Hide;
     }
 
     public void Hide()
@@ -22,14 +20,14 @@ public class InventoryExternalUI : UIObject
         base.Show(show);
 
         if (show)
-            InventoryManager.OnInventoryClosed += Hide;
+            InventoryManager.Instance.OnInventoryClosed += Hide;
         else
-            InventoryManager.OnInventoryClosed -= Hide;
+            InventoryManager.Instance.OnInventoryClosed -= Hide;
     }
 
-    public void UnSub(UIObject sender)
+    public override void Destroy()
     {
-        InventoryManager.OnInventoryClosed -= Hide;
-        OnDestroy -= UnSub;
+        base.Destroy();
+        InventoryManager.Instance.OnInventoryClosed -= Hide;
     }
 }

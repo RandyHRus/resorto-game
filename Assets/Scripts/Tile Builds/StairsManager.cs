@@ -5,7 +5,21 @@ using UnityEngine;
 
 public class StairsManager: MonoBehaviour
 {
-    public static bool StairsPlaceable(Vector2Int pos, out BuildRotation rot)
+    private static StairsManager _instance;
+    public static StairsManager Instance { get { return _instance; } }
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
+    }
+
+    public bool StairsPlaceable(Vector2Int pos, out BuildRotation rot)
     {       
         rot = 0;
 
@@ -96,7 +110,7 @@ public class StairsManager: MonoBehaviour
         }
     }
 
-    public static bool TryCreateStairs(StairsVariant variant, Vector2Int pos)
+    public bool TryCreateStairs(StairsVariant variant, Vector2Int pos)
     {
         if (!StairsPlaceable(pos, out BuildRotation rot))
             return false;
@@ -114,7 +128,7 @@ public class StairsManager: MonoBehaviour
         return true;
     }
 
-    public static Vector2Int GetStairsConnectedDockPosition(Vector2Int StairsPosition, BuildRotation stairsRotation)
+    public Vector2Int GetStairsConnectedDockPosition(Vector2Int StairsPosition, BuildRotation stairsRotation)
     {
         switch (stairsRotation)
         {

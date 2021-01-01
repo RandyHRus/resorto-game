@@ -7,7 +7,7 @@ public class RegionInstance
     public string InstanceName { get; private set; }
 
     public readonly RegionInformation regionInformation;
-    protected HashSet<Vector2Int> regionPositions;
+    protected ArrayHashSet<Vector2Int> regionPositions;
 
     public delegate void RegionRemoved();
     public event RegionRemoved OnRegionRemoved;
@@ -26,22 +26,22 @@ public class RegionInstance
     {
         this.InstanceName = instanceName;
         this.regionInformation = regionInformation;
-        this.regionPositions = new HashSet<Vector2Int>();
+        this.regionPositions = new ArrayHashSet<Vector2Int>();
 
         AddPositions(positions);
     }
-
-    public List<Vector2Int> GetRegionPositionsAsList()
+    
+    public Vector2Int GetRandomPosition()
+    {
+        return regionPositions.GetRandom();
+    }
+    
+    public List<Vector2Int> GetRegionPositions()
     {
         return new List<Vector2Int>(regionPositions);
     }
-
-    public HashSet<Vector2Int> GetRegionPositions()
-    {
-        return new HashSet<Vector2Int>(regionPositions);
-    }
-
-    public virtual void AddPositions(HashSet<Vector2Int> positions)
+    
+    public virtual void AddPositions(IEnumerable<Vector2Int> positions)
     {
         foreach (Vector2Int pos in positions)
             regionPositions.Add(pos);

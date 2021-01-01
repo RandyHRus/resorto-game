@@ -19,14 +19,14 @@ public abstract class NPCIdleState : NPCState
 
     public override string DisplayMessage => "Idle";
 
-    public NPCIdleState(NPCInstance npcInstance): base(npcInstance)
+    public NPCIdleState(NPCComponents npcComponents): base(npcComponents)
     {
         animator = npcGameObject.GetComponent<Animator>();
     }
 
     public override void StartState(object[] args)
     {
-        Vector2Int position = new Vector2Int(Mathf.RoundToInt(npcInstance.npcTransform.position.x), Mathf.RoundToInt(npcInstance.npcTransform.position.y));
+        Vector2Int position = new Vector2Int(Mathf.RoundToInt(npcComponents.npcTransform.position.x), Mathf.RoundToInt(npcComponents.npcTransform.position.y));
         TileInformationManager.Instance.TryGetTileInformation(position, out TileInformation info);
         tileLayer = info.layerNum;
 
@@ -44,25 +44,25 @@ public abstract class NPCIdleState : NPCState
                 float xOffset = Random.Range(-1f, 1f);
                 float yOffset = Random.Range(-1f, 1f);
                 Vector2 offsetVector = new Vector2(xOffset, yOffset);
-                float proposedX = npcInstance.npcTransform.position.x + xOffset;
-                float proposedY = npcInstance.npcTransform.position.y + yOffset;
+                float proposedX = npcComponents.npcTransform.position.x + xOffset;
+                float proposedY = npcComponents.npcTransform.position.y + yOffset;
                 target = new Vector2(proposedX, proposedY);
 
 
                 idleMoving = true;
-                moveStartPos = npcInstance.npcTransform.position;
+                moveStartPos = npcComponents.npcTransform.position;
                 travelDistance = Vector2.Distance(moveStartPos, target);
 
                 {
-                    npcInstance.npcDirection.SetDirectionOnMove(target - moveStartPos);
+                    npcComponents.npcDirection.SetDirectionOnMove(target - moveStartPos);
                     animator.SetBool("Walking", xOffset != 0 || yOffset != 0);
                 }
             }
         }
         else
         {
-            Vector2 currentPos = npcInstance.npcTransform.position;
-            Vector2 proposedPos = Vector2.MoveTowards(currentPos, target, npcInstance.moveSpeed * Time.deltaTime);
+            Vector2 currentPos = npcComponents.npcTransform.position;
+            Vector2 proposedPos = Vector2.MoveTowards(currentPos, target, npcComponents.moveSpeed * Time.deltaTime);
 
             bool stop = false;
             if (CollisionManager.CheckForCollisionMovement(currentPos, proposedPos, tileLayer, out bool collisionX, out bool collisionY))
@@ -73,9 +73,9 @@ public abstract class NPCIdleState : NPCState
             {
                 //Actual movement
                 //TODO: Fix depth not working very well
-                npcInstance.npcTransform.position = new Vector3(proposedPos.x, proposedPos.y, DynamicZDepth.GetDynamicZDepth(proposedPos, DynamicZDepth.NPC_OFFSET));
+                npcComponents.npcTransform.position = new Vector3(proposedPos.x, proposedPos.y, DynamicZDepth.GetDynamicZDepth(proposedPos, DynamicZDepth.NPC_OFFSET));
 
-                if (Vector2.Distance(moveStartPos, npcInstance.npcTransform.position) >= travelDistance)
+                if (Vector2.Distance(moveStartPos, npcComponents.npcTransform.position) >= travelDistance)
                     stop = true;
             }
 

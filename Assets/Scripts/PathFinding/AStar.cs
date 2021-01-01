@@ -5,7 +5,7 @@ using Priority_Queue;
 using System.Linq;
 using System;
 
-public static class AStar
+public class AStar
 {
     private const int MOVE_STRAIGHT_COST = 10;
     private const int MOVE_DIAGONAL_COST = 14;
@@ -148,7 +148,7 @@ public static class AStar
             if (openNodes.Count == 0)
             {
                 ShortestPath = null;
-                Debug.Log("No valid path found!");
+                Debug.Log("No valid path found to " + pathEnd.ToString());
                 Finished = true;
                 return;
             }

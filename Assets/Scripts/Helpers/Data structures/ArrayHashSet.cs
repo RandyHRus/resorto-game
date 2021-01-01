@@ -6,7 +6,7 @@ using UnityEngine;
  * Specialized datastructure 
  * Should be O(1) add, O(1) remove, O(1) random, O(1) search
  */
-public class ArrayHashSet<T>
+public class ArrayHashSet<T>: IEnumerable<T>
 {
     List<T> elems;
     Dictionary<T, int> locations;
@@ -76,5 +76,15 @@ public class ArrayHashSet<T>
     public bool Contains(T elem)
     {
         return locations.ContainsKey(elem);
+    }
+
+    public IEnumerator<T> GetEnumerator()
+    {
+        return elems.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }

@@ -29,8 +29,21 @@ public class PlayerDirection : MonoBehaviour
     {
         VisualDirection = new CharacterVisualDirection(transform);
         animator = GetComponent<Animator>();
+    }
 
-        PlayerMovement.PlayerMoved += (Vector2 pos, bool slow, Vector2 directionVector) => VisualDirection.SetDirectionOnMove(directionVector);
+    private void OnEnable()
+    {
+        PlayerMovement.Instance.PlayerMoved += OnPlayerMovedHandler;
+    }
+
+    private void OnDisable()
+    {
+        PlayerMovement.Instance.PlayerMoved -= OnPlayerMovedHandler;
+    }
+
+    private void OnPlayerMovedHandler(Vector2 pos, bool slow, Vector2 directionVector)
+    {
+        VisualDirection.SetDirectionOnMove(directionVector);
     }
 
     public void Execute()

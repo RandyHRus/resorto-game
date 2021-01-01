@@ -13,9 +13,7 @@ public abstract class ListComponentUI : UIObject
 
     private void AddListener(Button button)
     {
-        this.button = button;
         button.onClick.AddListener(OnClick);
-        OnDestroy += UnSub;
     }
 
     public virtual void OnClick()
@@ -34,7 +32,7 @@ public abstract class ListComponentUI : UIObject
         {
             if (t.tag == "Background Field")
             {
-                Button button = t.gameObject.GetComponent<Button>();
+                button = t.gameObject.GetComponent<Button>();
                 buttonImage = t.gameObject.GetComponent<Image>();
                 AddListener(button);
                 break;
@@ -69,9 +67,9 @@ public abstract class ListComponentUI : UIObject
     }
     */
 
-    private void UnSub(UIObject sender)
+    public override void Destroy()
     {
-        OnDestroy -= UnSub;
+        base.Destroy();
         button.onClick.RemoveListener(OnClick);
     }
 }

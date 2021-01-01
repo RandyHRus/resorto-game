@@ -22,30 +22,33 @@ public class HotelsMapVisualizer : ColorMapVisualizer
 
         ClearLines(); //Refresh lines
 
-        ArrayHashSet<RegionInstance> frontDeskRegions = RegionManager.GetAllRegionInstancesOfType(hotelFrontDeskRegionInfo);
-        foreach (RegionInstance f in frontDeskRegions.ToList())
+        ArrayHashSet<RegionInstance> frontDeskRegions = RegionManager.Instance.GetAllRegionInstancesOfType(hotelFrontDeskRegionInfo);
+        if (frontDeskRegions != null)
         {
-            HotelFrontDeskRegionInstance frontDeskRegion = (HotelFrontDeskRegionInstance)f;
-            Vector3 frontDeskMiddlePos = frontDeskRegion.GetWeightedMiddlePos();
-            HashSet<HotelRoomRegionInstance> connectedRooms = HotelsManager.Instance.GetRoomsConnectedToFrontDesk(frontDeskRegion);
-
-            if (connectedRooms != null)
+            foreach (RegionInstance f in frontDeskRegions.ToList())
             {
-                foreach (HotelRoomRegionInstance connectedRoom in connectedRooms)
-                {
-                    LineRenderer renderer;
-                    if (renderersPool.Count > 0)
-                    {
-                        renderer = renderersPool.Dequeue();
-                    }
-                    else
-                    {
-                        renderer = GameObject.Instantiate(dottedLine).GetComponent<LineRenderer>();
-                    }
+                HotelFrontDeskRegionInstance frontDeskRegion = (HotelFrontDeskRegionInstance)f;
+                Vector3 frontDeskMiddlePos = frontDeskRegion.GetWeightedMiddlePos();
+                HashSet<HotelRoomRegionInstance> connectedRooms = HotelsManager.Instance.GetRoomsConnectedToFrontDesk(frontDeskRegion);
 
-                    renderer.gameObject.SetActive(true);
-                    renderersActive.Enqueue(renderer);
-                    renderer.SetPositions(new Vector3[] { frontDeskMiddlePos, connectedRoom.GetWeightedMiddlePos() });
+                if (connectedRooms != null)
+                {
+                    foreach (HotelRoomRegionInstance connectedRoom in connectedRooms)
+                    {
+                        LineRenderer renderer;
+                        if (renderersPool.Count > 0)
+                        {
+                            renderer = renderersPool.Dequeue();
+                        }
+                        else
+                        {
+                            renderer = GameObject.Instantiate(dottedLine).GetComponent<LineRenderer>();
+                        }
+
+                        renderer.gameObject.SetActive(true);
+                        renderersActive.Enqueue(renderer);
+                        renderer.SetPositions(new Vector3[] { frontDeskMiddlePos, connectedRoom.GetWeightedMiddlePos() });
+                    }
                 }
             }
         }

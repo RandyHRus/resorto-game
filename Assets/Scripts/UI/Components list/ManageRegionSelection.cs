@@ -59,13 +59,13 @@ public class ManageRegionSelection : CollapsibleComponentUI
 
     private void OnRemoveButtonClicked()
     {
-        RegionManager.RemoveRegion(instance);
+        RegionManager.Instance.RemoveRegion(instance);
     }
 
     public override void OnClick()
     {
         base.OnClick();
-        CameraFunctions.LerpToPosition(instance.GetWeightedMiddlePos());
+        CameraFunctions.Instance.LerpToPosition(instance.GetWeightedMiddlePos());
     }
 
     public override void Destroy()

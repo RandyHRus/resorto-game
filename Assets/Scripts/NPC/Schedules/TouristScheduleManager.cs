@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 public class TouristScheduleManager : NPCScheduleManager
 {
@@ -28,7 +30,7 @@ public class TouristScheduleManager : NPCScheduleManager
     private readonly InGameTime BUFFER_TIME = new InGameTime(0, 10, 0);
 
     public TouristScheduleManager(InGameTime sleepTime, int sleepHours, int leaveDay, 
-        NPCSchedule[] schedules, TouristInstance instance): base(schedules, instance)
+        NPCSchedule[] schedules, TouristComponents touristComponents): base(schedules, touristComponents)
     {
         this.sleepTime = sleepTime;
         this.wakeTime = sleepTime + new InGameTime(sleepHours, 0);
@@ -38,12 +40,12 @@ public class TouristScheduleManager : NPCScheduleManager
         InGameTime boatLeaveTimeRecurse = BoatManager.Instance.BoatLeaveTime;
         boatLeaveTimeOnTouristLeaveDay = new InGameTime(boatLeaveTimeRecurse.hour, boatLeaveTimeRecurse.minute, leaveDay);
 
-        npcInstance.OnNPCDelete += OnNPCDeleteHandler;
+        npcComponents.SubscribeToEvent(NPCInstanceEvent.Delete, OnNPCDeleteHandler);
 
         GetNextSleepCycleTimes();
         refreshCoroutine = Coroutines.Instance.StartCoroutine(RefreshGoBackTimes());
 
-        npcInstance.OnTryStartScheduleAction += OnNPCTryStartScheduleActionHandler;
+        npcComponents.SubscribeToEvent(NPCInstanceEvent.TryStartScheduleAction, OnNPCTryStartScheduleActionHandler);
     }
 
 
@@ -52,6 +54,12 @@ public class TouristScheduleManager : NPCScheduleManager
     {
         InGameTime currentTime = TimeManager.Instance.GetCurrentTime();
 
+        //Just spawned
+        if (CurrentState == null)
+        {
+            args = null;
+            return typeof(TouristCheckInSchedule);
+        }
         //Could run when tourists are done dropping off luggage
         if (currentTime >= nextSleepTime)
         {
@@ -81,15 +89,15 @@ public class TouristScheduleManager : NPCScheduleManager
             if (targetPosition == null)
                 return null;
 
-            Vector2Int roundedPosition = new Vector2Int(Mathf.RoundToInt(npcInstance.npcTransform.position.x), Mathf.RoundToInt(npcInstance.npcTransform.position.y));
+            Vector2Int roundedPosition = new Vector2Int(Mathf.RoundToInt(npcComponents.npcTransform.position.x), Mathf.RoundToInt(npcComponents.npcTransform.position.y));
             InGameTime? timeToGoToTarget = AStar.EstimatePathTime(roundedPosition,
                                                                   (Vector2Int)targetPosition,
-                                                                  npcInstance.moveSpeed,
+                                                                  npcComponents.moveSpeed,
                                                                   out LinkedList<Tuple<Vector2Int, Vector2Int?>> path);
 
             if (timeToGoToTarget == null)
             {
-                Debug.Log("Tourist trapped!");
+                Debug.Log("Tourist trapped! " + npcComponents.npcInformation.NpcName);
                 return null;
             }
 
@@ -106,7 +114,7 @@ public class TouristScheduleManager : NPCScheduleManager
         while (true)
         {
             InGameTime soonBeforeBoatLeaveTime = boatLeaveTimeOnTouristLeaveDay - BUFFER_TIME;
-            Vector2Int unloadingDockPos = RegionManager.GetRandomRegionInstanceOfType(ResourceManager.Instance.BoatUnloadingRegion).GetRegionPositionsAsList()[0];
+            Vector2Int unloadingDockPos = RegionManager.Instance.GetRandomRegionInstanceOfType(ResourceManager.Instance.BoatUnloadingRegion).GetRegionPositions()[0];
             currentSubscribedUnloadingDockGobackTime = RefreshTimeToStartGoing(unloadingDockPos, soonBeforeBoatLeaveTime, currentSubscribedUnloadingDockGobackTime, OnGoBackToUnloadingDockTimeHandler);
 
             InGameTime soonBeforeSleepTime = (InGameTime)nextSleepTime - BUFFER_TIME;
@@ -120,7 +128,7 @@ public class TouristScheduleManager : NPCScheduleManager
 
     private void RefreshBedAccessLocation()
     {
-        bedAccessLocation = ((TouristInstance)npcInstance).GetRandomBedAccessLocation();
+        bedAccessLocation = ((TouristComponents)npcComponents).GetRandomBedAccessLocation();
     }
 
     private void GetNextSleepCycleTimes()
@@ -155,17 +163,17 @@ public class TouristScheduleManager : NPCScheduleManager
         GetNextSleepCycleTimes();
     }
 
-    private void OnNPCDeleteHandler()
+    private void OnNPCDeleteHandler(object[] args)
     {
-        npcInstance.OnNPCDelete -= OnNPCDeleteHandler;
-        npcInstance.OnTryStartScheduleAction -= OnNPCTryStartScheduleActionHandler;
+        npcComponents.UnsubscribeToEvent(NPCInstanceEvent.Delete, OnNPCDeleteHandler);
+        npcComponents.UnsubscribeToEvent(NPCInstanceEvent.TryStartScheduleAction, OnNPCTryStartScheduleActionHandler);
 
         TimeManager.Instance.UnsubscribeFromTime((InGameTime)nextWakeTime, OnWakeTimeHandler);
 
         Coroutines.Instance.StopCoroutine(refreshCoroutine);
     }
 
-    private void OnNPCTryStartScheduleActionHandler()
+    private void OnNPCTryStartScheduleActionHandler(object[] args)
     {
         CurrentState.TryStartScheduleAction();
     }

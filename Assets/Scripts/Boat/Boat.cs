@@ -17,15 +17,30 @@ public class Boat : MonoBehaviour
 
     protected RegionInstance boatUnloadingRegionInstance;
 
-    private void Awake()
+    public virtual void Awake()
     {
-        IslandGenerationPipeline.IslandCompleted += (Vector2Int playerStartingPosition) => Initialize();
+        IslandGenerationPipeline.IslandCompleted += Initialize;
     }
 
-    public virtual void Initialize()
+    public virtual void OnDestroy()
     {
-        boatUnloadingRegionInstance = RegionManager.GetRandomRegionInstanceOfType(boatUnloadingRegionInfo);
-        List<Vector2Int> regionPositions = boatUnloadingRegionInstance.GetRegionPositionsAsList();
+        IslandGenerationPipeline.IslandCompleted -= Initialize;
+
+        if (stateMachine != null)
+        {
+            stateMachine.OnStateChanged -= OnStateChanged;
+            if (stateMachine.CurrentState != null)
+            {
+                stateMachine.CurrentState.OnBoatDespawnPointReached -= InvokeOnBoatSpawnPointReached;
+                stateMachine.CurrentState.OnBoatUnloadingPointReached -= InvokeOnBoatUnloadingPointReached;
+            }
+        }
+    }
+
+    public virtual void Initialize(Vector2Int playerStartingPosition)
+    {
+        boatUnloadingRegionInstance = RegionManager.Instance.GetRandomRegionInstanceOfType(boatUnloadingRegionInfo);
+        List<Vector2Int> regionPositions = boatUnloadingRegionInstance.GetRegionPositions();
         int boatTargetXPosition = regionPositions[0].x;
 
         //Initialize stateMachine
@@ -35,7 +50,6 @@ public class Boat : MonoBehaviour
                 new BoatStoppedState(transform),
                 new BoatLeavingState(transform)
             };
-
             stateMachine = new StateMachineWithDefaultState<BoatState>(typeof(BoatMovingToUnloadingPositionState), stateInstances);
             stateMachine.OnStateChanged += OnStateChanged;
         }

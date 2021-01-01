@@ -12,11 +12,9 @@ public class RemoveTerrainState : PlayerState
     private bool coroutineRunning = false;
     private Coroutine currentCoroutine;
 
-    OutlineIndicatorManager indicatorManager;
-
     public override void StartState(object[] args)
     {
-        indicatorManager = new OutlineIndicatorManager();
+
     }
 
     public override void Execute()
@@ -24,18 +22,18 @@ public class RemoveTerrainState : PlayerState
         if (coroutineRunning)
             return;
 
-        indicatorManager.Toggle(true);
+        OutlineIndicatorManager.Instance.Toggle(true);
 
         Vector2Int mouseTilePosition = TileInformationManager.Instance.GetMouseTile();
 
         if (TerrainManager.Instance.TerrainRemoveable(mouseTilePosition, out int layerNumber))
         {
-            indicatorManager.SetSizeAndPosition(mouseTilePosition, mouseTilePosition);
-            indicatorManager.SetColor(ResourceManager.Instance.Green);
+            OutlineIndicatorManager.Instance.SetSizeAndPosition(mouseTilePosition, mouseTilePosition);
+            OutlineIndicatorManager.Instance.SetColor(ResourceManager.Instance.Green);
 
             if (CheckMouseOverUI.GetButtonDownAndNotOnUI("Primary"))
             {
-                indicatorManager.Toggle(false);
+                OutlineIndicatorManager.Instance.Toggle(false);
 
                 if (layerNumber == 0)
                 {
@@ -51,8 +49,8 @@ public class RemoveTerrainState : PlayerState
         }
         else
         {
-            indicatorManager.SetSizeAndPosition(mouseTilePosition, mouseTilePosition);
-            indicatorManager.SetColor(ResourceManager.Instance.Red);
+            OutlineIndicatorManager.Instance.SetSizeAndPosition(mouseTilePosition, mouseTilePosition);
+            OutlineIndicatorManager.Instance.SetColor(ResourceManager.Instance.Red);
         }
     }
     
@@ -61,7 +59,7 @@ public class RemoveTerrainState : PlayerState
         if (coroutineRunning)
             Coroutines.Instance.StopCoroutine(currentCoroutine);
 
-        indicatorManager.Toggle(false);
+        OutlineIndicatorManager.Instance.Toggle(false);
     }
 
     IEnumerator RemoveSand()

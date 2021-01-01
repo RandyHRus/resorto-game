@@ -6,41 +6,31 @@ using System;
 
 public class TouristMonoBehaviour : NPCMonoBehaviour
 {
-    public TouristInstance TouristInstance => (TouristInstance)NpcInstance;
+    public TouristInformation TouristInformation => (TouristInformation)NpcInformation;
+    public TouristComponents TouristComponents => (TouristComponents)NPCComponents;
     private TouristHappinessManager happinessManager;
-    private TouristHappinessChangeDisplay happinessDiaplay;
+    private TouristHappinessChangeDisplay happinessDisplay;
+    private LuggageManager luggageManager;
 
     public delegate void TouristDeleting(TouristMonoBehaviour mono);
     public event TouristDeleting OnTouristDeleting;
 
     public override Type DefaultStateType => typeof(TouristIdleState);
 
-    public override NPCInstance CreateNPCInstance(NPCInformation npcInfo, Transform npcTransform)
+    public override void Initialize(NPCInformation npcInfo, NPCComponents npcComponents)
     {
-        TouristInformation touristInformation = (TouristInformation)npcInfo;
+        base.Initialize(npcInfo, npcComponents);
 
-        //Random dialogue
-        TouristDialogue dialogue = TouristsGenerator.Instance.GenerateRandomDialogue(touristInformation);
-        TouristInterest[] interests = TouristsGenerator.Instance.GetRandomInterestsList();
-        TouristHappiness happiness = new TouristHappiness();
+        happinessManager = new TouristHappinessManager(TouristComponents, stateMachine);
+        happinessDisplay = new TouristHappinessChangeDisplay(TouristComponents);
+        luggageManager = new LuggageManager(TouristComponents);
 
-        TouristInstance instance = new TouristInstance(touristInformation, npcTransform, dialogue, interests, happiness);
-        return instance;
+        NPCComponents.SubscribeToEvent(NPCInstanceEvent.Delete, InvokeOnTouristDeleting);
     }
 
-    public override void Initialize(NPCInformation npcInfo)
+    private void InvokeOnTouristDeleting(object[] args)
     {
-        base.Initialize(npcInfo);
-
-        happinessManager = new TouristHappinessManager(TouristInstance, stateMachine);
-        happinessDiaplay = new TouristHappinessChangeDisplay(TouristInstance);
-
-        NpcInstance.OnNPCDelete += InvokeOnTouristDeleting;
-    }
-
-    private void InvokeOnTouristDeleting()
-    {
-        NpcInstance.OnNPCDelete -= InvokeOnTouristDeleting;
+        NPCComponents.UnsubscribeToEvent(NPCInstanceEvent.Delete, InvokeOnTouristDeleting);
         OnTouristDeleting?.Invoke(this);
     }
 
@@ -49,48 +39,43 @@ public class TouristMonoBehaviour : NPCMonoBehaviour
         //Gets dialogue either from state or happiness
         TouristDialogueType type = (CurrentState.GetType() is ITouristStateDialogue overrider) ?
             overrider.GetTouristDialogueType() :
-            TouristDialogue.GetDialogueTypeFromHappiness(TouristInstance.happiness.GetTouristHappinessEnum());
+            TouristDialogue.GetDialogueTypeFromHappiness(TouristComponents.happiness.GetTouristHappinessEnum());
 
-        return TouristInstance.dialogue.GetDialogue(type);
+        return TouristComponents.dialogue.GetDialogue(type);
     }
 
     public override void FollowNPC()
     {
         base.FollowNPC();
         Sidebar.Instance.OpenSidebar(SidebarTab.Tourists);
-        ((SidebarTouristsPanel)Sidebar.Instance.GetPanel(SidebarTab.Tourists)).SelectTourist(TouristInstance);
+        ((SidebarTouristsPanel)Sidebar.Instance.GetPanel(SidebarTab.Tourists)).SelectTourist(TouristComponents);
     }
 
-    public override void OnDelete()
-    {
-        base.OnDelete();
-    }
-
-    public override NPCScheduleManager CreateNPCScheduleManager(NPCSchedule[] schedules, NPCInstance instance)
+    public override NPCScheduleManager CreateNPCScheduleManager(NPCSchedule[] schedules, NPCComponents npcComponents)
     {
         int wakeTime = UnityEngine.Random.Range(5, 10);
         int sleepHours = UnityEngine.Random.Range(6, 9);
         int sleepTime = (int)MathFunctions.Mod(wakeTime - sleepHours, 24);
         int leaveDay = TimeManager.Instance.GetCurrentTime().day + UnityEngine.Random.Range(1, 8);
 
-        return new TouristScheduleManager(new InGameTime(sleepTime, 0, 0), sleepHours, leaveDay, schedules, TouristInstance);
+        return new TouristScheduleManager(new InGameTime(sleepTime, 0, 0), sleepHours, leaveDay, schedules, TouristComponents);
     }
 
-    public override NPCState[] CreateNPCStates(NPCInstance npcInstance)
+    public override NPCState[] GetNPCStates(NPCComponents npcComponents)
     {
         NPCState[] additionalStates = {
-               new TouristIdleState(npcInstance),
+               new TouristIdleState(npcComponents),
         };
 
-        return base.CreateNPCStates(npcInstance).Union(additionalStates).ToArray();
+        return base.GetNPCStates(npcComponents).Union(additionalStates).ToArray();
     }
 
-    public override NPCSchedule[] CreateNPCSchedules(NPCInstance npcInstance)
+    public override NPCSchedule[] GetNPCSchedules(NPCComponents npcComponents)
     {
         NPCSchedule[] additionalSchedules = {
-            new TouristCheckInSchedule((TouristInstance)npcInstance)
+            new TouristCheckInSchedule((TouristComponents)npcComponents)
         };
 
-        return base.CreateNPCSchedules(npcInstance).Union(additionalSchedules).ToArray();
+        return base.GetNPCSchedules(NPCComponents).Union(additionalSchedules).ToArray();
     }
 }

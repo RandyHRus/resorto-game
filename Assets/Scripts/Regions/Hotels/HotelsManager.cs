@@ -7,17 +7,17 @@ public class HotelsManager: MonoBehaviour
     [SerializeField] HotelRoomRegionInformation hotelRoomRegionInformation = null;
 
     //Available room means valid and unoccupied
-    private static ArrayHashSet<HotelRoomRegionInstance> availableRooms = new ArrayHashSet<HotelRoomRegionInstance>();
-    public static int AvailableRoomsCount => availableRooms.Count;
+    private ArrayHashSet<HotelRoomRegionInstance> availableRooms = new ArrayHashSet<HotelRoomRegionInstance>();
+    public int AvailableRoomsCount => availableRooms.Count;
 
-    private static ArrayHashSet<HotelRoomRegionInstance> validRooms = new ArrayHashSet<HotelRoomRegionInstance>();
+    private ArrayHashSet<HotelRoomRegionInstance> validRooms = new ArrayHashSet<HotelRoomRegionInstance>();
 
-    private static Dictionary<HotelRoomRegionInstance, HotelFrontDeskRegionInstance> roomToFrontDeskConnection = new Dictionary<HotelRoomRegionInstance, HotelFrontDeskRegionInstance>();
-    private static Dictionary<HotelFrontDeskRegionInstance, HashSet<HotelRoomRegionInstance>> frontDeskToRoomsConnection = new Dictionary<HotelFrontDeskRegionInstance, HashSet<HotelRoomRegionInstance>>();
+    private Dictionary<HotelRoomRegionInstance, HotelFrontDeskRegionInstance> roomToFrontDeskConnection = new Dictionary<HotelRoomRegionInstance, HotelFrontDeskRegionInstance>();
+    private Dictionary<HotelFrontDeskRegionInstance, HashSet<HotelRoomRegionInstance>> frontDeskToRoomsConnection = new Dictionary<HotelFrontDeskRegionInstance, HashSet<HotelRoomRegionInstance>>();
 
     public delegate void HotelRoomCountChanged(int newCount);
-    public static event HotelRoomCountChanged OnAvailableRoomsCountChanged;
-    public static event HotelRoomCountChanged OnValidRoomsCountChanged;
+    public event HotelRoomCountChanged OnAvailableRoomsCountChanged;
+    public event HotelRoomCountChanged OnValidRoomsCountChanged;
 
     private static HotelsManager _instance;
     public static HotelsManager Instance { get { return _instance; } }
@@ -34,9 +34,18 @@ public class HotelsManager: MonoBehaviour
                 _instance = this;
             }
         }
+    }
 
-        RegionManager.OnRegionCreatedEventManager.Subscribe(hotelRoomRegionInformation, OnHotelRoomCreatedHandler);
-        RegionManager.OnRegionRemovedEventManager.Subscribe(hotelRoomRegionInformation, OnHotelRoomRemovedHandler);
+    private void Start()
+    {
+        RegionManager.Instance.OnRegionCreatedEventManager.Subscribe(hotelRoomRegionInformation, OnHotelRoomCreatedHandler);
+        RegionManager.Instance.OnRegionRemovedEventManager.Subscribe(hotelRoomRegionInformation, OnHotelRoomRemovedHandler);
+    }
+
+    private void OnDestroy()
+    {
+        RegionManager.Instance.OnRegionCreatedEventManager.Unsubscribe(hotelRoomRegionInformation, OnHotelRoomCreatedHandler);
+        RegionManager.Instance.OnRegionRemovedEventManager.Unsubscribe(hotelRoomRegionInformation, OnHotelRoomRemovedHandler);
     }
 
     private void OnHotelRoomCreatedHandler(object[] args)

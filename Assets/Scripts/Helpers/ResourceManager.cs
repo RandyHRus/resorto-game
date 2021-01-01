@@ -86,6 +86,15 @@ public class ResourceManager : MonoBehaviour
     [SerializeField] private GameObject textListComponentUI = null;
     public GameObject TextListComponentUI => textListComponentUI;
 
+    [SerializeField] private GameObject settingsButtonListComponentUI = null;
+    public GameObject SettingsButtonListComponentUI => settingsButtonListComponentUI;
+
+    [SerializeField] private GameObject prefab_saveSlotComponentUI = null;
+    public GameObject Prefab_saveSlotComponentUI => prefab_saveSlotComponentUI;
+
+    [SerializeField] private GameObject prefab_newSaveSlotComponentUI = null;
+    public GameObject Prefab_newSaveSlotComponentUI => prefab_newSaveSlotComponentUI;
+
     [Header("Colors")]
 
     [SerializeField] private Color32 red = Color.white;
@@ -120,15 +129,6 @@ public class ResourceManager : MonoBehaviour
     [SerializeField] private GameObject character = null;
     public GameObject Character => character;
 
-    [SerializeField] private GameObject touristNpc = null;
-    public GameObject TouristNpc => touristNpc;
-
-    [SerializeField] private GameObject workerNpc = null;
-    public GameObject WorkerNpc => workerNpc;
-
-    [SerializeField] private GameObject visitorNpc = null;
-    public GameObject VisitorNpc => visitorNpc;
-
     [SerializeField] private Material diffuse = null;
     public Material Diffuse => diffuse;
 
@@ -158,6 +158,9 @@ public class ResourceManager : MonoBehaviour
 
     [SerializeField] private RegionInformation boatUnloadingRegion = null;
     public RegionInformation BoatUnloadingRegion => boatUnloadingRegion;
+
+    [SerializeField] private GameObject prefab_luggage = null;
+    public GameObject Prefab_luggage => prefab_luggage;
 
     [EnumNamedArray(typeof(TouristHappinessEnum)), SerializeField]
     private Sprite[] touristHappinessIcons = new Sprite[Enum.GetNames(typeof(TouristHappinessEnum)).Length];

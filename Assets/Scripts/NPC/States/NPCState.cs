@@ -6,15 +6,15 @@ using System;
 public abstract class NPCState : IStateMachineState
 {
     protected GameObject npcGameObject;
-    protected NPCInstance npcInstance;
+    protected NPCComponents npcComponents;
 
     public event ChangeState OnChangeState;
     public event EndState OnEndState;
 
-    public NPCState(NPCInstance npcInstance)
+    public NPCState(NPCComponents npcComponents)
     {
-        this.npcGameObject = npcInstance.npcTransform.gameObject;
-        this.npcInstance = npcInstance;
+        this.npcGameObject = npcComponents.npcTransform.gameObject;
+        this.npcComponents = npcComponents;
     }
 
     public void InvokeChangeState(Type stateType, object[] args = null)

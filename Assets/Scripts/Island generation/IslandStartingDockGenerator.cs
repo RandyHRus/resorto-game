@@ -94,20 +94,20 @@ public class IslandStartingDockGenerator: MonoBehaviour
 
         if (dockPositions1.Count > 0)
         {
-            if (!FlooringManager.TryPlaceFlooring(dockToCreate, dockPositions1, FlooringRotation.Vertical))
+            if (!FlooringManager.Instance.TryPlaceFlooring(dockToCreate, dockPositions1, FlooringRotation.Vertical))
                 throw new IslandGenerationException("Something went wrong generating the dock1!");
         }
 
-        if (!FlooringManager.TryPlaceFlooring(dockToCreate, dockPositions2, FlooringRotation.Horizontal))
+        if (!FlooringManager.Instance.TryPlaceFlooring(dockToCreate, dockPositions2, FlooringRotation.Horizontal))
             throw new IslandGenerationException("Something went wrong generating the dock2!");
 
-        if (!FlooringManager.TryPlaceFlooring(dockToCreate, unloadingDockPositions, FlooringRotation.Horizontal))
+        if (!FlooringManager.Instance.TryPlaceFlooring(dockToCreate, unloadingDockPositions, FlooringRotation.Horizontal))
             throw new IslandGenerationException("Something went wrong generating the unloading dock");
 
-        if (!StairsManager.TryCreateStairs(stairsToCreate, foundValidStairsPosition.Value))
+        if (!StairsManager.Instance.TryCreateStairs(stairsToCreate, foundValidStairsPosition.Value))
             throw new IslandGenerationException("Something went wrong generating the stairs!");
 
-        if (!RegionManager.TryCreateRegion(unloadingRegionInformation, unloadingRegionPositions))
+        if (!RegionManager.Instance.TryCreateRegion(unloadingRegionInformation, unloadingRegionPositions))
             throw new IslandGenerationException("Something went wrong generating the unloading region!");
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class SidebarTouristsPanel : SidebarPanel
 {
     private SelectionPanel<TouristInformationComponentUI> touristsComponentsPanel;
-    private Dictionary<TouristInstance, TouristInformationComponentUI> touristToComponent = new Dictionary<TouristInstance, TouristInformationComponentUI>();
+    private Dictionary<TouristComponents, TouristInformationComponentUI> touristToComponent = new Dictionary<TouristComponents, TouristInformationComponentUI>();
 
     protected override void Awake()
     {
@@ -17,14 +17,23 @@ public class SidebarTouristsPanel : SidebarPanel
             if (t.tag == "List Field")
                 touristsComponentsPanel = new SelectionPanel<TouristInformationComponentUI>(t.gameObject);
         }
-
-        TouristsManager.OnTouristAdded += AddTouristComponent;
-        TouristsManager.OnTouristRemoved += RemoveTouristComponent;
     }
 
-    public void SelectTourist(TouristInstance instance)
+    private void Start()
     {
-        TouristInformationComponentUI component = touristToComponent[instance];
+        TouristsManager.Instance.OnTouristAdded += AddTouristComponent;
+        TouristsManager.Instance.OnTouristRemoved += RemoveTouristComponent;
+    }
+
+    private void OnDestroy()
+    {
+        TouristsManager.Instance.OnTouristAdded -= AddTouristComponent;
+        TouristsManager.Instance.OnTouristRemoved -= RemoveTouristComponent;
+    }
+
+    public void SelectTourist(TouristComponents touristComponents)
+    {
+        TouristInformationComponentUI component = touristToComponent[touristComponents];
         touristsComponentsPanel.SetScrollToComponent(component);
 
         component.OnClick();
@@ -34,13 +43,13 @@ public class SidebarTouristsPanel : SidebarPanel
     {
         TouristInformationComponentUI component = new TouristInformationComponentUI(touristMono, touristsComponentsPanel.ObjectTransform);
         touristsComponentsPanel.InsertListComponent(component);
-        touristToComponent.Add(touristMono.TouristInstance, component);
+        touristToComponent.Add(touristMono.TouristComponents, component);
     }
 
     private void RemoveTouristComponent(TouristMonoBehaviour touristMono)
     {
-        TouristInformationComponentUI component = touristToComponent[touristMono.TouristInstance];
+        TouristInformationComponentUI component = touristToComponent[touristMono.TouristComponents];
         touristsComponentsPanel.RemoveListComponent(component);
-        touristToComponent.Remove(touristMono.TouristInstance);
+        touristToComponent.Remove(touristMono.TouristComponents);
     }
 }
