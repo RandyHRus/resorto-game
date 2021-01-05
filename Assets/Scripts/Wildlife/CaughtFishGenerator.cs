@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 public class CaughtFishGenerator: MonoBehaviour
 {
-    [SerializeField] private FishItemInformation[] allFish = null;
+    [SerializeField] private AssetReference[] allFish = null;
 
     private static CaughtFishGenerator _instance;
     public static CaughtFishGenerator Instance { get { return _instance; } }
@@ -25,14 +26,15 @@ public class CaughtFishGenerator: MonoBehaviour
 
     public void Update()
     {
-        GetRandomFish();
     }
 
     public FishItemInstance GetRandomFish()
     {
         //TODO: Fish depending on weather/time etc
-        FishItemInformation chosenFish = allFish[Random.Range(0, allFish.Length)];
-        float length = RandomFromDistribution.RandomRangeExponential(chosenFish.MillimetresLowerBound, chosenFish.MillimetresUpperBound, 1, RandomFromDistribution.Direction_e.Left);
+        AssetReference chosenFish = allFish[Random.Range(0, allFish.Length)];
+        FishItemInformation fishInfo = AssetsManager.GetAsset<FishItemInformation>(chosenFish);
+
+        float length = RandomFromDistribution.RandomRangeExponential(fishInfo.MillimetresLowerBound, fishInfo.MillimetresUpperBound, 1, RandomFromDistribution.Direction_e.Left);
         return new FishItemInstance(chosenFish, Mathf.RoundToInt(length));
     }
 }

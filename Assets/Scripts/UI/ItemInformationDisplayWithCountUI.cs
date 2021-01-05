@@ -20,19 +20,19 @@ public class ItemInformationDisplayWithCountUI : UIObject
             if (tr.tag == "Name Field")
             {
                 OutlinedText itemNameText = new OutlinedText(tr.gameObject);
-                itemNameText.SetText(itemInstance.ItemInformation.ItemName);
+                itemNameText.SetText(itemInstance.GetItemInformation().ItemName);
             }
             else if (tr.tag == "Item Icon Field")
             {
                 Image itemIcon = tr.GetComponent<Image>();
-                itemIcon.sprite = itemInstance.ItemInformation.ItemIcon;
+                itemIcon.sprite = itemInstance.GetItemInformation().ItemIcon;
 
             }
             else if (tr.tag == "Tag Field")
             {
                 OutlinedText itemTagText = new OutlinedText(tr.gameObject);
-                itemTagText.SetText(itemInstance.ItemInformation.Tag.ToString());
-                itemTagText.SetColor(ResourceManager.Instance.ItemTagColors[(int)itemInstance.ItemInformation.Tag]);
+                itemTagText.SetText(itemInstance.GetItemInformation().Tag.ToString());
+                itemTagText.SetColor(ResourceManager.Instance.ItemTagColors[(int)itemInstance.GetItemInformation().Tag]);
             }
             else if (tr.tag == "Count Field")
             {

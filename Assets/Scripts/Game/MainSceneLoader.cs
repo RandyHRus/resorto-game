@@ -4,26 +4,31 @@ using UnityEngine;
 
 public class MainSceneLoader: MonoBehaviour
 {
-    public static SceneLoadOption loadOption = 0;
+    public static MainSceneLoadOption loadOption = 0;
     public static string loadSaveDataPath;
+
+    public delegate void LoadingComplete();
+    public static event LoadingComplete OnLoadingComplete;
 
     public void Start()
     {
         switch (loadOption)
         {
-            case (SceneLoadOption.NewIsland):
+            case (MainSceneLoadOption.NewIsland):
                 IslandGenerationPipeline.GenerateIsland();
                 break;
-            case (SceneLoadOption.LoadSave):
-                SaveManager.LoadGame(loadSaveDataPath);
+            case (MainSceneLoadOption.LoadSave):
+                SaveManager.LoadSaveData(loadSaveDataPath);
                 break;
             default:
                 throw new System.NotImplementedException();
         }
+
+        OnLoadingComplete?.Invoke();
     }
 }
 
-public enum SceneLoadOption
+public enum MainSceneLoadOption
 {
     NewIsland,
     LoadSave

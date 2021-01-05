@@ -29,7 +29,6 @@ public class LightingManager : MonoBehaviour
             Debug.Log("Stopping color changing coroutine that was already running previously");
         }
 
-        Debug.Log("Changing light");
         currentCoroutine = StartCoroutine(ChangeLight(targetColor, targetIntensity, durationSeconds));
     }
 

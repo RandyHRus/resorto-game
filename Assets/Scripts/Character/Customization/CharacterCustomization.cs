@@ -1,31 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using Newtonsoft.Json;
 
 [System.Serializable]
 public class CharacterCustomization
 {
-    [SerializeField] private CharacterEyebrows eyebrows = null;
-    public CharacterEyebrows Eyebrows => eyebrows;
-
-    [SerializeField] private Color32 eyebrowsColor = Color.white;
-    public Color32 EyebrowsColor => eyebrowsColor;
-
-    [SerializeField] private CharacterHair hair = null;
-    public CharacterHair Hair => hair;
-
-    [SerializeField] private Color32 hairColor = Color.white;
-    public Color32 HairColor => hairColor;
-
-    [SerializeField] private Color32 skinColor = Color.white;
-    public Color32 SkinColor => skinColor;
-
-    [SerializeField] private Color32 eyesColor = Color.white;
-    public Color32 EyesColor => eyesColor;
-
-    [SerializeField] private CharacterSex sex = 0;
-    public CharacterSex Sex => sex;
-
     private static List<Color32> commonSkinColors = new List<Color32>()
     {
         new Color32(141, 85, 36, 255),
@@ -35,103 +16,95 @@ public class CharacterCustomization
         new Color32(255, 219, 172, 255)
     };
 
-    [SerializeField] private HatItemInstance hat = null;
-    public HatItemInstance Hat
+    public CustomEventManager<string> CustomizationPartChangedEventManager { get; } = new CustomEventManager<string>();
+
+    [SerializeField, JsonProperty, JsonConverter(typeof(AssetReferenceConverter))] private AssetReference eyebrows;
+    [JsonIgnore] public AssetReference Eyebrows { get { return eyebrows; } set { eyebrows = value; CustomizationPartChangedEventManager.TryInvokeEventGroup("eyebrows", null); } }
+
+    [SerializeField] private Color32 eyebrowsColor;
+    [JsonIgnore] public Color32 EyebrowsColor { get { return eyebrowsColor; } set { eyebrowsColor = value; CustomizationPartChangedEventManager.TryInvokeEventGroup("eyebrowsColor", null); } }
+
+    [SerializeField, JsonProperty, JsonConverter(typeof(AssetReferenceConverter))] private AssetReference hair;
+    [JsonIgnore] public AssetReference Hair { get { return hair; } set { hair = value; CustomizationPartChangedEventManager.TryInvokeEventGroup("hair", null); } }
+
+    [SerializeField, JsonProperty] private Color32 hairColor;
+    [JsonIgnore] public Color32 HairColor { get { return hairColor; } set { hairColor = value; CustomizationPartChangedEventManager.TryInvokeEventGroup("hairColor", null); } }
+
+    [SerializeField, JsonProperty] private Color32 skinColor;
+    [JsonIgnore] public Color32 SkinColor { get { return skinColor; } set { skinColor = value; CustomizationPartChangedEventManager.TryInvokeEventGroup("skinColor", null); } }
+
+    [SerializeField, JsonProperty] private Color32 eyesColor;
+    [JsonIgnore] public Color32 EyesColor { get { return eyesColor; } set { eyesColor = value; CustomizationPartChangedEventManager.TryInvokeEventGroup("eyesColor", null); } }
+
+    [SerializeField, JsonProperty] private CharacterSex sex;
+    [JsonIgnore] public CharacterSex Sex { get { return sex; } set { sex = value; CustomizationPartChangedEventManager.TryInvokeEventGroup("sex", null); } }
+
+    [SerializeField, JsonProperty] private TwoColorsCosmeticInstance hat = null;
+    [JsonIgnore] public TwoColorsCosmeticInstance Hat
     {
         get
         {
-            if (hat?.ItemInformation == null)
+            if (hat?.GetItemInformation() == null)
                 return null;
             else
                 return hat;
         }
-        private set
+        set
         {
             hat = value;
+            CustomizationPartChangedEventManager.TryInvokeEventGroup("hat", null);
         }
     }
 
-    [SerializeField] private ShirtItemInstance shirt = null;
-    public ShirtItemInstance Shirt
+   [SerializeField, JsonProperty] private TwoColorsCosmeticInstance shirt = null;
+   [JsonIgnore] public TwoColorsCosmeticInstance Shirt
     {
         get
         {
-            if (shirt?.ItemInformation == null)
+            if (shirt?.GetItemInformation() == null)
                 return null;
             else
                 return shirt;
         }
-        private set
+        set
         {
             shirt = value;
+            CustomizationPartChangedEventManager.TryInvokeEventGroup("shirt", null);
         }
     }
 
 
-    [SerializeField] private PantsItemInstance pants = null;
-    public PantsItemInstance Pants
+    [SerializeField, JsonProperty] private PantsItemInstance pants = null;
+    [JsonIgnore] public PantsItemInstance Pants
     {
         get
         {
-            if (pants?.ItemInformation == null)
+            if (pants?.GetItemInformation() == null)
                 return null;
             else
                 return pants;
         }
-        private set
+        set
         {
             pants = value;
+            CustomizationPartChangedEventManager.TryInvokeEventGroup("pants", null);
         }
     }
 
-
-    public CharacterCustomization(CharacterEyebrows eyebrows, Color32 eyebrowsColor, CharacterHair hair, Color32 hairColor,
-        Color32 skinColor, Color32 eyesColor, CharacterSex sex, HatItemInstance hat, ShirtItemInstance shirt, 
-        PantsItemInstance pants)
+    public static CharacterCustomization Copy(CharacterCustomization original)
     {
-        SetParts(eyebrows, eyebrowsColor, hair, hairColor, skinColor, eyesColor, sex, hat, shirt, pants);
+        return new CharacterCustomization(original.Eyebrows, original.EyebrowsColor, original.Hair, original.HairColor,
+            original.SkinColor, original.EyesColor, original.Sex, original.Hat, original.Shirt, original.Pants);
     }
 
-    public static CharacterCustomization RandomCharacterCustomization()
+    //Default constructor for JSON deserialization
+    public CharacterCustomization()
     {
-        Color32 GetRandomColor()
-        {
-            return new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255);
-        }
-
-        CharacterEyebrows eyebrows = ScenesSharedResources.Instance.EyebrowsOptions[Random.Range(0, ScenesSharedResources.Instance.EyebrowsOptions.Length)];
-        Color32 eyebrowsColor = GetRandomColor();
-
-        CharacterHair hair = ScenesSharedResources.Instance.HairOptions[Random.Range(0, ScenesSharedResources.Instance.HairOptions.Length)];
-        Color32 hairColor = GetRandomColor();
-
-        Color32 skinColor;
-        //Most times, pick a common skin color
-        if (Random.Range(0, 10) < 8)
-        {
-            skinColor = commonSkinColors[Random.Range(0, commonSkinColors.Count)];
-        }
-        else
-        {
-            skinColor = GetRandomColor();
-        }
-
-        Color32 eyesColor = GetRandomColor();
-
-        PantsItemInstance pantsInstance = new PantsItemInstance(ScenesSharedResources.Instance.Pants, GetRandomColor());
-
-        CharacterShirtItemInformation randomShirt = ScenesSharedResources.Instance.ShirtOptions[Random.Range(0, ScenesSharedResources.Instance.ShirtOptions.Length)];
-        ShirtItemInstance shirtItem = new ShirtItemInstance(randomShirt, 
-            randomShirt.HasPrimaryColor ? (Color32?)GetRandomColor() : null,
-            randomShirt.HasSecondaryColor ? (Color32?)GetRandomColor() : null);
-
-        CharacterSex randomSex = (CharacterSex)Random.Range(0, System.Enum.GetNames(typeof(CharacterSex)).Length);
-
-        return new CharacterCustomization(eyebrows, eyebrowsColor, hair, hairColor, skinColor, eyesColor, randomSex, null, shirtItem, pantsInstance);
     }
 
-    public void SetParts(CharacterEyebrows eyebrows, Color32 eyebrowsColor, CharacterHair hair, Color32 hairColor,
-        Color32 skinColor, Color32 eyesColor, CharacterSex sex, HatItemInstance hat, ShirtItemInstance shirt,
+
+    public CharacterCustomization(AssetReference eyebrows, Color32 eyebrowsColor, AssetReference hair, Color32 hairColor,
+        Color32 skinColor, Color32 eyesColor, CharacterSex sex, TwoColorsCosmeticInstance hat, TwoColorsCosmeticInstance shirt, 
         PantsItemInstance pants)
     {
         this.eyebrows = eyebrows;
@@ -144,5 +117,40 @@ public class CharacterCustomization
         this.hat = hat;
         this.shirt = shirt;
         this.pants = pants;
+    }
+
+    public static CharacterCustomization RandomCharacterCustomization(CharacterSex characterSex)
+    {
+        Color32 GetRandomColor()
+        {
+            return new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255);
+        }
+
+        AssetReference randomEyebrows = ScenesSharedResources.Instance.EyebrowsOptions[Random.Range(0, ScenesSharedResources.Instance.EyebrowsOptions.Length)];
+        Color32 randomEyebrowsColor = GetRandomColor();
+
+        AssetReference randomHair = ScenesSharedResources.Instance.HairOptions[Random.Range(0, ScenesSharedResources.Instance.HairOptions.Length)];
+        Color32 randomHairColor = GetRandomColor();
+
+        Color32 randomSkinColor;
+        //Most times, pick a common skin color
+        if (Random.Range(0, 10) < 8)
+        {
+            randomSkinColor = commonSkinColors[Random.Range(0, commonSkinColors.Count)];
+        }
+        else
+        {
+            randomSkinColor = GetRandomColor();
+        }
+
+        Color32 randomEyesColor = GetRandomColor();
+
+        PantsItemInstance randomPantsInstance = new PantsItemInstance(ScenesSharedResources.Instance.Pants, GetRandomColor());
+
+        AssetReference randomShirt = ScenesSharedResources.Instance.ShirtOptions[Random.Range(0, ScenesSharedResources.Instance.ShirtOptions.Length)];
+        CharacterShirtItemInformation randomShirtInfo = AssetsManager.GetAsset<CharacterShirtItemInformation>(randomShirt);
+        TwoColorsCosmeticInstance randomShirtInstance = new TwoColorsCosmeticInstance(randomShirt, GetRandomColor(), GetRandomColor());
+
+        return new CharacterCustomization(randomEyebrows, randomEyebrowsColor, randomHair, randomHairColor, randomSkinColor, randomEyesColor, characterSex, null, randomShirtInstance, randomPantsInstance);
     }
 }

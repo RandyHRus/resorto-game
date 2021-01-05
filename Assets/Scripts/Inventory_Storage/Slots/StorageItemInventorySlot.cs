@@ -47,7 +47,7 @@ public class StorageItemInventorySlot: ItemInventorySlot
         if (!(this.Item == null || this.Item.Equals(this.Item)))
             throw new System.Exception("Invalid item");
 
-        if (!item.ItemInformation.Stackable)
+        if (!item.GetItemInformation().Stackable)
         {
             if (Count + toAdd <= 1)
             {

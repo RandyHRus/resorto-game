@@ -16,7 +16,7 @@ public class CosmeticInventorySlot<T> : ItemInventorySlot where T: CharacterCosm
 
     public void SetSlot(InventoryItemInstance item)
     {
-        if (item != null && item.ItemInformation.GetType() != typeof(T))
+        if (item != null && item.GetItemInformation().GetType() != typeof(T))
         {
             throw new System.Exception("Invalid item in cosmetic slot");
         }
@@ -48,7 +48,7 @@ public class CosmeticInventorySlot<T> : ItemInventorySlot where T: CharacterCosm
 
         InventoryItemInstance currentItem = Item;
 
-        if (mouseDraggingSlotInformation.Item?.ItemInformation is T cosmetic)
+        if (mouseDraggingSlotInformation.Item?.GetItemInformation() is T cosmetic)
         {
             SetSlot(mouseDraggingSlotInformation.Item);
             mouseDraggingSlotInformation.SetSlot(currentItem, currentItem == null ? 0 : 1);

@@ -12,7 +12,7 @@ public class IslandGenerationPipeline
     {
         try
         {
-            IslandTerrainGenerator.Instance.GenerateIsland();
+            IslandTerrainGenerator.Instance.GenerateNewIsland();
             IslandStartingDockGenerator.Instance.CreateStartingDock(out Vector2Int unloadingPosition);
             IslandObjectsGenerator.Instance.GenerateIslandObjects();
 
@@ -25,6 +25,7 @@ public class IslandGenerationPipeline
         catch (IslandGenerationException e)
         {
             Debug.Log("Generation Failed. Requesting new island! " + e);
+            LoadingScene.sceneName = "Main";
             SceneManager.LoadScene("Loading");
         }
     }

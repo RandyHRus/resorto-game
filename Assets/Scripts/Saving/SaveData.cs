@@ -6,115 +6,95 @@ using System;
 [System.Serializable]
 public class SaveData
 {
-    [SerializeField] private PlayerData playerData = null;
-    public PlayerData PlayerData_ => playerData;
+    public PlayerData PlayerData { get; private set;}
+    public TouristsData TouristsData { get; private set; }
+    public MapData MapData { get; private set; }
 
-    [SerializeField] private TouristsData touristsData = null;
-    public TouristsData TouristsData_ => touristsData;
-
-    [SerializeField] private MapData mapData = null;
-    public MapData MapData_ => mapData;
-
-    public SaveData()
+    public SaveData(PlayerData playerData, TouristsData touristsData, MapData mapData)
     {
-        playerData = new PlayerData();
-        touristsData = new TouristsData();
-        mapData = new MapData();
+        this.PlayerData = playerData;
+        this.TouristsData = touristsData;
+        this.MapData = mapData;
+    }
+}
+
+[System.Serializable]
+public class PlayerData
+{
+    public CharacterCustomization CharacterCustomization { get; private set; }
+    public string PlayerName { get; private set; }
+    public Vector2 Position { get; private set; }
+
+    public PlayerData(CharacterCustomization characterCustomization, Vector2 position, string playerName)
+    {
+        this.CharacterCustomization = characterCustomization;
+        this.PlayerName = playerName;
+        this.Position = position;
+    }
+}
+
+[System.Serializable]
+public class TouristsData
+{
+    public TouristData[] TouristsData_ { get; private set; }
+
+    public TouristsData(TouristData[] touristsData)
+    {
+        this.TouristsData_ = touristsData;
+    }
+
+
+    [System.Serializable]
+    public class TouristData
+    {
+        public TouristInformation TouristInformation { get; private set; }
+        public Vector2 Position { get; private set; }
+        public int Happiness { get; private set; }
+        //TODO: interests, states, etc.
+
+        public TouristData(TouristInformation touristInformation, Vector2 position, int happiness)
+        {
+            this.TouristInformation = touristInformation;
+            this.Position = position;
+            this.Happiness = happiness;
+
+        }
+    }
+}
+
+[System.Serializable]
+public class MapData
+{
+    public string IslandName { get; private set; }
+    public TileData[,] TilesData { get; private set; }
+    public RegionData[] RegionsData { get; private set; }
+
+    public MapData(string islandName, TileData[,] tilesData)
+    {
+        this.IslandName = islandName;
+        this.TilesData = tilesData;
     }
 
     [System.Serializable]
-    public class PlayerData
+    public class TileData
     {
-        [SerializeField] private CharacterCustomization characterCustomization = null;
-        public CharacterCustomization CharacterCustomization => characterCustomization;
+        public int LayerNum { get; private set; }
 
-        [SerializeField] private Vector2 position = default;
-        public Vector2 Position => position;
-
-        public PlayerData()
+        public TileData(int layerNum)
         {
-            characterCustomization = PlayerCustomization.Character;
-            position = PlayerMovement.Instance.transform.position;
+            this.LayerNum = layerNum;
         }
     }
 
     [System.Serializable]
-    public class TouristsData
+    public class RegionData
     {
-        [SerializeField] private TouristData[] touristsData = null;
-        public TouristData[] TouristsData_ => touristsData;
+        public Vector2Int[] Positions { get; private set; }
+        public RegionInformation RegionInfo { get; private set; }
 
-        public TouristsData()
+        public RegionData()
         {
-            touristsData = new TouristData[TouristsManager.Instance.touristsCount];
-            List<TouristMonoBehaviour> Tourists = TouristsManager.Instance.Tourists;
-            for (int i = 0; i < TouristsManager.Instance.touristsCount; i++)
-            {
-                touristsData[i] = new TouristData(Tourists[i]);
-            }
-        }
 
-
-        [System.Serializable]
-        public class TouristData
-        {
-            [SerializeField] private TouristInformation touristInformation = null;
-            public TouristInformation TouristInformation => touristInformation;
-
-            [SerializeField] private Vector2 position = default;
-            public Vector2 Position => position;
-
-            [SerializeField] private int happiness = default;
-            public int Happiness => happiness;
-            //TODO: interests, states, etc.
-
-            public TouristData(TouristMonoBehaviour touristMono)
-            {
-                touristInformation = touristMono.TouristInformation;
-                position = touristMono.transform.position;
-                happiness = touristMono.TouristComponents.happiness.Value;
-
-            }
-        }
-    }
-
-    [System.Serializable]
-    public class MapData
-    {
-        [SerializeField] private string islandName = default;
-        public string IslandName => islandName;
-
-        [SerializeField] private TileData[,] tilesData = null;
-        public TileData[,] TilesData => tilesData;
-
-        [SerializeField] private RegionData[] regionsData = null;
-        public RegionData[] RegionsData => regionsData;
-
-        public MapData()
-        {
-            islandName = "#PlaceHolder#";
-        }
-
-        [System.Serializable]
-        public class TileData
-        {
-            [SerializeField] int layerNum = default;
-            public int LayerNum => layerNum;
-        }
-
-        [System.Serializable]
-        public class RegionData
-        {
-            [SerializeField] private Vector2Int[] positions = null;
-            public Vector2Int[] Positions => positions;
-
-            [SerializeField] private RegionInformation regionInfo = null;
-            public RegionInformation RegionInfo => regionInfo;
-
-            public RegionData()
-            {
-
-            }
         }
     }
 }

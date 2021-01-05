@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.AddressableAssets;
+using System;
 
 public class CharacterCustomizationLoader : MonoBehaviour
 {
+    private CharacterCustomization currentLoadedCustomization = null;
+
     [SerializeField] private bool useImages = false;
     [ConditionalHide("useImages", false, true), SerializeField] private CharacterSpriteRenderers spriteRenderers = null;
     [ConditionalHide("useImages", false, false), SerializeField] private CharacterImageRenderers images = null;
@@ -76,7 +80,6 @@ public class CharacterCustomizationLoader : MonoBehaviour
         [SerializeField] private SpritableSpriteRenderer[] eyeRenderers = null;
         public override Spritable[] EyeRenderers => eyeRenderers;
     }
-
 
     [System.Serializable]
     public class CharacterImageRenderers: SpriteRendererOrImage
@@ -195,185 +198,199 @@ public class CharacterCustomizationLoader : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    public void SetEyes(Color32 color)
+    private void OnEyesColorChangedHandler(object[] args = null)
     {
         for (int i = 0; i < renderers.EyeRenderers.Length; i++)
         {
-            renderers.EyeRenderers[i].SetColor(color);
+            renderers.EyeRenderers[i].SetColor(currentLoadedCustomization.EyesColor);
         }
     }
 
-    public void SetSkin(Color32 color)
+    private void OnSkinColorChangedHandler(object[] args = null)
     {
         for (int i = 0; i < renderers.SkinColorRenderers.Length; i++)
         {
-            renderers.SkinColorRenderers[i].SetColor(color);
+            renderers.SkinColorRenderers[i].SetColor(currentLoadedCustomization.SkinColor);
         }
     }
 
-    public void SetEyebrowsColor(Color32 color)
+    private void OnEyebrowsColorChangedHandler(object[] args = null)
     {
-        renderers.EyebrowRenderer.SetColor(color);
+        renderers.EyebrowRenderer.SetColor(currentLoadedCustomization.EyebrowsColor);
     }
 
-    public void SetEyebrows(CharacterEyebrows eyebrows)
+    private void OnEyebrowsChangedHandler(object[] args = null)
     {
+        CharacterEyebrows eyebrows = AssetsManager.GetAsset<CharacterEyebrows>(currentLoadedCustomization.Eyebrows);
         renderers.EyebrowRenderer.SetSprite(eyebrows.Sprite);
     }
 
-    public void SetHair(CharacterHair hair)
+    private void OnHairChangedHandler(object[] args = null)
     {
-        renderers.HairFrontRenderer.Enable(hair != null && hair.FrontHair != null && animator.GetFloat("Vertical") <= 0);
-        renderers.HairBackRenderer.Enable(hair != null && hair.BackHair != null && animator.GetFloat("Vertical") > 0);
+        //renderers.HairFrontRenderer.Enable(hair != null && hair.FrontHair != null && animator.GetFloat("Vertical") <= 0);
+        //renderers.HairBackRenderer.Enable(hair != null && hair.BackHair != null && animator.GetFloat("Vertical") > 0);
 
-        renderers.HairFrontRenderer.SetSprite(hair?.FrontHair);
-        renderers.HairBackRenderer.SetSprite(hair?.BackHair);
+        CharacterHair hair = AssetsManager.GetAsset<CharacterHair>(currentLoadedCustomization.Hair);
+
+        renderers.HairFrontRenderer.SetSprite(hair.FrontHair);
+        renderers.HairBackRenderer.SetSprite(hair.BackHair);
     }
 
-    public void SetHairColor(Color32 color)
+    private void OnHairColorChangedHandler(object[] args = null)
     {
-        renderers.HairFrontRenderer.SetColor(color);
-        renderers.HairBackRenderer.SetColor(color);
+        renderers.HairFrontRenderer.SetColor(currentLoadedCustomization.HairColor);
+        renderers.HairBackRenderer.SetColor(currentLoadedCustomization.HairColor);
     }
 
-    public void SetSex(CharacterSex sex)
+    private void OnSexChangedHandler(object[] args = null)
     {
-        renderers.BraRenderer.Enable(sex == CharacterSex.Female);
+        renderers.BraRenderer.Enable(currentLoadedCustomization.Sex == CharacterSex.Female);
     }
-    
-    public void LoadHatInstance(HatItemInstance hat)
+
+    private void OnHatChangedHandler(object[] args = null)
     {
-        if (hat != null)
+        CharacterHatItemInformation hat;
+        if (currentLoadedCustomization.Hat != null)
         {
-            SetHat((CharacterHatItemInformation)hat.ItemInformation);
-
-            if (hat.PrimaryColor != null)
-                SetHatBaseColor((Color32)hat.PrimaryColor);
-
-            if (hat.SecondaryColor != null)
-                SetHatColorableColor((Color32)hat.SecondaryColor);
+            hat = (CharacterHatItemInformation)currentLoadedCustomization.Hat.GetItemInformation();
         }
         else
         {
-            SetHat(null);
+            hat = null;
+        }
+        //Sets hat
+        {
+            renderers.HatFrontRenderer1.SetSprite(hat?.BaseSpritePair.SpriteFront);
+            renderers.HatFrontRenderer1.Enable(hat != null && animator.GetFloat("Vertical") <= 0);
+
+            renderers.HatFrontRenderer2.SetSprite(hat?.TopSpritePair.SpriteFront);
+            renderers.HatFrontRenderer2.Enable(hat != null && animator.GetFloat("Vertical") <= 0);
+
+            renderers.HatBackRenderer1.SetSprite(hat?.BaseSpritePair.SpriteBack);
+            renderers.HatBackRenderer1.Enable(hat != null && animator.GetFloat("Vertical") > 0);
+
+            renderers.HatBackRenderer2.SetSprite(hat?.TopSpritePair.SpriteBack);
+            renderers.HatBackRenderer2.Enable(hat != null && animator.GetFloat("Vertical") > 0);
+        }
+
+        if (currentLoadedCustomization.Hat != null)
+        {
+            //Set base color
+            renderers.HatFrontRenderer1.SetColor(currentLoadedCustomization.Hat.BaseColor);
+            renderers.HatBackRenderer1.SetColor(currentLoadedCustomization.Hat.BaseColor);
+
+            //Set top color
+            renderers.HatFrontRenderer2.SetColor(currentLoadedCustomization.Hat.TopColor);
+            renderers.HatBackRenderer2.SetColor(currentLoadedCustomization.Hat.TopColor);
         }
     }
 
-    public void SetHat(CharacterHatItemInformation hat)
+    private void OnShirtChangedHandler(object[] args = null)
     {
-        renderers.HatFrontRenderer1.SetSprite(hat?.BaseSpritePair.SpriteFront);
-        renderers.HatFrontRenderer1.Enable(hat != null && hat.BaseSpritePair.SpriteFront != null && animator.GetFloat("Vertical") <= 0);
-
-        renderers.HatFrontRenderer2.SetSprite(hat?.ColorableSpritePair.SpriteFront);
-        renderers.HatFrontRenderer2.Enable(hat != null  && hat.ColorableSpritePair.SpriteFront != null && animator.GetFloat("Vertical") <= 0);
-
-        renderers.HatBackRenderer1.SetSprite(hat?.BaseSpritePair.SpriteBack);
-        renderers.HatBackRenderer1.Enable(hat != null && hat.BaseSpritePair.SpriteBack != null && animator.GetFloat("Vertical") > 0);
-
-        renderers.HatBackRenderer2.SetSprite(hat?.ColorableSpritePair.SpriteBack);
-        renderers.HatBackRenderer2.Enable(hat != null && hat.ColorableSpritePair.SpriteBack != null && animator.GetFloat("Vertical") > 0);
-    }
-
-    public void SetHatBaseColor(Color32 color)
-    {
-        renderers.HatFrontRenderer1.SetColor(color);
-        renderers.HatBackRenderer1.SetColor(color);
-    }
-
-    public void SetHatColorableColor(Color32 color)
-    {
-        renderers.HatFrontRenderer2.SetColor(color);
-        renderers.HatBackRenderer2.SetColor(color);
-    }
-
-    public void LoadShirtInstance(ShirtItemInstance shirt)
-    {
-        if (shirt != null)
+        CharacterShirtItemInformation shirt;
+        if (currentLoadedCustomization.Shirt != null)
         {
-            SetShirt((CharacterShirtItemInformation)shirt.ItemInformation);
-
-            if (shirt.BaseColor != null)
-                SetShirtBaseColor((Color32)shirt.BaseColor);
-
-            if (shirt.ColorableColor != null) 
-                SetShirtColorableColor((Color32)shirt.ColorableColor);
+            shirt = (CharacterShirtItemInformation)currentLoadedCustomization.Shirt.GetItemInformation();
         }
         else
         {
-            SetShirt(null);
+            shirt = null;
         }
-    }
-
-    public void SetShirt(CharacterShirtItemInformation shirt)
-    {
-        renderers.ShirtFrontRenderer1.SetSprite(shirt?.BaseSpritePair.SpriteFront);
-        renderers.ShirtFrontRenderer1.Enable(shirt != null && shirt.BaseSpritePair.SpriteFront != null && animator.GetFloat("Vertical") <= 0);
-
-        renderers.ShirtFrontRenderer2.SetSprite(shirt?.ColorableSpritePair.SpriteFront);
-        renderers.ShirtFrontRenderer2.Enable(shirt != null && shirt.ColorableSpritePair.SpriteFront != null && animator.GetFloat("Vertical") <= 0);
-
-        renderers.ShirtBackRenderer1.SetSprite(shirt?.BaseSpritePair.SpriteBack);
-        renderers.ShirtBackRenderer1.Enable(shirt != null && shirt.BaseSpritePair.SpriteBack != null && animator.GetFloat("Vertical") > 0);
-
-        renderers.ShirtBackRenderer2.SetSprite(shirt?.ColorableSpritePair.SpriteBack);
-        renderers.ShirtBackRenderer2.Enable(shirt != null && shirt.ColorableSpritePair.SpriteBack != null && animator.GetFloat("Vertical") > 0);
-    }
-
-    public void SetShirtBaseColor(Color32 color)
-    {
-        renderers.ShirtFrontRenderer1.SetColor(color);
-        renderers.ShirtBackRenderer1.SetColor(color);
-    }
-
-    public void SetShirtColorableColor(Color32 color)
-    {
-        renderers.ShirtFrontRenderer2.SetColor(color);
-        renderers.ShirtBackRenderer2.SetColor(color);
-    }
-
-    public void LoadPantsInstance(PantsItemInstance pants)
-    {
-        if (pants != null)
+        //Set shirt
         {
-            SetPants((CharacterPantsItemInformation)pants.ItemInformation);
-            SetPantsColor(pants.Color_);
+            renderers.ShirtFrontRenderer1.SetSprite(shirt?.BaseSpritePair.SpriteFront);
+            renderers.ShirtFrontRenderer1.Enable(shirt != null && animator.GetFloat("Vertical") <= 0);
+
+            renderers.ShirtFrontRenderer2.SetSprite(shirt?.TopSpritePair.SpriteFront);
+            renderers.ShirtFrontRenderer2.Enable(shirt != null && animator.GetFloat("Vertical") <= 0);
+
+            renderers.ShirtBackRenderer1.SetSprite(shirt?.BaseSpritePair.SpriteBack);
+            renderers.ShirtBackRenderer1.Enable(shirt != null && animator.GetFloat("Vertical") > 0);
+
+            renderers.ShirtBackRenderer2.SetSprite(shirt?.TopSpritePair.SpriteBack);
+            renderers.ShirtBackRenderer2.Enable(shirt != null && animator.GetFloat("Vertical") > 0);
         }
-        else
+
+        if (currentLoadedCustomization.Shirt != null)
         {
-            SetPants(null);
+            //Set base color
+            renderers.ShirtFrontRenderer1.SetColor(currentLoadedCustomization.Shirt.BaseColor);
+            renderers.ShirtBackRenderer1.SetColor(currentLoadedCustomization.Shirt.BaseColor);
+
+            //Set top color
+            renderers.ShirtFrontRenderer2.SetColor(currentLoadedCustomization.Shirt.TopColor);
+            renderers.ShirtBackRenderer2.SetColor(currentLoadedCustomization.Shirt.TopColor);
         }
     }
 
-    public void SetPants(CharacterPantsItemInformation pants)
+    private void OnPantsChangedHandler(object[] args = null)
     {
-        // Little weird with pants because we only have 1 type,
         // Enable/Disable pants renderers depending on if pants is null or not
         for (int i = 0; i < renderers.PantsRenderers.Length; i++)
         {
-            renderers.PantsRenderers[i].Enable(pants != null);
+            renderers.PantsRenderers[i].Enable(currentLoadedCustomization.Pants != null);
+        }
+
+        if (currentLoadedCustomization.Pants != null)
+        {
+            //Set color
+            for (int i = 0; i < renderers.PantsRenderers.Length; i++)
+            {
+                renderers.PantsRenderers[i].SetColor(currentLoadedCustomization.Pants.Color_);
+            }
         }
     }
 
-    public void SetPantsColor(Color32 color)
-    {
-        for (int i = 0; i < renderers.PantsRenderers.Length; i++)
-        {
-            renderers.PantsRenderers[i].SetColor(color);
-        }
-    } 
-
     public void LoadCustomization(CharacterCustomization customization)
     {
-        SetEyes(customization.EyesColor);
-        SetSkin(customization.SkinColor);
-        SetEyebrows(customization.Eyebrows);
-        SetEyebrowsColor(customization.EyebrowsColor);
-        SetHair(customization.Hair);
-        SetHairColor(customization.HairColor);
-        SetSex(customization.Sex);
+        if (currentLoadedCustomization != null)
+        {
+            UnsubscribeCurrent();
+        }
+        currentLoadedCustomization = customization;
 
-        LoadHatInstance(customization.Hat);
-        LoadShirtInstance(customization.Shirt);
-        LoadPantsInstance(customization.Pants);
+        OnEyebrowsChangedHandler();
+        OnEyebrowsColorChangedHandler();
+        OnHairChangedHandler();
+        OnHairColorChangedHandler();
+        OnSkinColorChangedHandler();
+        OnEyesColorChangedHandler();
+        OnSexChangedHandler();
+        OnHatChangedHandler();
+        OnShirtChangedHandler();
+        OnPantsChangedHandler();
+
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Subscribe("eyebrows",           OnEyebrowsChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Subscribe("eyebrowsColor",      OnEyebrowsColorChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Subscribe("hair",               OnHairChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Subscribe("hairColor",          OnHairColorChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Subscribe("skinColor",          OnSkinColorChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Subscribe("eyesColor",          OnEyesColorChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Subscribe("sex",                OnSexChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Subscribe("hat",                OnHatChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Subscribe("shirt",              OnShirtChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Subscribe("pants",              OnPantsChangedHandler);
+    }
+
+    private void UnsubscribeCurrent()
+    {
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Unsubscribe("eyebrows", OnEyebrowsChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Unsubscribe("eyebrowsColor", OnEyebrowsColorChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Unsubscribe("hair", OnHairChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Unsubscribe("hairColor", OnHairColorChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Unsubscribe("skinColor", OnSkinColorChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Unsubscribe("eyesColor", OnEyesColorChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Unsubscribe("sex", OnSexChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Unsubscribe("hat", OnHatChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Unsubscribe("shirt", OnShirtChangedHandler);
+        currentLoadedCustomization.CustomizationPartChangedEventManager.Unsubscribe("pants", OnPantsChangedHandler);
+    }
+
+    private void OnDestroy()
+    {
+        if (currentLoadedCustomization != null)
+        {
+            UnsubscribeCurrent();
+        }
     }
 }

@@ -19,16 +19,17 @@ public class PlayerInitialization : MonoBehaviour
                 _instance = this;
             }
         }
-
         IslandGenerationPipeline.IslandCompleted += SetInitialLocation;
+        MainSceneLoader.OnLoadingComplete += OnMainSceneLoadingCompleteHandler;
     }
 
     private void OnDestroy()
     {
         IslandGenerationPipeline.IslandCompleted -= SetInitialLocation;
+        MainSceneLoader.OnLoadingComplete -= OnMainSceneLoadingCompleteHandler;
     }
 
-    private void Start()
+    private void OnMainSceneLoadingCompleteHandler()
     {
         //Load character
         GetComponent<CharacterCustomizationLoader>().LoadCustomization(PlayerCustomization.Character);

@@ -27,7 +27,7 @@ public class WildlifeManager : MonoBehaviour
             _instance = this;
         }
 
-        IslandGenerationPipeline.IslandCompleted += OnIslandCompletedHandler;
+        MainSceneLoader.OnLoadingComplete += OnLoadingCompleteHandler;
     }
 
     private void Start()
@@ -37,11 +37,11 @@ public class WildlifeManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        IslandGenerationPipeline.IslandCompleted -= OnIslandCompletedHandler;
+        MainSceneLoader.OnLoadingComplete -= OnLoadingCompleteHandler;
         PlayerMovement.Instance.PlayerMoved -= OnPlayerMovedHandler;
     }
 
-    private void OnIslandCompletedHandler(Vector2Int startPos)
+    private void OnLoadingCompleteHandler()
     {
         Initialize();
     }

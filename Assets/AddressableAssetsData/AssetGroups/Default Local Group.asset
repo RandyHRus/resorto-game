@@ -1,0 +1,450 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Default Local Group
+  m_EditorClassIdentifier: 
+  m_GroupName: Default Local Group
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 1adc49733a338eb44a5f5ed2310635e0
+  m_SerializeEntries:
+  - m_GUID: 0024e7dc750e6b0489b2a095b0a2d1a0
+    m_Address: Assets/_Items/Objects/Darkwood/Darkwood tall round table.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 012c52045788f0c428963fd66a887f07
+    m_Address: Assets/_Items/Food/Ramen.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 04492999d5a6acc448ef696446fb4732
+    m_Address: Assets/_Items/Objects/Darkwood/Darkwood large table.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 07d4eb248d9cd1748bb63976c87c6177
+    m_Address: Assets/_CharacterParts/BodyParts/Eyebrows/Eyebrows1.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: 0b8933c91db26d640bd3b685c83b8ddd
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair14.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: 0d5af5366a822b74191bee5e65bff3d4
+    m_Address: Assets/_Interests/Nature.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Interest
+  - m_GUID: 1347da320231d1d4f9efc28b332d30ac
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair9.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: 147c5b5dd5a3010439d5b87747ec5dc0
+    m_Address: Assets/_Items/Cosmetics/Pants/Pants.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 14f1d81dd16a0084981a65ea48d035b6
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair8.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: 15291d69076786e499c7f6a033d6f313
+    m_Address: Assets/_Items/Objects/Lamp post.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 15dad8b3478b56f4a9022d01b3894e8a
+    m_Address: Assets/_Items/Food/Dango.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 164363fbb8b0afd459ac3da43cad607c
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair17.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: 1962caeafdfd8a74dae1794f642fbf0e
+    m_Address: Assets/_Interests/Drinks.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Interest
+  - m_GUID: 1d3302cb158440c42962b12eee6f7809
+    m_Address: Assets/_Regions/Base_BoatUnloading.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Region
+  - m_GUID: 1fea2f2843a772447865c3fa75cf0dc3
+    m_Address: Assets/_Interests/Art.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Interest
+  - m_GUID: 25a9d129adf191e4e9847b69da36e6e7
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair11.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: 284f49615cd178048b20887851ddf361
+    m_Address: Assets/_Interests/Sports.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Interest
+  - m_GUID: 289d84e7f3679bb4fa07c6ec57ba431d
+    m_Address: Assets/_Items/Food/Soup.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 2aeabb4de4fa12540b8fa528e179d61c
+    m_Address: Assets/_Items/Food/Taco.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 345a3f41187d864458f89dbc27996635
+    m_Address: Assets/_Items/Food/Baguette.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 380714a5678dedb4da0c1adaa9e9fa19
+    m_Address: Assets/_Items/Resources_/Driftwood.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 3ff12e44f92ea704e8e83f3f966501fc
+    m_Address: Assets/_Items/Cosmetics/Shirts/Plain shirt.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 44c9e092ddeadc74094cafb5d6ebf618
+    m_Address: Assets/_Interests/Fitness.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Interest
+  - m_GUID: 45144888db30ad44fb539f15dec1754a
+    m_Address: Assets/_Items/Food/Salad.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 455ed2763986d3743b09c66595db25cf
+    m_Address: Assets/_Items/Food/Chicken skewer.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 4625b887efa6fc8458693ba96dfb2bc0
+    m_Address: Assets/_Items/Food/Donut.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 4805216a34fea2e40ab4f264f734b12f
+    m_Address: Assets/_Items/Objects/Darkwood/Darkwood music tile.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 4b407a6e12d76ec4bbcb7ffde925929c
+    m_Address: Assets/_Items/Objects/Darkwood/Darkwood chair.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 4fa2365260cf97d4ba3f6b476f884f21
+    m_Address: Assets/_Regions/Base_HotelFrontDesk.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Region
+  - m_GUID: 535efd34fc0224b42bf20544e9bd9063
+    m_Address: Assets/_Items/Objects/Pink carpet.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 5435324896504ea4f99e5dcba0c68f3d
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair1.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: 5ca9f5fee8d6b394f9c3855d9108cabf
+    m_Address: Assets/_Items/Food/Spaghetti.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 61d6ef482c7fdcb4eb50495415dd3b54
+    m_Address: Assets/_Items/Food/Ice cream.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 637c7c72993f66b4a97bb26d989a4750
+    m_Address: Assets/_Items/Food/Takoyaki.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 6492869299a38b14da322fda6b1182e1
+    m_Address: Assets/_Interests/Shopping.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Interest
+  - m_GUID: 68bfa2902b1d5ed48a9afa42e4bf437f
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair20.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: 6d553b378ba315d41a90c4a70b06b036
+    m_Address: Assets/_Items/Fish/Clownfish.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 71fb71743793048438fc97aa438de2e6
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair7.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: 7754d30c66267294ca71b306ed79c5b2
+    m_Address: Assets/_Regions/Base_Fishing.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Region
+  - m_GUID: 7b62a5f40f0ee57408f1097fa65914c8
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair15.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: 7bfa5e1d988e28d4cac20cace96fabde
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair6.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: 7d90f42a7fe952e44a0d1468e8b8152d
+    m_Address: Assets/_Items/Objects/Darkwood/Darkwood dresser.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 7f5b3c55e303c604882c19247b0ec6b2
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair3.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: 8189142d4f299db4ba97246685aade1e
+    m_Address: Assets/_Items/Objects/Darkwood/Darkwood chest.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 859a4c2ca45bb354787a5629bef1e451
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair12.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: 8b597fd854049524eab263e62198969a
+    m_Address: Assets/_Items/Objects/Darkwood/Darkwood medium table.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 8b85877db9cb2a84e971399a8a80774d
+    m_Address: Assets/_Items/Food/Pizza.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 8c89c632d0bc0e64695459aa64846c43
+    m_Address: Assets/_Items/Food/Fries.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 8da08706c077c3241a5b0e9e4103eb8d
+    m_Address: Assets/_Items/Fish/Tuna.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 8ec167b6270c1f543a9b7b5524ee76fd
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair18.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: 93787ef7c5452b04e82793fdc1e2e401
+    m_Address: Assets/_Items/Food/Fried chicken.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 955a650c74eba0f479cfd72dffb240ba
+    m_Address: Assets/_Items/Food/Sushi.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 986e19deca139e244b7f96a70640cea5
+    m_Address: Assets/_Items/Food/Steamed buns.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 9b397330aa95a6248a8481aea38879f0
+    m_Address: Assets/_Items/Food/Hot dog.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: 9d4b1bcd2a19a984cae76bdbc1cd2bf2
+    m_Address: Assets/_Interests/Food.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Interest
+  - m_GUID: a14bceaf5bcf65f47a5bafe32ba3bd67
+    m_Address: Assets/_Items/Food/Steak dinner.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: a1cafa0a48655e346a09e79ffba4de77
+    m_Address: Assets/_Interests/Gambling.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Interest
+  - m_GUID: a22d7a68b707cea40b0b46042c511736
+    m_Address: Assets/_Items/Objects/Tall grass seeds.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: a3937f99a69462b419e3d964ad845f46
+    m_Address: Assets/_Items/Food/Cookie.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: a80f14cee4e79724caf09861ef171c7c
+    m_Address: Assets/_Items/Food/Hamburger.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: ae3d949761e42df4eb8df1e0710c4bf3
+    m_Address: Assets/_Interests/Fishing.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Interest
+  - m_GUID: ba13c4212601b384bbec2083a89f28f1
+    m_Address: Assets/_Items/Cosmetics/Hats/TestHat.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: bce7b8e5cc45a584abf6d80cb62ccb7e
+    m_Address: Assets/_Items/Objects/Pink seashell.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: c7d122d0bbd0a0e4db27e4564e995e1e
+    m_Address: Assets/_Items/Tool items/Fishing rod.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: ca3a8141575a2ef428b9b16bef620440
+    m_Address: Assets/_Items/Objects/Darkwood/Darkwood tall table.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: cb0b415f9fbd7c74681ab3d780ed6a6e
+    m_Address: Assets/_Items/Food/Croissant.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: ce240ac9c4aa6514a8a81ee64324e502
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair22(bold).asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: cfd13428ba535f94ba9d6651478c16a2
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair16.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: d432e158b892fe741ac3bfb46e1926af
+    m_Address: Assets/_Items/Food/Curry.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: d484f800d6a69a646bda8c888c8aeb99
+    m_Address: Assets/_Items/Objects/Orange seashell.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: d7cef26125bd23f4db327d2802931efd
+    m_Address: Assets/_Items/Cosmetics/Hats/Bowler.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: daa304ef22368ed48bba8ee3690d8e2b
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair2.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: db988bdd812226849a3f4d1283f12aa4
+    m_Address: Assets/_Items/Objects/Teddy bear.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: de7a958ed1d2ba8468f75a35b39750ec
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair13.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: dfc95ad7d5d225141b28cc67c775e8b2
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair10.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: ec575c94f5f2bf14bb68ea582f8d17da
+    m_Address: Assets/_Items/Objects/Darkwood/Darkwood short round table.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: ed22a8df565acee4985e5d1cf0b2105a
+    m_Address: Assets/_Interests/Relaxing.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Interest
+  - m_GUID: ee417c10a8f79594596be7d887ebdda5
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair5.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: ef408ab3bd2721641b015db92518a789
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair4.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: f43d541a44bd871448c43f1662bac7d6
+    m_Address: Assets/_Items/Objects/Darkwood/Darkwood bed.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: f6eac92c1700813408ff6bc5292e347b
+    m_Address: Assets/_CharacterParts/BodyParts/Eyebrows/Eyebrows2.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: f8c86939eda0bcd4a96f1a159a1271ae
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair19.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: fd83fe9b69c0ea64cab90d7d607938d1
+    m_Address: Assets/_CharacterParts/BodyParts/Hair/Hair21.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Character Part
+  - m_GUID: fecdae2fd72a5c94ababb289462f2e4a
+    m_Address: Assets/_Items/Objects/Darkwood/Darkwood short table.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Inventory Item
+  - m_GUID: ff2bde1d900053143a316fc54286fd03
+    m_Address: Assets/_Regions/Base_HotelRoom.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Region
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 85f7037428fdbbf4cb0131e088b98217, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: c5363a531a70e0c46ae1f44aa741c4cc, type: 2}
+    - {fileID: 11400000, guid: c940e60123b97ae49b9ac7e950a35cfc, type: 2}

@@ -11,6 +11,7 @@ public class ForceReload : MonoBehaviour
         #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.O))
         {
+            LoadingScene.sceneName = "Main";
             SceneManager.LoadScene("Loading");
         }
         #endif

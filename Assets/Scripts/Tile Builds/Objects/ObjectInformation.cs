@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 [CreateAssetMenu]
 public class ObjectInformation : StructureInformation, IBuildable
@@ -51,7 +52,7 @@ public class ObjectInformation : StructureInformation, IBuildable
     private Vector2Int sizeWhenNoSprite = new Vector2Int();
     public Vector2Int SizeWhenNoSprite => sizeWhenNoSprite;
 
-    [SerializeField] private InventoryItemInformation dropItem = null;
+    [SerializeField] private AssetReference dropItem = null;
 
     [SerializeField] private int transparencyCapableYSize = 0;
     public int TransparencyCapableYSize => transparencyCapableYSize;

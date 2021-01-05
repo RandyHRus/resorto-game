@@ -1,22 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using Newtonsoft.Json;
 
 [System.Serializable]
 public class PantsItemInstance : CosmeticItemInstance
 {
-    [SerializeField] private CharacterPantsItemInformation pantsItemInformation = null;
-    public override InventoryItemInformation ItemInformation => pantsItemInformation;
-
-    [SerializeField] private Color32 color = Color.white;
-    public Color32 Color_ => color;
-
     public override Color32? PrimaryColor => color;
     public override Color32? SecondaryColor => null;
 
-    public PantsItemInstance(CharacterPantsItemInformation itemInfo, Color32 color) : base(itemInfo)
+    [SerializeField, JsonProperty] private Color32 color = Color.white;
+    [JsonIgnore] public Color32 Color_ => color;
+
+    public PantsItemInstance(AssetReference itemAsset, Color32 color) : base(itemAsset)
     {
-        pantsItemInformation = itemInfo;
         this.color = color;
     }
 
@@ -29,7 +27,7 @@ public class PantsItemInstance : CosmeticItemInstance
         }
         else
         {
-            return (((PantsItemInstance)obj).ItemInformation == this.ItemInformation &&
+            return (((PantsItemInstance)obj).GetItemInformation() == this.GetItemInformation() &&
                 this.color.Equals(((PantsItemInstance)obj).color));
         }
 
@@ -40,6 +38,6 @@ public class PantsItemInstance : CosmeticItemInstance
         /*Since I cant use mutable fields in hash code, this should be fine
          * as long as I dont use it in a hash table
         */
-        return ItemInformation.GetHashCode();
+        return GetItemInformation().GetHashCode();
     }
 }

@@ -119,22 +119,18 @@ public class TimeManager : MonoBehaviour
         switch (hour) {
             case (morningStart):
                 OnTurnedMorning?.Invoke();
-                Debug.Log("Morning");
                 break;
 
             case (midDayStart):
                 OnTurnedMidDay?.Invoke();
-                Debug.Log("Mid day");
                 break;
 
             case (eveningStart):
                 OnTurnedEvening?.Invoke();
-                Debug.Log("Evening");
                 break;
 
             case (nightStart):
                 OnTurnedNight?.Invoke();
-                Debug.Log("Night");
                 break;
         }
     }

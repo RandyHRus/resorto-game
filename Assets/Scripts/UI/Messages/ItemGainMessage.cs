@@ -19,12 +19,12 @@ public class ItemGainMessage : MessageBox
             else if (tr.tag == "Name Field")
             {
                 OutlinedText text = new OutlinedText(tr.gameObject);
-                text.SetText(item.ItemInformation.ItemName);
-                text.SetColor(ResourceManager.Instance.ItemTagColors[(int)item.ItemInformation.Tag]);
+                text.SetText(item.GetItemInformation().ItemName);
+                text.SetColor(ResourceManager.Instance.ItemTagColors[(int)item.GetItemInformation().Tag]);
             }
             else if (tr.tag == "Icon Field")
             {
-                tr.GetComponent<Image>().sprite = item.ItemInformation.ItemIcon;
+                tr.GetComponent<Image>().sprite = item.GetItemInformation().ItemIcon;
             }
         }
     }

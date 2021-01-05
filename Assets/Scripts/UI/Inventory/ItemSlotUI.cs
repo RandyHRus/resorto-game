@@ -47,7 +47,7 @@ public class ItemSlotUI : InventorySlotUI
         }
         else
         {
-            iconImage.sprite = itemInventorySlot.Item.ItemInformation.ItemIcon;
+            iconImage.sprite = itemInventorySlot.Item.GetItemInformation().ItemIcon;
             iconImage.enabled = true;
 
             itemCountText.SetText(itemInventorySlot.Count > 1 ? itemInventorySlot.Count.ToString() : "");

@@ -1,14 +1,38 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using Newtonsoft.Json;
 
 public class InventoryItemInstance
 {
-    public virtual InventoryItemInformation ItemInformation { get; private set; }
+    [SerializeField, JsonProperty, JsonConverter(typeof(AssetReferenceConverter))] private AssetReference itemInformationAsset = null;
 
-    public InventoryItemInstance(InventoryItemInformation itemInformation)
+    [JsonIgnore] public AssetReference ItemInformationAsset => itemInformationAsset;
+
+    private InventoryItemInformation cachedItemInformation = null;
+    public InventoryItemInformation GetItemInformation() 
     {
-        this.ItemInformation = itemInformation;
+        if (cachedItemInformation == null)
+        {
+            cachedItemInformation = AssetsManager.GetAsset<InventoryItemInformation>(itemInformationAsset);
+        }
+
+        if (cachedItemInformation == null)
+            throw new System.Exception("Something went wrong");
+
+        return cachedItemInformation;
+    }
+
+    //Default constructor for JSON desealization
+    public InventoryItemInstance()
+    {
+
+    }
+
+    public InventoryItemInstance(AssetReference itemInformationAsset)
+    {
+        this.itemInformationAsset = itemInformationAsset;
     }
 
     public override bool Equals(object obj)
@@ -20,13 +44,13 @@ public class InventoryItemInstance
         }
         else
         {
-            return ((InventoryItemInstance)obj).ItemInformation == this.ItemInformation;
+            return ((InventoryItemInstance)obj).GetItemInformation() == this.GetItemInformation();
         }
     }
 
     public override int GetHashCode()
     {
-        return ItemInformation.GetHashCode();
+        return GetItemInformation().GetHashCode();
     }
 
     public virtual void ShowMessage(int count)

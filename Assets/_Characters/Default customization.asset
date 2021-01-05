@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: Default customization
   m_EditorClassIdentifier: 
   characterCustomization:
-    characterName: Default Character
-    eyebrows: {fileID: 11400000, guid: f6eac92c1700813408ff6bc5292e347b, type: 2}
+    eyebrows:
+      m_AssetGUID: 07d4eb248d9cd1748bb63976c87c6177
     eyebrowsColor:
       serializedVersion: 2
       rgba: 4281611396
-    hair: {fileID: 11400000, guid: 71fb71743793048438fc97aa438de2e6, type: 2}
+    hair:
+      m_AssetGUID: f8c86939eda0bcd4a96f1a159a1271ae
     hairColor:
       serializedVersion: 2
       rgba: 4283002015
@@ -30,26 +31,26 @@ MonoBehaviour:
       rgba: 4286259736
     sex: 1
     hat:
-      hatItemInformation: {fileID: 11400000, guid: d7cef26125bd23f4db327d2802931efd,
-        type: 2}
+      itemInformationAsset:
+        m_AssetGUID: d7cef26125bd23f4db327d2802931efd
       primaryColor:
         serializedVersion: 2
-        rgba: 4280799202
+        rgba: 4282072000
       secondaryColor:
         serializedVersion: 2
-        rgba: 4278255459
+        rgba: 4280361365
     shirt:
-      shirtItemInformation: {fileID: 11400000, guid: 3ff12e44f92ea704e8e83f3f966501fc,
-        type: 2}
+      itemInformationAsset:
+        m_AssetGUID: 3ff12e44f92ea704e8e83f3f966501fc
       primaryColor:
         serializedVersion: 2
-        rgba: 4281377214
+        rgba: 4287631292
       secondaryColor:
         serializedVersion: 2
-        rgba: 0
+        rgba: 4286302354
     pants:
-      pantsItemInformation: {fileID: 11400000, guid: 147c5b5dd5a3010439d5b87747ec5dc0,
-        type: 2}
+      itemInformationAsset:
+        m_AssetGUID: 147c5b5dd5a3010439d5b87747ec5dc0
       color:
         serializedVersion: 2
         rgba: 4279983289

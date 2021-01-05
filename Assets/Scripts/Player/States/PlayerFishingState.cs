@@ -151,7 +151,7 @@ public class PlayerFishingState : PlayerState
                 caughtFishFlyingInstance = GameObject.Instantiate(ResourceManager.Instance.CaughtFishPrefab, lineEndPosition, Quaternion.identity).transform;
 
                 randomFish = CaughtFishGenerator.Instance.GetRandomFish();
-                caughtFishFlyingInstance.GetComponent<SpriteRenderer>().sprite = randomFish.ItemInformation.ItemIcon;
+                caughtFishFlyingInstance.GetComponent<SpriteRenderer>().sprite = randomFish.GetItemInformation().ItemIcon;
 
                 Coroutines.Instance.StartCoroutine(LerpEffect.LerpVectorSpeed(lineEndPosition, Player.position, fishCaughtFlySpeed, FishFlyingProgress, FishFlyingEnd, true));
 

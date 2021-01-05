@@ -2,33 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CharacterTwoColorsCosmeticInformation : CharacterCosmeticItemInformation
+public abstract class CharacterTwoColorsCosmeticInformation : CharacterCosmeticItemInformation
 {
     [SerializeField] private CosmeticSpritePair baseSpritePair = null;
     public CosmeticSpritePair BaseSpritePair => baseSpritePair;
 
-    [SerializeField] private bool baseColorable = false;
-    public bool BaseColorable => baseColorable;
+    [SerializeField] private CosmeticSpritePair topSpritePair = null;
+    public CosmeticSpritePair TopSpritePair => topSpritePair;
+}
 
-    [SerializeField] private bool hasColorable = false;
-    public bool HasColorable => hasColorable;
+[System.Serializable]
+public class CosmeticSpritePair
+{
+    [SerializeField] private Sprite spriteFront = null;
+    public Sprite SpriteFront => spriteFront;
 
-    [ConditionalHide("hasColorable", false, false), SerializeField] private CosmeticSpritePair colorableSpritePair = null;
-    public CosmeticSpritePair ColorableSpritePair => colorableSpritePair;
+    [SerializeField] private Sprite spriteBack = null;
+    public Sprite SpriteBack => spriteBack;
 
-    public override bool HasPrimaryColor
-    {
-        get
-        {
-            return (baseColorable || hasColorable);
-        }
-    }
-
-    public override bool HasSecondaryColor
-    {
-        get
-        {
-            return (baseColorable && hasColorable);
-        }
-    }
 }

@@ -3,12 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.AddressableAssets;
 
 public class InventoryManager : MonoBehaviour
 {
-    [SerializeField] private CharacterCustomizationLoader customizationLoader = null;
-
-    [SerializeField] private InventoryItemInformation[] starterItems = null;
+    [SerializeField] private AssetReference[] starterItems = null;
 
     [SerializeField] private Transform inventoryCanvas = null;
     [SerializeField] private Transform inventoryAboveCanvas = null;
@@ -183,17 +182,17 @@ public class InventoryManager : MonoBehaviour
 
     private void OnHatSlotChangedHandler()
     {
-        customizationLoader.LoadHatInstance((HatItemInstance)hatSlot.Item);
+        PlayerCustomization.Character.Hat = (TwoColorsCosmeticInstance)hatSlot.Item;
     }
 
     private void OnShirtSlotChangedHandler()
     {
-        customizationLoader.LoadShirtInstance((ShirtItemInstance)shirtSlot.Item);
+        PlayerCustomization.Character.Shirt =  (TwoColorsCosmeticInstance)shirtSlot.Item;
     }
 
     private void OnPantsSlotChangedHandler()
     {
-        customizationLoader.LoadPantsInstance((PantsItemInstance)pantsSlot.Item);
+        PlayerCustomization.Character.Pants = (PantsItemInstance)pantsSlot.Item;
     }
 
     private void OnDestroy()
@@ -261,7 +260,7 @@ public class InventoryManager : MonoBehaviour
 
     private void GainStartItems()
     {
-        foreach (InventoryItemInformation item in starterItems)
+        foreach (AssetReference item in starterItems)
         {
             //TODO remove, we dont want starter items maybe
             InventoryItemInstance iteminstance = new InventoryItemInstance(item);
@@ -305,7 +304,7 @@ public class InventoryManager : MonoBehaviour
         if (SelectedSlot.Item == null)
             PlayerStateMachineManager.Instance.SwitchState<DefaultState>();
         else
-            SelectedSlot.Item.ItemInformation.ItemSelected();
+            SelectedSlot.Item.GetItemInformation().ItemSelected();
     }
 
     public void AddItem(InventoryItemInstance item, int count) {

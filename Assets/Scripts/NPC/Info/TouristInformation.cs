@@ -16,7 +16,7 @@ public class TouristInformation : NPCInformation
     public static TouristInformation CreateRandomTouristInformation()
     {
         string randomName = RandomNPCName.GetRandomNPCName();
-        CharacterCustomization randomCustomization = CharacterCustomization.RandomCharacterCustomization();
+        CharacterCustomization randomCustomization = CharacterCustomization.RandomCharacterCustomization((CharacterSex)Random.Range(0, System.Enum.GetNames(typeof(CharacterSex)).Length));
         TouristPersonality randomPersonality = (TouristPersonality)Random.Range(0, System.Enum.GetNames(typeof(TouristPersonality)).Length);
 
         return new TouristInformation(randomPersonality, randomName, randomCustomization);

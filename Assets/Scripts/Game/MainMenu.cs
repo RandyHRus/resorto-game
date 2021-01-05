@@ -7,7 +7,8 @@ public class MainMenu : MonoBehaviour
 {
     public void OnNewGameClicked()
     {
-        SceneManager.LoadScene("Character Customization");
+        LoadingScene.sceneName = "Character Customization";
+        SceneManager.LoadScene("Loading");
     }
 
     public void OnLoadGameClicked()

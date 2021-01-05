@@ -13,26 +13,4 @@ public abstract class CharacterCosmeticItemInformation : InventoryItemInformatio
     {
         PlayerStateMachineManager.Instance.SwitchState<DefaultState>();
     }
-
-    public abstract bool HasPrimaryColor { get; }
-
-    public abstract bool HasSecondaryColor { get; }
-    
-    public enum NumberOfColors
-    {
-        None,
-        One,
-        Two
-    }
-}
-
-[System.Serializable]
-public class CosmeticSpritePair
-{
-    [SerializeField] private Sprite spriteFront = null;
-    public Sprite SpriteFront => spriteFront;
-
-    [SerializeField] private Sprite spriteBack = null;
-    public Sprite SpriteBack => spriteBack;
-
 }

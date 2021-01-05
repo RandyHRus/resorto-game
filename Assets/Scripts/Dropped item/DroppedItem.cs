@@ -46,7 +46,7 @@ public class DroppedItem : MonoBehaviour
 
         this.ItemInstance = itemInstance;
         this.Count = count;
-        innerTransform.GetComponent<SpriteRenderer>().color = ResourceManager.Instance.ItemTagColors[(int)itemInstance.ItemInformation.Tag];
+        innerTransform.GetComponent<SpriteRenderer>().color = ResourceManager.Instance.ItemTagColors[(int)itemInstance.GetItemInformation().Tag];
 
         timer = 0;
 

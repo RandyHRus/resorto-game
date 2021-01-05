@@ -37,7 +37,30 @@ public class IslandTerrainGenerator : MonoBehaviour
         }
     }
 
-    public void GenerateIsland()
+    public void GenerateNewIsland()
+    {
+        float[,] mapData = GenerateMapData();
+
+        int[,] layerHeightMap = new int[mapSize, mapSize];
+
+        //Determine which layers to create terrain on
+        for (int x = 0; x < mapSize; x++)
+        {
+            for (int y = 0; y < mapSize; y++)
+            {
+                int layerNum = (int)Mathf.Lerp(-1, maxLayerHeight, mapData[x, y]);
+                layerHeightMap[x, y] = layerNum;
+            }
+        }
+
+        GenerateIslandTerrain(layerHeightMap);
+    }
+
+    //LayerHeightMap should be:
+    // -1 for water
+    // 0 for sand
+    // 1 and above for land
+    public void GenerateIslandTerrain(int[,] layerHeightMap)
     {
         //Create water tilemap (and water background
         {
@@ -55,36 +78,14 @@ public class IslandTerrainGenerator : MonoBehaviour
             }
         }
 
-        float[,] mapData = GenerateMapData();
-
-        int[,] layerHeightMap = new int[mapSize, mapSize];
-
-        bool[,,] layerHeightToBCreateTerrain = new bool[maxLayerHeight+1, mapSize, mapSize]; //Each element in array is false by default
-
-        //Determine which layers to create terrain on
-        for (int x = 0; x < mapSize; x++)
-        {
-            for (int y = 0; y < mapSize; y++)
-            {
-                int layerNum = (int)Mathf.Lerp(-1, maxLayerHeight, mapData[x, y]);
-                layerHeightMap[x, y] = layerNum;
-
-                for (int j = layerNum; j >= 0; j--)
-                {
-                    layerHeightToBCreateTerrain[j, x, y] = true;
-                }
-            }
-        }
-
-        //Actual terrain creation;
         for (int i = 0; i < maxLayerHeight; i++)
         {
             for (int x = 0; x < mapSize; x++)
             {
                 for (int y = 0; y < mapSize; y++)
                 {
-                    bool toCreate = layerHeightToBCreateTerrain[i, x, y];
-                    if (toCreate) {
+                    if (layerHeightMap[x, y] >= i)
+                    {
                         if (i == 0)
                         {
                             TerrainManager.Instance.TryCreateSand(new Vector2Int(x, y));
@@ -99,6 +100,7 @@ public class IslandTerrainGenerator : MonoBehaviour
         }
     }
 
+    //Returns float between 0 to 1
     private float[,] GenerateMapData()
     {
         float[,] noiseMap = GenerateNoiseMap();

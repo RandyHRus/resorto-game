@@ -55,7 +55,7 @@ public class TouristsManager : MonoBehaviour
         */
         for (int i = 0; i < 1; i++)
         {
-            CreateTourist(TouristInformation.CreateRandomTouristInformation(), new Vector2Int(playerStartingPosition.x, playerStartingPosition.y));
+            //CreateTourist(TouristInformation.CreateRandomTouristInformation(), new Vector2Int(playerStartingPosition.x, playerStartingPosition.y));
         }
     }
     

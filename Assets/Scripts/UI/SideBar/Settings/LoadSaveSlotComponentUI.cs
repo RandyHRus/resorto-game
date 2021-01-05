@@ -4,6 +4,7 @@ using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
 using Newtonsoft.Json.Linq;
+using UnityEngine.SceneManagement;
 
 public class LoadSaveSlotComponentUI : SaveSlotComponentUI
 {
@@ -15,6 +16,10 @@ public class LoadSaveSlotComponentUI : SaveSlotComponentUI
     public override void OnClick()
     {
         base.OnClick();
-        //Todo: load
+        MainSceneLoader.loadOption = MainSceneLoadOption.LoadSave;
+        MainSceneLoader.loadSaveDataPath = saveInfo.SaveDataPath;
+
+        LoadingScene.sceneName = "Main";
+        SceneManager.LoadScene("Loading");
     }
 }

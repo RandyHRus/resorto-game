@@ -1,40 +1,30 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using Newtonsoft.Json;
 
-public abstract class TwoColorsCosmeticInstance : CosmeticItemInstance
+[System.Serializable]
+public class TwoColorsCosmeticInstance : CosmeticItemInstance
 {
-    public Color32? BaseColor {
-        get
-        {
-            if (((CharacterTwoColorsCosmeticInformation)ItemInformation).BaseColorable)
-                return PrimaryColor;
-            else
-                return null;
-        }
-    }
+    public override Color32? PrimaryColor => baseColor;
+    public override Color32? SecondaryColor => topColor;
 
-    public Color32? ColorableColor
-    {
-        get
-        {
-            CharacterTwoColorsCosmeticInformation cosInfo = (CharacterTwoColorsCosmeticInformation)ItemInformation;
+    [SerializeField, JsonProperty] private Color32 baseColor = default;
+    [JsonIgnore] public Color32 BaseColor => baseColor;
 
-            if (cosInfo.HasColorable)
-            {
-                if (cosInfo.BaseColorable)
-                    return SecondaryColor;
-                else
-                    return PrimaryColor;
-            }
-            else
-                return null;
-        }
-    }
+    [SerializeField, JsonProperty] private Color32 topColor = default;
+    [JsonIgnore] public Color32 TopColor => topColor;
 
-    public TwoColorsCosmeticInstance(CharacterCosmeticItemInformation itemInfo, Color32? primaryColor, Color32? secondaryColor): base(itemInfo)
+    public TwoColorsCosmeticInstance(): base()
     {
 
+    }
+
+    public TwoColorsCosmeticInstance(AssetReference assetReference, Color32 baseColor, Color32 topColor): base(assetReference)
+    {
+        this.baseColor = baseColor;
+        this.topColor = topColor;
     }
 
     public override bool Equals(object obj)
@@ -48,9 +38,9 @@ public abstract class TwoColorsCosmeticInstance : CosmeticItemInstance
         {
             TwoColorsCosmeticInstance compare = (TwoColorsCosmeticInstance)obj;
 
-            return (compare.ItemInformation == this.ItemInformation &&
-                (this.BaseColor == null ? (compare == null) : this.BaseColor.Equals(compare.BaseColor)) &&
-                (this.ColorableColor == null ? (compare == null) : this.ColorableColor.Equals(compare.ColorableColor)));
+            return (compare.GetItemInformation() == this.GetItemInformation() &&
+                (this.BaseColor.Equals(compare.BaseColor)) &&
+                (this.TopColor.Equals(compare.TopColor)));
         }
 
     }
@@ -60,6 +50,6 @@ public abstract class TwoColorsCosmeticInstance : CosmeticItemInstance
         /*Since I cant use mutable fields in hash code, this should be fine
          * as long as I dont use it in a hash table
         */
-        return ItemInformation.GetHashCode();
+        return GetItemInformation().GetHashCode();
     }
 }

@@ -1,18 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 public class StartingChestGenerator : MonoBehaviour
 {
     [SerializeField] private ObjectInformation chestObject = null;
 
-    [SerializeField] private InventoryItemInformationToCount[] chestContent = null;
+    [SerializeField] private InventoryItemAssetToCount[] chestContent = null;
 
     [System.Serializable]
-    public class InventoryItemInformationToCount
+    public class InventoryItemAssetToCount
     {
-        [SerializeField] private InventoryItemInformation item = null;
-        public InventoryItemInformation Item => item;
+        [SerializeField] private AssetReference item = null;
+        public AssetReference Item => item;
 
         [SerializeField] private int count = 0;
         public int Count => count;
@@ -44,7 +45,7 @@ public class StartingChestGenerator : MonoBehaviour
 
         ChestStorage chestStorage = buildOnTile.GameObjectOnTile.GetComponent<ChestStorage>();
 
-        foreach (InventoryItemInformationToCount i in chestContent)
+        foreach (InventoryItemAssetToCount i in chestContent)
         {
             chestStorage.InsertItemInRandomEmptySlot(new InventoryItemInstance(i.Item), i.Count);
         }

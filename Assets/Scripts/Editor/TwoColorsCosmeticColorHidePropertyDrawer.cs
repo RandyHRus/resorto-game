@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using System;
 
 [CustomPropertyDrawer(typeof(TwoColorsCosmeticColorHideAttribute))]
+[Obsolete("Not used any more", true)]
 public class TwoColorsCosmeticColorHidePropertyDrawer : PropertyDrawer
 {
+    /*
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
         TwoColorsCosmeticColorHideAttribute condHAtt = (TwoColorsCosmeticColorHideAttribute)attribute;
@@ -70,4 +73,5 @@ public class TwoColorsCosmeticColorHidePropertyDrawer : PropertyDrawer
 
         return enabled;
     }
+    */
 }
