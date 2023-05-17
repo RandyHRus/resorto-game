@@ -1,1 +1,1 @@
-Details on game: https://randyrus.github.io/#resorto
+Details on game: https://www.randyhrus.com/projects/resorto
